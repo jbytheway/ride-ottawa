@@ -32,7 +32,10 @@ class InsertAs(object):
         session.add(self._type(**row))
 
 csv_handlers = [
-        ("stops.txt", InsertAs(Stop))
+        ("stops.txt", InsertAs(Stop)),
+        ("routes.txt", InsertAs(Route)),
+        ("trips.txt", InsertAs(Trip)),
+        ("stop_times.txt", InsertAs(StopTime)),
         ]
 
 with zipfile.ZipFile(zip_filename) as zip_file:
