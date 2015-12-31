@@ -21,12 +21,12 @@
 
     </android.support.design.widget.AppBarLayout>
 
-    <fragment xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/fragment"
-    android:name="io.github.jbytheway.octranspoalarm.EditFavouriteActivityFragment"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:layout="@layout/fragment_edit_favourite" />
+    <fragment
+        android:id="@+id/fragment"
+        android:name="io.github.jbytheway.octranspoalarm.EditFavouriteActivityFragment"
+        android:layout_marginTop="?android:attr/actionBarSize"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        tools:layout="@layout/fragment_edit_favourite" />
 
 </android.support.design.widget.CoordinatorLayout>
