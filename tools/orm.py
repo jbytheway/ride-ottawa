@@ -12,7 +12,6 @@ _converters = {
 class Mixin(object):
     def __init__(self, **kargs):
         for k, v in kargs.items():
-            k = k.lstrip('\ufeff')
             if k in self.ignore_fields:
                 continue
             columns = self.__table__.columns
