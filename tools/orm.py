@@ -28,7 +28,7 @@ class Stop(Mixin, Base):
     ignore_fields = ('stop_desc', 'stop_url', 'location_type', 'zone_id')
 
     stop_id = Column(String, primary_key=True)
-    stop_code = Column(String)
+    stop_code = Column(String, index=True)
     stop_name = Column(String)
     stop_lat = Column(Float)
     stop_lon = Column(Float)
