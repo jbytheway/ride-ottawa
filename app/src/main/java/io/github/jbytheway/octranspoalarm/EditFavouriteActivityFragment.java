@@ -1,6 +1,8 @@
 package io.github.jbytheway.octranspoalarm;
 
 import android.app.Fragment;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -25,13 +27,23 @@ public class EditFavouriteActivityFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_edit_favourite, container, false);
         mStopRouteList = (ListView) view.findViewById(R.id.stop_route_list_view);
 
-        // For now, we have a hardcoded string array for our list, for testing
         String[] array = new String[4];
-        array[0] = "Hello";
-        array[1] = "Hello";
-        array[2] = "Hello";
-        array[3] = "Hello";
-        ArrayAdapter<String> adapter = new ArrayAdapter<String>(getActivity(), android.R.layout.simple_list_item_1, array);
+        OcTranspoDbHelper dbHelper = new OcTranspoDbHelper(getActivity());
+        SQLiteDatabase database = dbHelper.getReadableDatabase();
+        Cursor c = database.rawQuery("SELECT * FROM stop_times", null);
+        int arrival_time_column = c.getColumnIndex("arrival_time");
+        c.moveToFirst();
+
+        // For now, we have a hardcoded string array for our list, for testing
+        for (int i = 0; i < array.length; ++i) {
+            array[i] = c.getString(arrival_time_column);
+            if (!c.moveToNext())
+                break;
+        }
+
+        c.close();
+
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(getActivity(), android.R.layout.simple_list_item_1, array);
         mStopRouteList.setAdapter(adapter);
         Log.i(TAG, "Added adapter");
         return view;
