@@ -14,7 +14,7 @@ public class OcTranspoDataAccess {
         String[] args = {stopName};
         return mDatabase.rawQuery(
                 "select distinct routes.route_id, route_short_name from stops " +
-                "join stop_times on stops.stop_id = stop_times.stop_id " +
+                "join stop_times on stops.id = stop_times.stop_id " +
                 "join trips on trips.trip_id = stop_times.trip_id " +
                 "join routes on trips.route_id = routes.route_id " +
                 "where stop_code = ?", args);
