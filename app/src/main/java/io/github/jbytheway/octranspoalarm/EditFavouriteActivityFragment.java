@@ -27,7 +27,7 @@ public class EditFavouriteActivityFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_edit_favourite, container, false);
         mStopRouteList = (ListView) view.findViewById(R.id.stop_route_list_view);
 
-        mOcTranspo = new OcTranspoDataAccess(getActivity());
+        mOcTranspo = ((OcTranspoApplication) getActivity().getApplication()).getOcTranspo();
 
         Cursor c = mOcTranspo.getRoutesForStop("3038");
         String[] array = new String[c.getCount()];
