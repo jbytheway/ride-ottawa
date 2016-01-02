@@ -4,6 +4,7 @@ __pycache__
 *.iml
 .gradle
 /local.properties
+/.idea/misc.xml
 /.idea/workspace.xml
 /.idea/libraries
 .DS_Store
