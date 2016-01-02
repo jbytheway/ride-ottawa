@@ -27,16 +27,14 @@ public class EditFavouriteActivityFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_edit_favourite, container, false);
         mStopRouteList = (ListView) view.findViewById(R.id.stop_route_list_view);
 
-        String[] array = new String[4];
-        OcTranspoDbHelper dbHelper = new OcTranspoDbHelper(getActivity());
-        SQLiteDatabase database = dbHelper.getReadableDatabase();
-        Cursor c = database.rawQuery("SELECT * FROM stop_times", null);
-        int arrival_time_column = c.getColumnIndex("arrival_time");
-        c.moveToFirst();
+        mOcTranspo = new OcTranspoDataAccess(getActivity());
 
-        // For now, we have a hardcoded string array for our list, for testing
+        Cursor c = mOcTranspo.getRoutesForStop("3038");
+        String[] array = new String[c.getCount()];
+        int route_column = c.getColumnIndex("route_short_name");
+        c.moveToFirst();
         for (int i = 0; i < array.length; ++i) {
-            array[i] = c.getString(arrival_time_column);
+            array[i] = c.getString(route_column);
             if (!c.moveToNext())
                 break;
         }
@@ -54,5 +52,6 @@ public class EditFavouriteActivityFragment extends Fragment {
         mStopRouteList = null;
     }
 
+    private OcTranspoDataAccess mOcTranspo;
     private ListView mStopRouteList;
 }
