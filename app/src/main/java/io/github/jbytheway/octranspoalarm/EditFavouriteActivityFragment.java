@@ -50,6 +50,7 @@ public class EditFavouriteActivityFragment extends Fragment {
     @Override
     public void onDestroyView() {
         mStopRouteList = null;
+        super.onDestroyView();
     }
 
     private OcTranspoDataAccess mOcTranspo;
