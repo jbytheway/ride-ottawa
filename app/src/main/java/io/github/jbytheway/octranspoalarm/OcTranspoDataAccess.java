@@ -17,7 +17,8 @@ public class OcTranspoDataAccess {
                 "join stop_times on stops.id = stop_times.stop_id " +
                 "join trips on trips.trip_id = stop_times.trip_id " +
                 "join routes on trips.route_id = routes.route_id " +
-                "where stop_code = ?", args);
+                "where stop_code = ?" +
+                "order by CAST(routes.route_short_name AS INTEGER)", args);
     }
 
     private OcTranspoDbHelper mHelper;
