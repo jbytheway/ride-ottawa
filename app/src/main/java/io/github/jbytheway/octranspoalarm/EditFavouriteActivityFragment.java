@@ -9,7 +9,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.ListView;
+import android.widget.TextView;
 
 /**
  * A placeholder fragment containing a simple view.
@@ -43,7 +45,19 @@ public class EditFavouriteActivityFragment extends Fragment {
 
         ArrayAdapter<String> adapter = new ArrayAdapter<>(getActivity(), android.R.layout.simple_list_item_1, array);
         mStopRouteList.setAdapter(adapter);
-        Log.i(TAG, "Added adapter");
+
+        mName = (TextView) view.findViewById(R.id.name);
+
+        Button saveButton = (Button) view.findViewById(R.id.save_button);
+        saveButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Favourite f = makeFavourite();
+                f.save();
+                getActivity().finish();
+            }
+        });
+
         return view;
     }
 
@@ -53,6 +67,11 @@ public class EditFavouriteActivityFragment extends Fragment {
         super.onDestroyView();
     }
 
+    private Favourite makeFavourite() {
+        return new Favourite(mName.toString());
+    }
+
     private OcTranspoDataAccess mOcTranspo;
     private ListView mStopRouteList;
+    private TextView mName;
 }
