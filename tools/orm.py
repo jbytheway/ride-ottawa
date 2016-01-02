@@ -39,7 +39,7 @@ class Route(Mixin, Base):
     ignore_fields = ('route_long_name', 'route_desc', 'route_type', 'route_url')
 
     route_id = Column(String, primary_key=True)
-    route_short_name = Column(String)
+    route_short_name = Column(String, index=True)
 
 class Trip(Mixin, Base):
     __tablename__ = 'trips'
@@ -47,7 +47,7 @@ class Trip(Mixin, Base):
     ignore_fields = ()
 
     trip_id = Column(String, primary_key=True)
-    route_id = Column(String, ForeignKey('routes.route_id'))
+    route_id = Column(String, ForeignKey('routes.route_id'), index=True)
     service_id = Column(String)
     trip_headsign = Column(String)
     direction_id = Column(Integer)
@@ -59,9 +59,9 @@ class StopTime(Mixin, Base):
     ignore_fields = ('departure_time')
 
     id = Column(Integer, primary_key=True)
-    trip_id = Column(String, ForeignKey('trips.trip_id'))
+    trip_id = Column(String, ForeignKey('trips.trip_id'), index=True)
     arrival_time = Column(String)
-    stop_id = Column(String, ForeignKey('stops.stop_id'))
+    stop_id = Column(String, ForeignKey('stops.stop_id'), index=True)
     stop_sequence = Column(Integer)
     pickup_type = Column(Integer)
     drop_off_type = Column(Integer)
