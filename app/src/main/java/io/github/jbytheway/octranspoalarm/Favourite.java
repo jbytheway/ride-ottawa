@@ -9,10 +9,8 @@ public class Favourite extends SugarRecord {
     }
 
     public Favourite(String name) {
-        mName = name;
+        Name = name;
     }
 
-    public String getName() { return mName; }
-
-    String mName;
+    public String Name;
 }

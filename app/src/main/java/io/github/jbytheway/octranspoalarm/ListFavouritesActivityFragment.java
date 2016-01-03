@@ -1,11 +1,13 @@
 package io.github.jbytheway.octranspoalarm;
 
+import android.content.Intent;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -38,11 +40,25 @@ public class ListFavouritesActivityFragment extends Fragment {
                 @Override
                 public void applyView(View v, Favourite f) {
                     TextView name = (TextView) v.findViewById(R.id.name);
-                    name.setText(f.getName());
+                    name.setText(f.Name);
                 }
             }
         );
         mFavouriteList.setAdapter(mAdapter);
+
+        mFavouriteList.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+            @Override
+            public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+                //Favourite item = mAdapter.getItem(position);
+                Intent intent = new Intent(getActivity(), EditFavouriteActivity.class);
+                intent.putExtra(EditFavouriteActivity.NEW_FAVOURITE, false);
+                intent.putExtra(EditFavouriteActivity.FAVOURITE_ID, id);
+
+                startActivity(intent);
+
+                return true;
+            }
+        });
 
         return view;
     }

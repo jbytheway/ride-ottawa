@@ -1,6 +1,7 @@
 package io.github.jbytheway.octranspoalarm;
 
 import android.app.Fragment;
+import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.util.Log;
@@ -13,7 +14,6 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 public class EditFavouriteActivityFragment extends Fragment {
-
     private static final String TAG = "EditFavouriteFragment";
 
     public EditFavouriteActivityFragment() {
@@ -48,13 +48,35 @@ public class EditFavouriteActivityFragment extends Fragment {
         saveButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Favourite f = makeFavourite();
-                f.save();
+                updateFavourite();
+                mFavourite.save();
                 getActivity().finish();
             }
         });
 
         return view;
+    }
+
+    public void initialize(Intent intent) {
+        boolean newFavourite = intent.getBooleanExtra(EditFavouriteActivity.NEW_FAVOURITE, true);
+
+        if (newFavourite) {
+            mFavourite = new Favourite();
+        } else {
+            long favouriteId = intent.getLongExtra(EditFavouriteActivity.FAVOURITE_ID, -1);
+            if (favouriteId == -1) {
+                Log.e(TAG, "Missing FAVOURITE_ID in EditFavourite Intent");
+            } else {
+                mFavourite = Favourite.findById(Favourite.class, favouriteId);
+                populateFromFavourite();
+            }
+        }
+    }
+
+    @Override
+    public void onDetach() {
+        mFavourite = null;
+        super.onDetach();
     }
 
     @Override
@@ -63,11 +85,16 @@ public class EditFavouriteActivityFragment extends Fragment {
         super.onDestroyView();
     }
 
-    private Favourite makeFavourite() {
-        return new Favourite(mName.getText().toString());
+    private void populateFromFavourite() {
+        mName.setText(mFavourite.Name);
+    }
+
+    private void updateFavourite() {
+        mFavourite.Name = mName.getText().toString();
     }
 
     private OcTranspoDataAccess mOcTranspo;
     private ListView mStopRouteList;
+    private Favourite mFavourite;
     private TextView mName;
 }
