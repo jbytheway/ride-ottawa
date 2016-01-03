@@ -56,6 +56,7 @@ public class ListFavouritesActivityFragment extends Fragment {
     @Override
     public void onDestroyView() {
         mFavouriteList = null;
+        super.onDestroyView();
     }
 
     private ListView mFavouriteList;
