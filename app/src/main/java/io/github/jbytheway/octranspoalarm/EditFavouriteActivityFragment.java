@@ -68,7 +68,7 @@ public class EditFavouriteActivityFragment extends Fragment {
     }
 
     private Favourite makeFavourite() {
-        return new Favourite(mName.toString());
+        return new Favourite(mName.getText().toString());
     }
 
     private OcTranspoDataAccess mOcTranspo;
