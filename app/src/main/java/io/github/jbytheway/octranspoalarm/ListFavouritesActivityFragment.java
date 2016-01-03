@@ -11,12 +11,8 @@ import android.widget.TextView;
 
 import com.google.common.collect.Lists;
 
-import java.util.Iterator;
 import java.util.List;
 
-/**
- * A placeholder fragment containing a simple view.
- */
 public class ListFavouritesActivityFragment extends Fragment {
     private static final String TAG = "ListFavouritesFragment";
 

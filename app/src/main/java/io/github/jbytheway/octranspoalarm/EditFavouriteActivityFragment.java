@@ -2,7 +2,6 @@ package io.github.jbytheway.octranspoalarm;
 
 import android.app.Fragment;
 import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -13,9 +12,6 @@ import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
 
-/**
- * A placeholder fragment containing a simple view.
- */
 public class EditFavouriteActivityFragment extends Fragment {
 
     private static final String TAG = "EditFavouriteFragment";
