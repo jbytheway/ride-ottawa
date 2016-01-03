@@ -10,5 +10,7 @@ public class Favourite extends SugarRecord {
         mName = name;
     }
 
+    public String getName() { return mName; }
+
     String mName;
 }

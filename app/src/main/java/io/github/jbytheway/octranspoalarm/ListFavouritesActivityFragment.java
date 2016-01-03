@@ -2,16 +2,23 @@ package io.github.jbytheway.octranspoalarm;
 
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
 import android.widget.ListView;
+import android.widget.TextView;
+
+import com.google.common.collect.Lists;
+
+import java.util.Iterator;
+import java.util.List;
 
 /**
  * A placeholder fragment containing a simple view.
  */
 public class ListFavouritesActivityFragment extends Fragment {
+    private static final String TAG = "ListFavouritesFragment";
 
     public ListFavouritesActivityFragment() {
     }
@@ -22,13 +29,32 @@ public class ListFavouritesActivityFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_list_favourites, container, false);
         mFavouriteList = (ListView) view.findViewById(R.id.favourite_list_view);
 
-        // For now, we have a hardcoded string array for our list, for testing
-        String[] array = new String[1];
-        array[0] = "Hello";
-        ArrayAdapter<String> adapter = new ArrayAdapter<String>(getActivity(), android.R.layout.simple_list_item_1, array);
-        mFavouriteList.setAdapter(adapter);
+        mAdapter = new IndirectArrayAdapter<>(
+            getActivity(),
+            R.layout.favourite_list_item,
+            new IndirectArrayAdapter.ListGenerator<Favourite>() {
+                @Override
+                public List<Favourite> makeList() {
+                    return Lists.newArrayList(Favourite.findAll(Favourite.class));
+                }
+            },
+            new IndirectArrayAdapter.ViewGenerator<Favourite>() {
+                @Override
+                public void applyView(View v, Favourite f) {
+                    TextView name = (TextView) v.findViewById(R.id.name);
+                    name.setText(f.getName());
+                }
+            }
+        );
+        mFavouriteList.setAdapter(mAdapter);
 
         return view;
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        mAdapter.notifyDataSetChanged();
     }
 
     @Override
@@ -37,4 +63,5 @@ public class ListFavouritesActivityFragment extends Fragment {
     }
 
     private ListView mFavouriteList;
+    private IndirectArrayAdapter<Favourite> mAdapter;
 }
