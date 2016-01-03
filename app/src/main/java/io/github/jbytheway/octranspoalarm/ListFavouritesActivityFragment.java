@@ -9,7 +9,7 @@ import android.view.ViewGroup;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import com.google.common.collect.Lists;
+import org.apache.commons.collections4.IteratorUtils;
 
 import java.util.List;
 
@@ -31,7 +31,7 @@ public class ListFavouritesActivityFragment extends Fragment {
             new IndirectArrayAdapter.ListGenerator<Favourite>() {
                 @Override
                 public List<Favourite> makeList() {
-                    return Lists.newArrayList(Favourite.findAll(Favourite.class));
+                    return IteratorUtils.toList(Favourite.findAll(Favourite.class));
                 }
             },
             new IndirectArrayAdapter.ViewGenerator<Favourite>() {

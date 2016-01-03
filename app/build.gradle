@@ -26,5 +26,6 @@ dependencies {
     compile 'com.android.support:design:23.1.1'
     compile 'com.readystatesoftware.sqliteasset:sqliteassethelper:2.0.1'
     compile 'com.github.satyan:sugar:1.4'
-    compile 'com.google.guava:guava:19.0'
+    //compile 'com.google.guava:guava:19.0'
+    compile 'org.apache.commons:commons-collections4:4.0'
 }
