@@ -8,9 +8,9 @@ public class Favourite extends SugarRecord {
         // Required for Sugar
     }
 
-    public Favourite(String name) {
-        Name = name;
-    }
-
     public String Name;
+
+    public void deleteRecursively() {
+        delete();
+    }
 }

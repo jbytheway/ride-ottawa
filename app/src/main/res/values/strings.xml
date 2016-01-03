@@ -1,6 +1,7 @@
 <resources>
     <string name="app_name">OcTranspo Alarm</string>
     <string name="action_settings">Settings</string>
+    <string name="action_delete">Delete</string>
     <string name="title_activity_list_favourites">Favourites</string>
     <string name="title_activity_edit_favourite">Edit Favourite</string>
     <string name="name_label">Name:</string>

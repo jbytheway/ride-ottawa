@@ -6,6 +6,9 @@ import android.database.Cursor;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
@@ -20,12 +23,23 @@ public class EditFavouriteActivityFragment extends Fragment {
     }
 
     @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        // Don't destroy Fragment on reconfiguration
+        setRetainInstance(true);
+
+        // This Fragment adds options to the ActionBar
+        setHasOptionsMenu(true);
+
+        mOcTranspo = ((OcTranspoApplication) getActivity().getApplication()).getOcTranspo();
+    }
+
+    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_edit_favourite, container, false);
         mStopRouteList = (ListView) view.findViewById(R.id.stop_route_list_view);
-
-        mOcTranspo = ((OcTranspoApplication) getActivity().getApplication()).getOcTranspo();
 
         Cursor c = mOcTranspo.getRoutesForStop("3038");
         String[] array = new String[c.getCount()];
@@ -57,6 +71,11 @@ public class EditFavouriteActivityFragment extends Fragment {
         return view;
     }
 
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        inflater.inflate(R.menu.menu_edit_favourite, menu);
+    }
+
     public void initialize(Intent intent) {
         boolean newFavourite = intent.getBooleanExtra(EditFavouriteActivity.NEW_FAVOURITE, true);
 
@@ -70,6 +89,22 @@ public class EditFavouriteActivityFragment extends Fragment {
                 mFavourite = Favourite.findById(Favourite.class, favouriteId);
                 populateFromFavourite();
             }
+        }
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.edit_menu_delete:
+                Long id = mFavourite.getId();
+                if (id != null) {
+                    mFavourite.deleteRecursively();
+                }
+                getActivity().finish();
+                return true;
+
+            default:
+                return super.onOptionsItemSelected(item);
         }
     }
 
