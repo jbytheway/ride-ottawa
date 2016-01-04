@@ -1,8 +1,11 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     tools:context="io.github.jbytheway.octranspoalarm.EditFavouriteActivity">
     <item
         android:id="@+id/edit_menu_delete"
         android:orderInCategory="100"
-        android:title="@string/action_delete" />
+        android:title="@string/action_delete"
+        android:icon="@android:drawable/ic_menu_delete"
+        app:showAsAction="ifRoom"/>
 </menu>
