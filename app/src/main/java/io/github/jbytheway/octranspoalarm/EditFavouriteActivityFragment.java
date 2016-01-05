@@ -80,10 +80,11 @@ public class EditFavouriteActivityFragment extends Fragment {
                 new IndirectArrayAdapter.ViewGenerator<FavouriteStop>() {
                     @Override
                     public void applyView(View v, FavouriteStop favouriteStop) {
-                        TextView stop_title = (TextView) v.findViewById(R.id.stop_title);
+                        TextView stop_code = (TextView) v.findViewById(R.id.stop_code);
+                        TextView stop_name = (TextView) v.findViewById(R.id.stop_name);
                         OcTranspoDataAccess.Stop stop = mOcTranspo.getStop(favouriteStop.StopId);
-                        String title = getString(R.string.stop_title, stop.getCode(), stop.getName());
-                        stop_title.setText(title);
+                        stop_code.setText(stop.getCode());
+                        stop_name.setText(stop.getName());
                     }
                 }
         );
