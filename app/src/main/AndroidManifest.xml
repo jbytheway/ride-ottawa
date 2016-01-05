@@ -3,12 +3,16 @@
     package="io.github.jbytheway.octranspoalarm">
 
     <application
+        android:name=".OcTranspoApplication"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:supportsRtl="true"
-        android:theme="@style/AppTheme.NoActionBar"
-        android:name="io.github.jbytheway.octranspoalarm.OcTranspoApplication">
+        android:theme="@style/AppTheme.NoActionBar">
+        <meta-data
+            android:name="DOMAIN_PACKAGE_NAME"
+            android:value="io.github.jbytheway.octranspoalarm" />
+
         <activity
             android:name=".ListFavouritesActivity"
             android:label="@string/app_name"
@@ -26,6 +30,13 @@
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="io.github.jbytheway.octranspoalarm.ListFavouritesActivity" />
+        </activity>
+        <activity android:name=".SelectStopActivity"
+            android:label="@string/title_activity_select_stop"
+            android:parentActivityName=".EditFavouriteActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="io.github.jbytheway.octranspoalarm.EditFavouriteActivity" />
         </activity>
     </application>
 

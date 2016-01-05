@@ -27,7 +27,7 @@ class Stop(Mixin, Base):
     ignore_fields = ('stop_desc', 'stop_url', 'location_type', 'zone_id')
     mapping = {}
 
-    id = Column(Integer, primary_key=True)
+    _id = Column(Integer, primary_key=True)
     stop_id = Column(String, unique=True)
     stop_code = Column(String, index=True)
     stop_name = Column(String)
@@ -37,7 +37,7 @@ class Stop(Mixin, Base):
     def __init__(self, *, stop_id, **kargs):
         id = len(Stop.mapping)
         Stop.mapping[stop_id] = id
-        super().__init__(id=id, stop_id=stop_id, **kargs)
+        super().__init__(_id=id, stop_id=stop_id, **kargs)
 
 class Route(Mixin, Base):
     __tablename__ = 'routes'
@@ -73,7 +73,7 @@ class StopTime(Mixin, Base):
     id = Column(Integer, primary_key=True)
     trip_id = Column(Integer, ForeignKey('trips.trip_id'), index=True)
     arrival_time = Column(String)
-    stop_id = Column(Integer, ForeignKey('stops.id'), index=True)
+    stop_id = Column(Integer, ForeignKey('stops._id'), index=True)
     stop_sequence = Column(Integer)
     pickup_type = Column(Integer)
     drop_off_type = Column(Integer)
