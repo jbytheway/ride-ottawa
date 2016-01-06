@@ -69,6 +69,7 @@ public class FavouriteStop extends SugarRecord implements Idable {
 
         // At this point everything left in desiredRouteIds is a thing we need to add
         for (String desiredRouteId : desiredRouteIds) {
+            // FIXME: need to get proper route name here
             addRoute(desiredRouteId, desiredRouteId);
         }
     }
