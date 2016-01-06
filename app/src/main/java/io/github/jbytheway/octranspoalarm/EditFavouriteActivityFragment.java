@@ -15,6 +15,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -44,7 +45,7 @@ public class EditFavouriteActivityFragment extends Fragment {
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(final LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_edit_favourite, container, false);
         ListView stopList = (ListView) view.findViewById(R.id.stop_list);
@@ -87,14 +88,15 @@ public class EditFavouriteActivityFragment extends Fragment {
                             }
                         });
 
-                        ListView routeList = (ListView) v.findViewById(R.id.route_list);
+                        LinearLayout routeList = (LinearLayout) v.findViewById(R.id.route_list);
+                        routeList.removeAllViews();
                         List<FavouriteRoute> routes = favouriteStop.getRoutes();
-                        String[] routeNames = new String[routes.size()];
-                        for (int i = 0; i < routes.size(); ++i) {
-                            routeNames[i] = routes.get(i).RouteName;
+                        for (FavouriteRoute route : routes) {
+                            View routeView = inflater.inflate(android.R.layout.simple_list_item_1, routeList, false);
+                            TextView routeName = (TextView) routeView.findViewById(android.R.id.text1);
+                            routeName.setText(route.RouteName);
+                            routeList.addView(routeView);
                         }
-                        ArrayAdapter<String> adapter = new ArrayAdapter<String>(getActivity(), android.R.layout.simple_list_item_1, routeNames);
-                        routeList.setAdapter(adapter);
                     }
                 }
         );
