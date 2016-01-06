@@ -12,7 +12,7 @@ import com.orm.SugarRecord;
 
 import java.util.List;
 
-public class IndirectArrayAdapter<T extends SugarRecord> extends BaseAdapter {
+public class IndirectArrayAdapter<T extends Idable> extends BaseAdapter {
     private static final String TAG = "IndirectArrayAdapter";
 
     interface ListGenerator<T> {

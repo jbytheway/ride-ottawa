@@ -3,6 +3,10 @@ package io.github.jbytheway.octranspoalarm;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.widget.LinearLayout;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class OcTranspoDataAccess {
     OcTranspoDataAccess(Context context) {
@@ -26,17 +30,50 @@ public class OcTranspoDataAccess {
         private String mName;
     }
 
+    class Route implements Idable {
+        Route(String id, String name) {
+            mId = id;
+            mName = name;
+        }
+
+        public Long getId() { return new Long(-1); }
+        public String getRouteId() { return mId; }
+        public String getName() { return mName; }
+
+        private String mId;
+        private String mName;
+    }
+
     private static final String[] STOP_COLUMNS = new String[]{"_id", "stop_id", "stop_code", "stop_name"};
 
-    Cursor getRoutesForStop(String stopName) {
-        String[] args = {stopName};
+    Cursor getRoutesForStopById(String stopId) {
+        String[] args = {stopId};
         return mDatabase.rawQuery(
                 "select distinct routes.route_id, route_short_name from stops " +
-                "join stop_times on stops.id = stop_times.stop_id " +
+                "join stop_times on stops._id = stop_times.stop_id " +
                 "join trips on trips.trip_id = stop_times.trip_id " +
                 "join routes on trips.route_id = routes.route_id " +
-                "where stop_code = ?" +
+                "where stops.stop_id = ?" +
                 "order by CAST(routes.route_short_name AS INTEGER)", args);
+    }
+
+    List<Route> routeCursorToList(Cursor c) {
+        ArrayList<Route> result = new ArrayList<>();
+        if (c.moveToFirst()) {
+            int id_column = c.getColumnIndex("route_id");
+            int name_column = c.getColumnIndex("route_short_name");
+
+            while (true) {
+                String id = c.getString(id_column);
+                String name = c.getString(name_column);
+                result.add(new Route(id, name));
+
+                if (!c.moveToNext()) {
+                    break;
+                }
+            }
+        }
+        return result;
     }
 
     Cursor getAllStops(String orderBy) {

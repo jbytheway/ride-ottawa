@@ -2,11 +2,12 @@ package io.github.jbytheway.octranspoalarm;
 
 import com.orm.SugarRecord;
 import com.orm.dsl.Ignore;
+import com.orm.dsl.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class Favourite extends SugarRecord {
+public class Favourite extends SugarRecord implements Idable {
     @SuppressWarnings("unused")
     public Favourite() {
         // Required for Sugar
@@ -37,10 +38,34 @@ public class Favourite extends SugarRecord {
         ArrayList<FavouriteStop> all = new ArrayList<>();
         Long id = getId();
         if (id != null) {
-            all.addAll(FavouriteStop.find(FavouriteStop.class, "favourite = ?", new String[]{id.toString()}));
+            all.addAll(FavouriteStop.find(FavouriteStop.class, "favourite = ?", id.toString()));
         }
         all.addAll(mPendingStops);
         return all;
+    }
+
+    public FavouriteStop getStop(String stopId) {
+        // First look in DB
+        Long id = getId();
+        if (id != null) {
+            List<FavouriteStop> results = FavouriteStop.find(FavouriteStop.class, "favourite = ? and stop_id = ?", id.toString(), stopId);
+            if (results.size() != 1) {
+                throw new AssertionError("Unexpected number of matching stops " + results.size());
+            }
+            FavouriteStop result = results.get(0);
+            if (result != null) {
+                return result;
+            }
+        }
+
+        // DB failed, check pending
+        for (FavouriteStop stop : mPendingStops) {
+            if (stop.StopId == stopId) {
+                return stop;
+            }
+        }
+
+        throw new AssertionError("Couldn't find requested stop");
     }
 
     public void addStop(String stopId) {

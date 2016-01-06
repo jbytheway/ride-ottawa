@@ -10,4 +10,5 @@
     <string name="add_route">Add route</string>
     <string name="add_destination">Add destination</string>
     <string name="title_activity_select_stop">Select Stop</string>
+    <string name="title_activity_select_routes">SelectRoutesActivity</string>
 </resources>

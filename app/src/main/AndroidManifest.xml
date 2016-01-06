@@ -31,8 +31,17 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="io.github.jbytheway.octranspoalarm.ListFavouritesActivity" />
         </activity>
-        <activity android:name=".SelectStopActivity"
+        <activity
+            android:name=".SelectStopActivity"
             android:label="@string/title_activity_select_stop"
+            android:parentActivityName=".EditFavouriteActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="io.github.jbytheway.octranspoalarm.EditFavouriteActivity" />
+        </activity>
+        <activity
+            android:name=".SelectRoutesActivity"
+            android:label="@string/title_activity_select_routes"
             android:parentActivityName=".EditFavouriteActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
