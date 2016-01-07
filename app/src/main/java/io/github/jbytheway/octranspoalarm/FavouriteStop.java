@@ -43,6 +43,10 @@ public class FavouriteStop extends SugarRecord implements Idable {
         return all;
     }
 
+    public void addRoute(OcTranspoDataAccess.Route r) {
+        addRoute(r.getRouteId(), r.getName());
+    }
+
     public void addRoute(String routeId, String routeName) {
         FavouriteRoute route = new FavouriteRoute();
         route.Stop = this;
@@ -51,7 +55,7 @@ public class FavouriteStop extends SugarRecord implements Idable {
         mPendingRoutes.add(route);
     }
 
-    public void updateRoutes(String[] routeIds) {
+    public void updateRoutes(String[] routeIds, OcTranspoDataAccess ocTranspo) {
         // This is supposed to set the current set of routes to be those given in the argument
         HashSet<String> desiredRouteIds = new HashSet<>(Arrays.asList(routeIds));
 
@@ -68,9 +72,9 @@ public class FavouriteStop extends SugarRecord implements Idable {
         }
 
         // At this point everything left in desiredRouteIds is a thing we need to add
-        for (String desiredRouteId : desiredRouteIds) {
-            // FIXME: need to get proper route name here
-            addRoute(desiredRouteId, desiredRouteId);
+        List<OcTranspoDataAccess.Route> newRoutes = ocTranspo.routeCursorToList(ocTranspo.getRoutesByIds(desiredRouteIds));
+        for (OcTranspoDataAccess.Route newRoute : newRoutes) {
+            addRoute(newRoute);
         }
     }
 

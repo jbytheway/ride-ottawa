@@ -5,7 +5,10 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.widget.LinearLayout;
 
+import org.apache.commons.lang3.StringUtils;
+
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 public class OcTranspoDataAccess {
@@ -45,6 +48,7 @@ public class OcTranspoDataAccess {
     }
 
     private static final String[] STOP_COLUMNS = new String[]{"_id", "stop_id", "stop_code", "stop_name"};
+    private static final String[] ROUTE_COLUMNS = new String[]{"route_id", "route_short_name"};
 
     Cursor getRoutesForStopById(String stopId) {
         String[] args = {stopId};
@@ -55,6 +59,21 @@ public class OcTranspoDataAccess {
                 "join routes on trips.route_id = routes.route_id " +
                 "where stops.stop_id = ?" +
                 "order by CAST(routes.route_short_name AS INTEGER)", args);
+    }
+
+    Cursor getRoutesByIds(Collection<String> routeIds) {
+        String[] routeIdArray = routeIds.toArray(new String[routeIds.size()]);
+        return getRoutesByIds(routeIdArray);
+    }
+
+    Cursor getRoutesByIds(String[] routeIds) {
+        String queryList;
+        if (routeIds.length == 0) {
+            queryList = "";
+        } else {
+            queryList = "?" + StringUtils.repeat(",?", routeIds.length - 1);
+        }
+        return mDatabase.query("routes", ROUTE_COLUMNS, "route_id in ("+queryList+")", routeIds, null, null, null);
     }
 
     List<Route> routeCursorToList(Cursor c) {
