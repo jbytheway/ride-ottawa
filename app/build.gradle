@@ -17,6 +17,10 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
+    packagingOptions {
+        pickFirst  'META-INF/LICENSE.txt'
+        pickFirst  'META-INF/NOTICE.txt'
+    }
 }
 
 dependencies {
@@ -28,4 +32,5 @@ dependencies {
     compile 'com.github.satyan:sugar:1.4'
     //compile 'com.google.guava:guava:19.0'
     compile 'org.apache.commons:commons-collections4:4.0'
+    compile 'org.apache.commons:commons-lang3:3.4'
 }
