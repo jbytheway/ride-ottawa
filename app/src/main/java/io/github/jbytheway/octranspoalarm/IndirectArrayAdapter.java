@@ -12,7 +12,7 @@ import com.orm.SugarRecord;
 
 import java.util.List;
 
-public class IndirectArrayAdapter<T extends Idable> extends BaseAdapter {
+public class IndirectArrayAdapter<T> extends BaseAdapter {
     private static final String TAG = "IndirectArrayAdapter";
 
     interface ListGenerator<T> {
@@ -54,7 +54,7 @@ public class IndirectArrayAdapter<T extends Idable> extends BaseAdapter {
 
     @Override
     public long getItemId(int position) {
-        return getItem(position).getId();
+        return -1;
     }
 
     @Override

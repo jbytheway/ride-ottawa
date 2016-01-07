@@ -8,7 +8,7 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 
-public class FavouriteStop extends SugarRecord implements Idable {
+public class FavouriteStop extends SugarRecord {
     @SuppressWarnings("unused")
     public FavouriteStop() {
         // Required for Sugar

@@ -33,13 +33,12 @@ public class OcTranspoDataAccess {
         private String mName;
     }
 
-    class Route implements Idable {
+    class Route {
         Route(String id, String name) {
             mId = id;
             mName = name;
         }
 
-        public Long getId() { return new Long(-1); }
         public String getRouteId() { return mId; }
         public String getName() { return mName; }
 

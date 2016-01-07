@@ -7,7 +7,7 @@ import com.orm.dsl.NotNull;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Favourite extends SugarRecord implements Idable {
+public class Favourite extends SugarRecord {
     @SuppressWarnings("unused")
     public Favourite() {
         // Required for Sugar
