@@ -60,12 +60,17 @@ public class Favourite extends SugarRecord {
 
         // DB failed, check pending
         for (FavouriteStop stop : mPendingStops) {
-            if (stop.StopId == stopId) {
+            if (stop.StopId.equals(stopId)) {
                 return stop;
             }
         }
 
-        throw new AssertionError("Couldn't find requested stop");
+        String pendingList = "";
+        for (FavouriteStop stop : mPendingStops) {
+            pendingList += " '" + stop.StopId + "'";
+        }
+
+        throw new AssertionError("Couldn't find requested stop '"+stopId+"'; pending stops were"+pendingList);
     }
 
     public void addStop(String stopId) {
