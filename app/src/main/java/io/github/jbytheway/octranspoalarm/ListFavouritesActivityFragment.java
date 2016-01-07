@@ -49,10 +49,10 @@ public class ListFavouritesActivityFragment extends Fragment {
         mFavouriteList.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
             @Override
             public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
-                //Favourite item = mAdapter.getItem(position);
+                Favourite item = mAdapter.getItem(position);
                 Intent intent = new Intent(getActivity(), EditFavouriteActivity.class);
                 intent.putExtra(EditFavouriteActivity.NEW_FAVOURITE, false);
-                intent.putExtra(EditFavouriteActivity.FAVOURITE_ID, id);
+                intent.putExtra(EditFavouriteActivity.FAVOURITE_ID, item.getId());
 
                 startActivity(intent);
 
