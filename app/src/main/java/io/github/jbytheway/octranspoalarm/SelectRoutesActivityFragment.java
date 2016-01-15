@@ -45,7 +45,7 @@ public class SelectRoutesActivityFragment extends Fragment {
         if (selectedRoutesArray == null) {
             throw new AssertionError("Intent lacked SELECTED_ROUTES");
         }
-        mSelectedRoutes = new TreeSet<>(Arrays.asList(selectedRoutesArray));
+        mSelectedRoutes = new HashSet<>(Arrays.asList(selectedRoutesArray));
 
         Cursor cursor = mOcTranspo.getRoutesForStopById(stopId);
         final List<OcTranspoDataAccess.Route> routes = mOcTranspo.routeCursorToList(cursor);
