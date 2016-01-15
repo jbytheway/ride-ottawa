@@ -30,10 +30,10 @@ public class IndirectArrayAdapter<T> extends BaseAdapter {
         mViewGenerator = vg;
         mList = mListGenerator.makeList();
 
-        Log.i(TAG, "List size is "+mList.size()+"; content:");
-        for (T t: mList) {
-            Log.i(TAG, "  "+t);
-        }
+        //Log.i(TAG, "List size is "+mList.size()+"; content:");
+        //for (T t: mList) {
+        //    Log.i(TAG, "  "+t);
+        //}
     }
 
     @Override
