@@ -49,13 +49,17 @@ public class Favourite extends SugarRecord {
         Long id = getId();
         if (id != null) {
             List<FavouriteStop> results = FavouriteStop.find(FavouriteStop.class, "favourite = ? and stop_id = ?", id.toString(), stopId);
-            if (results.size() != 1) {
+            if (results.size() > 1) {
                 throw new AssertionError("Unexpected number of matching stops " + results.size());
+            } else if (results.size() == 1) {
+                FavouriteStop result = results.get(0);
+                if (result != null) {
+                    return result;
+                } else {
+                    throw new AssertionError("Resulting FavouriteStop unexpectedly null");
+                }
             }
-            FavouriteStop result = results.get(0);
-            if (result != null) {
-                return result;
-            }
+            // else zero results, in which case fall through to checking pending
         }
 
         // DB failed, check pending
