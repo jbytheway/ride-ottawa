@@ -5,6 +5,7 @@ import android.app.Fragment;
 import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.support.design.widget.FloatingActionButton;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -68,7 +69,7 @@ public class EditFavouriteActivityFragment extends Fragment {
                     public void applyView(View v, final FavouriteStop favouriteStop) {
                         TextView stop_code = (TextView) v.findViewById(R.id.stop_code);
                         TextView stop_name = (TextView) v.findViewById(R.id.stop_name);
-                        final OcTranspoDataAccess.Stop stop = mOcTranspo.getStop(favouriteStop.StopId);
+                        final Stop stop = mOcTranspo.getStop(favouriteStop.StopId);
                         stop_code.setText(stop.getCode());
                         stop_name.setText(stop.getName());
 
@@ -79,11 +80,11 @@ public class EditFavouriteActivityFragment extends Fragment {
                                 Intent intent = new Intent(getActivity(), SelectRoutesActivity.class);
                                 intent.putExtra(SelectRoutesActivity.STOP_ID, stop.getId());
                                 List<FavouriteRoute> routes = favouriteStop.getRoutes();
-                                String[] selectedRoutes = new String[routes.size()];
-                                for (int i=0; i < routes.size(); ++i) {
-                                    selectedRoutes[i] = routes.get(i).RouteId;
+                                ArrayList<Route> selectedRoutes = new ArrayList<>();
+                                for (FavouriteRoute route : routes) {
+                                    selectedRoutes.add(route.asRoute());
                                 }
-                                intent.putExtra(SelectRoutesActivity.SELECTED_ROUTES, selectedRoutes);
+                                intent.putParcelableArrayListExtra(SelectRoutesActivity.SELECTED_ROUTES, selectedRoutes);
                                 startActivityForResult(intent, REQUEST_ROUTES);
                             }
                         });
@@ -178,7 +179,7 @@ public class EditFavouriteActivityFragment extends Fragment {
                 if (resultCode == Activity.RESULT_OK) {
                     String stopId = data.getStringExtra(SelectRoutesActivity.STOP_ID);
                     FavouriteStop stop = mFavourite.getStop(stopId);
-                    String[] selectedRoutes = data.getStringArrayExtra(SelectRoutesActivity.SELECTED_ROUTES);
+                    ArrayList<Route> selectedRoutes = data.getParcelableArrayListExtra(SelectRoutesActivity.SELECTED_ROUTES);
                     stop.updateRoutes(selectedRoutes, mOcTranspo);
                     if (stop.getId() != null) {
                         stop.saveRecursively();

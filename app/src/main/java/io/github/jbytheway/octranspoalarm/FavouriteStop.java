@@ -43,37 +43,37 @@ public class FavouriteStop extends SugarRecord {
         return all;
     }
 
-    public void addRoute(OcTranspoDataAccess.Route r) {
-        addRoute(r.getRouteId(), r.getName());
+    public void addRoute(Route r) {
+        addRoute(r.getName(), r.getDirection());
     }
 
-    public void addRoute(String routeId, String routeName) {
+    public void addRoute(String routeName, int direction) {
         FavouriteRoute route = new FavouriteRoute();
         route.Stop = this;
-        route.RouteId = routeId;
         route.RouteName = routeName;
+        route.Direction = direction;
         mPendingRoutes.add(route);
     }
 
-    public void updateRoutes(String[] routeIds, OcTranspoDataAccess ocTranspo) {
+    public void updateRoutes(List<Route> routes, OcTranspoDataAccess ocTranspo) {
         // This is supposed to set the current set of routes to be those given in the argument
-        HashSet<String> desiredRouteIds = new HashSet<>(Arrays.asList(routeIds));
+        HashSet<Route> desiredRoutes = new HashSet<>(routes);
 
-        for (FavouriteRoute route : getRoutes()) {
-            if (desiredRouteIds.contains(route.RouteId)) {
-                desiredRouteIds.remove(route.RouteId);
+        for (FavouriteRoute favRoute : getRoutes()) {
+            Route rawRoute = favRoute.asRoute();
+            if (desiredRoutes.contains(rawRoute)) {
+                desiredRoutes.remove(rawRoute);
             } else {
-                if (route.getId() == null) {
-                    mPendingRoutes.remove(route);
+                if (favRoute.getId() == null) {
+                    mPendingRoutes.remove(favRoute);
                 } else {
-                    route.deleteRecursively();
+                    favRoute.deleteRecursively();
                 }
             }
         }
 
-        // At this point everything left in desiredRouteIds is a thing we need to add
-        List<OcTranspoDataAccess.Route> newRoutes = ocTranspo.routeCursorToList(ocTranspo.getRoutesByIds(desiredRouteIds));
-        for (OcTranspoDataAccess.Route newRoute : newRoutes) {
+        // At this point everything left in desiredRoutes is a thing we need to add
+        for (Route newRoute : desiredRoutes) {
             addRoute(newRoute);
         }
     }

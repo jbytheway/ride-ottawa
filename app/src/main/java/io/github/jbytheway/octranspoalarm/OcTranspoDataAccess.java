@@ -10,6 +10,7 @@ import org.apache.commons.lang3.StringUtils;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Objects;
 
 public class OcTranspoDataAccess {
     OcTranspoDataAccess(Context context) {
@@ -17,42 +18,13 @@ public class OcTranspoDataAccess {
         mDatabase = mHelper.getReadableDatabase();
     }
 
-    public class Stop {
-        Stop(String id, String code, String name) {
-            mId = id;
-            mCode = code;
-            mName = name;
-        }
-
-        public String getId() { return mId; }
-        public String getCode() { return mCode; }
-        public String getName() { return mName; }
-
-        private String mId;
-        private String mCode;
-        private String mName;
-    }
-
-    class Route {
-        Route(String id, String name) {
-            mId = id;
-            mName = name;
-        }
-
-        public String getRouteId() { return mId; }
-        public String getName() { return mName; }
-
-        private String mId;
-        private String mName;
-    }
-
     private static final String[] STOP_COLUMNS = new String[]{"_id", "stop_id", "stop_code", "stop_name"};
-    private static final String[] ROUTE_COLUMNS = new String[]{"route_id", "route_short_name"};
+    private static final String[] ROUTE_COLUMNS = new String[]{"route_short_name", "direction_id"};
 
     Cursor getRoutesForStopById(String stopId) {
         String[] args = {stopId};
         return mDatabase.rawQuery(
-                "select distinct routes.route_id, route_short_name from stops " +
+                "select distinct route_short_name, direction_id from stops " +
                 "join stop_times on stops._id = stop_times.stop_id " +
                 "join trips on trips.trip_id = stop_times.trip_id " +
                 "join routes on trips.route_id = routes.route_id " +
@@ -60,6 +32,7 @@ public class OcTranspoDataAccess {
                 "order by CAST(routes.route_short_name AS INTEGER)", args);
     }
 
+    /*
     Cursor getRoutesByIds(Collection<String> routeIds) {
         String[] routeIdArray = routeIds.toArray(new String[routeIds.size()]);
         return getRoutesByIds(routeIdArray);
@@ -74,17 +47,20 @@ public class OcTranspoDataAccess {
         }
         return mDatabase.query("routes", ROUTE_COLUMNS, "route_id in ("+queryList+")", routeIds, null, null, null);
     }
+    */
 
     List<Route> routeCursorToList(Cursor c) {
         ArrayList<Route> result = new ArrayList<>();
         if (c.moveToFirst()) {
-            int id_column = c.getColumnIndex("route_id");
+            //int id_column = c.getColumnIndex("route_id");
             int name_column = c.getColumnIndex("route_short_name");
+            int direction_column = c.getColumnIndex("direction_id");
 
             while (true) {
-                String id = c.getString(id_column);
+                //String id = c.getString(id_column);
                 String name = c.getString(name_column);
-                result.add(new Route(id, name));
+                int direction = c.getInt(direction_column);
+                result.add(new Route(name, direction));
 
                 if (!c.moveToNext()) {
                     break;

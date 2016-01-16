@@ -8,6 +8,10 @@ public class FavouriteRoute extends SugarRecord {
         // Required for Sugar
     }
 
+    Route asRoute() {
+        return new Route(RouteName, Direction);
+    }
+
     public void saveRecursively() {
         save();
     }
@@ -16,7 +20,7 @@ public class FavouriteRoute extends SugarRecord {
         delete();
     }
 
-    public String RouteId;
     public String RouteName;
+    public int Direction;
     public FavouriteStop Stop;
 }

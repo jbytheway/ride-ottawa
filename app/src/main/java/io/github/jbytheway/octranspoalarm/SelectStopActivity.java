@@ -38,7 +38,7 @@ public class SelectStopActivity extends Activity {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Intent result = new Intent();
-                OcTranspoDataAccess.Stop stop = mOcTranspo.getStop(id);
+                Stop stop = mOcTranspo.getStop(id);
                 String stopId = stop.getId();
                 result.putExtra(SELECTED_STOP, stopId);
                 setResult(RESULT_OK, result);
