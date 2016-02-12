@@ -180,7 +180,7 @@ public class EditFavouriteActivityFragment extends Fragment {
                     String stopId = data.getStringExtra(SelectRoutesActivity.STOP_ID);
                     FavouriteStop stop = mFavourite.getStop(stopId);
                     ArrayList<Route> selectedRoutes = data.getParcelableArrayListExtra(SelectRoutesActivity.SELECTED_ROUTES);
-                    stop.updateRoutes(selectedRoutes, mOcTranspo);
+                    stop.updateRoutes(selectedRoutes);
                     if (stop.getId() != null) {
                         stop.saveRecursively();
                     }

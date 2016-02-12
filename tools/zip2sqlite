@@ -9,10 +9,13 @@ import os
 import zipfile
 import csv
 import io
+import datetime
 import sqlalchemy
 from sqlalchemy.orm import sessionmaker
 
 from orm import *
+
+DATE_FORMAT = '%Y%m%d'
 
 zip_filename, sqlite_filename = sys.argv[1:]
 
@@ -31,7 +34,54 @@ class InsertAs(object):
     def __call__(self, row, session):
         session.add(self._type(**row))
 
+def get_service_id(name):
+    mapping = ServiceDay.service_mapping
+    return mapping.setdefault(name, len(mapping))
+
+ignore_schedules = set()
+
+def set_schedules(row, session):
+    service_id = get_service_id(row['service_id'])
+    date = row['date']
+    type = row['exception_type']
+
+    if type == "2":
+        # Schedule is removed from this day; mark it as one to ignore later
+        ignore_schedules.add((service_id, date))
+    else:
+        assert type == "1"
+        # Service is added for this date; insert it
+        session.add(ServiceDay(date=date, service_id=service_id))
+
+def parse_date(date):
+    return datetime.datetime.strptime(date, DATE_FORMAT).date()
+
+def inclusive_date_range(start_date, end_date):
+    for n in range((end_date - start_date).days + 1):
+        yield start_date + datetime.timedelta(n)
+
+def extend_schedules(row, session):
+    service_id = get_service_id(row['service_id'])
+    start_date = parse_date(row['start_date'])
+    end_date = parse_date(row['end_date'])
+
+    week = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday',
+            'saturday', 'sunday']
+    weekdays = set()
+    for i, day in enumerate(week):
+        if row[day] == "1":
+            weekdays.add(i)
+
+    for date in inclusive_date_range(start_date, end_date):
+        if date.weekday() in weekdays:
+            date_string = date.strftime(DATE_FORMAT)
+            if (service_id, date_string) not in ignore_schedules:
+                session.add(
+                        ServiceDay(date=date_string, service_id=service_id))
+
 csv_handlers = [
+        ("calendar_dates.txt", set_schedules),
+        ("calendar.txt", extend_schedules),
         ("stops.txt", InsertAs(Stop)),
         ("routes.txt", InsertAs(Route)),
         ("trips.txt", InsertAs(Trip)),

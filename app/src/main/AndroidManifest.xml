@@ -47,6 +47,7 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="io.github.jbytheway.octranspoalarm.EditFavouriteActivity" />
         </activity>
+        <activity android:name=".ViewFavouriteActivity"></activity>
     </application>
 
 </manifest>

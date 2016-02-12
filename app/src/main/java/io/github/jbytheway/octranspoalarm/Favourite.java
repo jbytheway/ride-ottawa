@@ -2,7 +2,6 @@ package io.github.jbytheway.octranspoalarm;
 
 import com.orm.SugarRecord;
 import com.orm.dsl.Ignore;
-import com.orm.dsl.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -82,6 +81,19 @@ public class Favourite extends SugarRecord {
         stop.StopId = stopId;
         stop.Favourite = this;
         mPendingStops.add(stop);
+    }
+
+    public List<ForthcomingTrip> getForthcomingTrips(OcTranspoDataAccess ocTranspo) {
+        if (!mPendingStops.isEmpty()) {
+            throw new AssertionError("Should only be called on saved Favourites");
+        }
+
+        ArrayList<ForthcomingTrip> result = new ArrayList<>();
+        for (FavouriteStop stop : getStops()) {
+            result.addAll(stop.getForthcomingTrips(ocTranspo));
+        }
+
+        return result;
     }
 
     @Ignore

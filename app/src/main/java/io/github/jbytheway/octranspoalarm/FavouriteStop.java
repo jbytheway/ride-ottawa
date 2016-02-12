@@ -4,7 +4,6 @@ import com.orm.SugarRecord;
 import com.orm.dsl.Ignore;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 
@@ -55,7 +54,7 @@ public class FavouriteStop extends SugarRecord {
         mPendingRoutes.add(route);
     }
 
-    public void updateRoutes(List<Route> routes, OcTranspoDataAccess ocTranspo) {
+    public void updateRoutes(List<Route> routes) {
         // This is supposed to set the current set of routes to be those given in the argument
         HashSet<Route> desiredRoutes = new HashSet<>(routes);
 
@@ -76,6 +75,19 @@ public class FavouriteStop extends SugarRecord {
         for (Route newRoute : desiredRoutes) {
             addRoute(newRoute);
         }
+    }
+
+    public List<ForthcomingTrip> getForthcomingTrips(OcTranspoDataAccess ocTranspo) {
+        if (!mPendingRoutes.isEmpty()) {
+            throw new AssertionError("Should only be called on saved Stops");
+        }
+
+        ArrayList<ForthcomingTrip> result = new ArrayList<>();
+        for (FavouriteRoute route : getRoutes()) {
+            result.addAll(route.getForthcomingTrips(ocTranspo));
+        }
+
+        return result;
     }
 
     public String StopId;

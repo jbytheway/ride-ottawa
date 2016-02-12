@@ -3,19 +3,21 @@ package io.github.jbytheway.octranspoalarm;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.widget.LinearLayout;
 
-import org.apache.commons.lang3.StringUtils;
+import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
+import org.joda.time.Duration;
+import org.joda.time.Interval;
+import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
-import java.util.Objects;
 
 public class OcTranspoDataAccess {
     OcTranspoDataAccess(Context context) {
-        mHelper = new OcTranspoDbHelper(context);
-        mDatabase = mHelper.getReadableDatabase();
+        OcTranspoDbHelper helper = new OcTranspoDbHelper(context);
+        mDatabase = helper.getReadableDatabase();
     }
 
     private static final String[] STOP_COLUMNS = new String[]{"_id", "stop_id", "stop_code", "stop_name"};
@@ -84,6 +86,7 @@ public class OcTranspoDataAccess {
         int stopNameColumn = c.getColumnIndex("stop_name");
         String stopCode = c.getString(stopCodeColumn);
         String stopName = c.getString(stopNameColumn);
+        c.close();
         return new Stop(stopId, stopCode, stopName);
     }
 
@@ -99,9 +102,75 @@ public class OcTranspoDataAccess {
         String stopId = c.getString(stopIdColumn);
         String stopCode = c.getString(stopCodeColumn);
         String stopName = c.getString(stopNameColumn);
+        c.close();
         return new Stop(stopId, stopCode, stopName);
     }
 
-    private OcTranspoDbHelper mHelper;
+    public Cursor getForthcomingTrips(String stopId, String routeName, int direction) {
+        // Get the current instant in the Ottawa time zone
+        DateTime now = new DateTime();
+        DateTime nowOttawa = now.withZone(DateTimeZone.forID("America/Toronto"));
+
+        // Next we need to figure out the midnight that started this day in Ottawa
+        DateTime startOfDay = nowOttawa.withTimeAtStartOfDay();
+        // And how much time has passed since then
+        Interval intervalSinceMidnight = new Interval(startOfDay, nowOttawa);
+        Duration sinceMidnight = intervalSinceMidnight.toDuration();
+        long minutesSinceMidnight = sinceMidnight.getStandardMinutes();
+        long minTime = minutesSinceMidnight - 5;
+
+        // Format the date in ISO format (which is what the db uses)
+        DateTimeFormatter isoDate = DateTimeFormat.forPattern("yyyyMMdd");
+        String today = isoDate.print(nowOttawa);
+
+        // Now we can finally make a query
+        return mDatabase.rawQuery(
+                "select * from stop_times " +
+                        "join trips on stop_times.trip_id = trips.trip_id " +
+                        "join days on days.service_id = trips.service_id " +
+                        "join routes on trips.route_id = routes.route_id " +
+                        "join stops on stop_times.stop_id = stops._id " +
+                        "where stops.stop_id = ? " +
+                        "and routes.route_short_name = ? " +
+                        "and trips.direction_id = ? " +
+                        "and days.date = ? " +
+                        "and stop_times.arrival_time >= ? " +
+                        "order by stop_times.arrival_time " +
+                        "limit 10",
+                new String[]{stopId, routeName, "" + direction, today, ""+minTime});
+
+        // FIXME: also fetch trips with times which derive from the previous day (i.e. which started yesterday)
+    }
+
+    List<ForthcomingTrip> stopTimeCursorToList(Cursor c) {
+        ArrayList<ForthcomingTrip> result = new ArrayList<>();
+        if (c.moveToFirst()) {
+            int stop_id_column = c.getColumnIndex("stop_id");
+            int stop_code_column = c.getColumnIndex("stop_code");
+            int stop_name_column = c.getColumnIndex("stop_name");
+            int route_name_column = c.getColumnIndex("route_short_name");
+            int direction_column = c.getColumnIndex("direction_id");
+            int head_sign_column = c.getColumnIndex("trip_headsign");
+            int arrival_time_column = c.getColumnIndex("arrival_time");
+
+            while (true) {
+                String stopId = c.getString(stop_id_column);
+                String stopCode = c.getString(stop_code_column);
+                String stopName = c.getString(stop_name_column);
+                String routeName = c.getString(route_name_column);
+                int direction = c.getInt(direction_column);
+                String headSign = c.getString(head_sign_column);
+                int arrivalTime = c.getInt(arrival_time_column);
+                result.add(new ForthcomingTrip(new Stop(stopId, stopCode, stopName), new Route(routeName, direction), headSign, arrivalTime));
+
+                if (!c.moveToNext()) {
+                    break;
+                }
+            }
+        }
+        c.close();
+        return result;
+    }
+
     private SQLiteDatabase mDatabase;
 }

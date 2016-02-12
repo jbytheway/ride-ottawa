@@ -46,6 +46,17 @@ public class ListFavouritesActivityFragment extends Fragment {
         );
         mFavouriteList.setAdapter(mAdapter);
 
+        mFavouriteList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Favourite item = mAdapter.getItem(position);
+                Intent intent = new Intent(getActivity(), ViewFavouriteActivity.class);
+                intent.putExtra(ViewFavouriteActivity.FAVOURITE_ID, item.getId());
+
+                startActivity(intent);
+            }
+        });
+
         mFavouriteList.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
             @Override
             public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
