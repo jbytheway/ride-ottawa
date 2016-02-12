@@ -5,7 +5,7 @@ xmlns:tools="http://schemas.android.com/tools"
 android:layout_width="match_parent"
 android:layout_height="match_parent"
 android:fitsSystemWindows="true"
-tools:context="io.github.jbytheway.octranspoalarm.ViewFavouriteActivity">
+tools:context=".ui.ViewFavouriteActivity">
 
 <android.support.design.widget.AppBarLayout
     android:layout_width="match_parent"
@@ -23,7 +23,7 @@ tools:context="io.github.jbytheway.octranspoalarm.ViewFavouriteActivity">
 
 <fragment
     android:id="@+id/fragment"
-    android:name="io.github.jbytheway.octranspoalarm.ViewFavouriteActivityFragment"
+    android:name="io.github.jbytheway.octranspoalarm.ui.ViewFavouriteActivityFragment"
     android:layout_marginTop="?android:attr/actionBarSize"
     android:layout_width="match_parent"
     android:layout_height="match_parent"

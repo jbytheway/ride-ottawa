@@ -15,15 +15,15 @@ import java.util.List;
 public class IndirectArrayAdapter<T> extends BaseAdapter {
     private static final String TAG = "IndirectArrayAdapter";
 
-    interface ListGenerator<T> {
+    public interface ListGenerator<T> {
         List<T> makeList();
     }
 
-    interface ViewGenerator<T> {
+    public interface ViewGenerator<T> {
         void applyView(View v, T t);
     }
 
-    IndirectArrayAdapter(Context context, @LayoutRes int resource, ListGenerator<T> lg, ViewGenerator<T> vg) {
+    public IndirectArrayAdapter(Context context, @LayoutRes int resource, ListGenerator<T> lg, ViewGenerator<T> vg) {
         mContext = context;
         mResource = resource;
         mListGenerator = lg;

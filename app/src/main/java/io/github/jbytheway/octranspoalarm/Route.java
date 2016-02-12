@@ -5,7 +5,7 @@ import android.os.Parcelable;
 
 import java.util.Objects;
 
-class Route implements Parcelable {
+public class Route implements Parcelable {
     Route(String name, int direction) {
         //mId = id;
         mName = name;

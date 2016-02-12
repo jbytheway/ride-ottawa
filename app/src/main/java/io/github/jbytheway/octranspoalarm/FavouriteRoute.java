@@ -12,7 +12,7 @@ public class FavouriteRoute extends SugarRecord {
         // Required for Sugar
     }
 
-    Route asRoute() {
+    public Route asRoute() {
         return new Route(RouteName, Direction);
     }
 

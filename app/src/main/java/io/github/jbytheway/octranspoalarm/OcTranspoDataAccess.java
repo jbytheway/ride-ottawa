@@ -23,7 +23,7 @@ public class OcTranspoDataAccess {
     private static final String[] STOP_COLUMNS = new String[]{"_id", "stop_id", "stop_code", "stop_name"};
     private static final String[] ROUTE_COLUMNS = new String[]{"route_short_name", "direction_id"};
 
-    Cursor getRoutesForStopById(String stopId) {
+    public Cursor getRoutesForStopById(String stopId) {
         String[] args = {stopId};
         return mDatabase.rawQuery(
                 "select distinct route_short_name, direction_id from stops " +
@@ -51,7 +51,7 @@ public class OcTranspoDataAccess {
     }
     */
 
-    List<Route> routeCursorToList(Cursor c) {
+    public List<Route> routeCursorToList(Cursor c) {
         ArrayList<Route> result = new ArrayList<>();
         if (c.moveToFirst()) {
             //int id_column = c.getColumnIndex("route_id");
@@ -69,14 +69,15 @@ public class OcTranspoDataAccess {
                 }
             }
         }
+        c.close();
         return result;
     }
 
-    Cursor getAllStops(String orderBy) {
+    public Cursor getAllStops(String orderBy) {
         return mDatabase.query("stops", STOP_COLUMNS, null, null, null, null, orderBy);
     }
 
-    Stop getStop(String stopId) {
+    public Stop getStop(String stopId) {
         Cursor c = mDatabase.query("stops", STOP_COLUMNS, "stop_id = ?", new String[]{stopId}, null, null, null);
         if (c.getCount() != 1) {
             throw new AssertionError("Requested invalid StopId " + stopId);
@@ -90,7 +91,7 @@ public class OcTranspoDataAccess {
         return new Stop(stopId, stopCode, stopName);
     }
 
-    Stop getStop(long id) {
+    public Stop getStop(long id) {
         Cursor c = mDatabase.query("stops", STOP_COLUMNS, "_id = ?", new String[]{""+id}, null, null, null);
         if (c.getCount() != 1) {
             throw new AssertionError("Requested invalid StopId " + id);
@@ -142,7 +143,7 @@ public class OcTranspoDataAccess {
         // FIXME: also fetch trips with times which derive from the previous day (i.e. which started yesterday)
     }
 
-    List<ForthcomingTrip> stopTimeCursorToList(Cursor c) {
+    public List<ForthcomingTrip> stopTimeCursorToList(Cursor c) {
         ArrayList<ForthcomingTrip> result = new ArrayList<>();
         if (c.moveToFirst()) {
             int stop_id_column = c.getColumnIndex("stop_id");

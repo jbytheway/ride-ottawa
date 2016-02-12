@@ -1,4 +1,4 @@
-package io.github.jbytheway.octranspoalarm;
+package io.github.jbytheway.octranspoalarm.ui;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -8,6 +8,11 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
+
+import io.github.jbytheway.octranspoalarm.OcTranspoApplication;
+import io.github.jbytheway.octranspoalarm.OcTranspoDataAccess;
+import io.github.jbytheway.octranspoalarm.R;
+import io.github.jbytheway.octranspoalarm.Stop;
 
 public class SelectStopActivity extends Activity {
     public static final String SELECTED_STOP = "selected_stop";

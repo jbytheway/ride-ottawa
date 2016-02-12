@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fitsSystemWindows="true"
-    tools:context="io.github.jbytheway.octranspoalarm.SelectRoutesActivity">
+    tools:context=".ui.SelectRoutesActivity">
 
     <android.support.design.widget.AppBarLayout
         android:layout_width="match_parent"
@@ -22,7 +22,7 @@
 
     <fragment
         android:id="@+id/fragment"
-        android:name="io.github.jbytheway.octranspoalarm.SelectRoutesActivityFragment"
+        android:name="io.github.jbytheway.octranspoalarm.ui.SelectRoutesActivityFragment"
         android:layout_marginTop="?android:attr/actionBarSize"
         android:layout_width="match_parent"
         android:layout_height="match_parent"

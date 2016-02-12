@@ -1,4 +1,4 @@
-package io.github.jbytheway.octranspoalarm;
+package io.github.jbytheway.octranspoalarm.ui;
 
 import android.app.Activity;
 import android.app.Fragment;
@@ -16,6 +16,12 @@ import android.widget.ListView;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+
+import io.github.jbytheway.octranspoalarm.IndirectArrayAdapter;
+import io.github.jbytheway.octranspoalarm.OcTranspoApplication;
+import io.github.jbytheway.octranspoalarm.OcTranspoDataAccess;
+import io.github.jbytheway.octranspoalarm.R;
+import io.github.jbytheway.octranspoalarm.Route;
 
 public class SelectRoutesActivityFragment extends Fragment {
 

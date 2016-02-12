@@ -1,4 +1,4 @@
-package io.github.jbytheway.octranspoalarm;
+package io.github.jbytheway.octranspoalarm.ui;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -7,13 +7,20 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
-import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import io.github.jbytheway.octranspoalarm.Favourite;
+import io.github.jbytheway.octranspoalarm.ForthcomingTrip;
+import io.github.jbytheway.octranspoalarm.IndirectArrayAdapter;
+import io.github.jbytheway.octranspoalarm.OcTranspoApplication;
+import io.github.jbytheway.octranspoalarm.OcTranspoDataAccess;
+import io.github.jbytheway.octranspoalarm.R;
+import io.github.jbytheway.octranspoalarm.Route;
+import io.github.jbytheway.octranspoalarm.Stop;
 
 public class ViewFavouriteActivityFragment extends Fragment {
     private static final String TAG = "ViewFavouriteFragment";

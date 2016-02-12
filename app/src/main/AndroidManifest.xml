@@ -14,7 +14,7 @@
             android:value="io.github.jbytheway.octranspoalarm" />
 
         <activity
-            android:name=".ListFavouritesActivity"
+            android:name=".ui.ListFavouritesActivity"
             android:label="@string/app_name"
             android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
@@ -24,30 +24,30 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".EditFavouriteActivity"
+            android:name=".ui.EditFavouriteActivity"
             android:label="@string/title_activity_edit_favourite"
-            android:parentActivityName=".ListFavouritesActivity">
+            android:parentActivityName=".ui.ListFavouritesActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="io.github.jbytheway.octranspoalarm.ListFavouritesActivity" />
+                android:value=".ui.ListFavouritesActivity" />
         </activity>
         <activity
-            android:name=".SelectStopActivity"
+            android:name=".ui.SelectStopActivity"
             android:label="@string/title_activity_select_stop"
-            android:parentActivityName=".EditFavouriteActivity">
+            android:parentActivityName=".ui.EditFavouriteActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="io.github.jbytheway.octranspoalarm.EditFavouriteActivity" />
+                android:value=".ui.EditFavouriteActivity" />
         </activity>
         <activity
-            android:name=".SelectRoutesActivity"
+            android:name=".ui.SelectRoutesActivity"
             android:label="@string/title_activity_select_routes"
-            android:parentActivityName=".EditFavouriteActivity">
+            android:parentActivityName=".ui.EditFavouriteActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="io.github.jbytheway.octranspoalarm.EditFavouriteActivity" />
+                android:value=".ui.EditFavouriteActivity" />
         </activity>
-        <activity android:name=".ViewFavouriteActivity"></activity>
+        <activity android:name=".ui.ViewFavouriteActivity"></activity>
     </application>
 
 </manifest>
