@@ -1,5 +1,9 @@
 <resources>
     <string name="app_name">OcTranspo Alarm</string>
+    <string name="checking_for_updates">Checking for database updates…</string>
+    <string name="downloading_new">New version available; downloading…</string>
+    <string name="decompressing">Decompressing database…</string>
+    <string name="download_failed_but_continuing">Download failed.  Using existing database.</string>
     <string name="action_settings">Settings</string>
     <string name="action_delete">Delete</string>
     <string name="title_activity_list_favourites">Favourites</string>

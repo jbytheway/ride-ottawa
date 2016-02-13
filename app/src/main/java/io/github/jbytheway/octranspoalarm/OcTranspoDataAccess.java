@@ -1,5 +1,6 @@
 package io.github.jbytheway.octranspoalarm;
 
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -11,27 +12,33 @@ import org.joda.time.Interval;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import io.github.jbytheway.octranspoalarm.utils.DownloadableDatabase;
+
 public class OcTranspoDataAccess {
     OcTranspoDataAccess(Context context) {
-        OcTranspoDbHelper helper = new OcTranspoDbHelper(context);
-        mDatabase = helper.getReadableDatabase();
+        mHelper = new OcTranspoDbHelper(context);
+    }
+
+    public void checkForUpdates(ProgressDialog progressDialog, DownloadableDatabase.UpdateListener listener) throws IOException {
+        mHelper.checkForUpdates(progressDialog, listener);
     }
 
     private static final String[] STOP_COLUMNS = new String[]{"_id", "stop_id", "stop_code", "stop_name"};
     private static final String[] ROUTE_COLUMNS = new String[]{"route_short_name", "direction_id"};
 
     public Cursor getRoutesForStopById(String stopId) {
-        String[] args = {stopId};
-        return mDatabase.rawQuery(
+        SQLiteDatabase database = mHelper.getReadableDatabase();
+        return database.rawQuery(
                 "select distinct route_short_name, direction_id from stops " +
                 "join stop_times on stops._id = stop_times.stop_id " +
                 "join trips on trips.trip_id = stop_times.trip_id " +
                 "join routes on trips.route_id = routes.route_id " +
                 "where stops.stop_id = ?" +
-                "order by CAST(routes.route_short_name AS INTEGER)", args);
+                "order by CAST(routes.route_short_name AS INTEGER)", new String[]{stopId});
     }
 
     /*
@@ -74,11 +81,13 @@ public class OcTranspoDataAccess {
     }
 
     public Cursor getAllStops(String orderBy) {
-        return mDatabase.query("stops", STOP_COLUMNS, null, null, null, null, orderBy);
+        SQLiteDatabase database = mHelper.getReadableDatabase();
+        return database.query("stops", STOP_COLUMNS, null, null, null, null, orderBy);
     }
 
     public Stop getStop(String stopId) {
-        Cursor c = mDatabase.query("stops", STOP_COLUMNS, "stop_id = ?", new String[]{stopId}, null, null, null);
+        SQLiteDatabase database = mHelper.getReadableDatabase();
+        Cursor c = database.query("stops", STOP_COLUMNS, "stop_id = ?", new String[]{stopId}, null, null, null);
         if (c.getCount() != 1) {
             throw new AssertionError("Requested invalid StopId " + stopId);
         }
@@ -92,7 +101,8 @@ public class OcTranspoDataAccess {
     }
 
     public Stop getStop(long id) {
-        Cursor c = mDatabase.query("stops", STOP_COLUMNS, "_id = ?", new String[]{""+id}, null, null, null);
+        SQLiteDatabase database = mHelper.getReadableDatabase();
+        Cursor c = database.query("stops", STOP_COLUMNS, "_id = ?", new String[]{""+id}, null, null, null);
         if (c.getCount() != 1) {
             throw new AssertionError("Requested invalid StopId " + id);
         }
@@ -125,7 +135,8 @@ public class OcTranspoDataAccess {
         String today = isoDate.print(nowOttawa);
 
         // Now we can finally make a query
-        return mDatabase.rawQuery(
+        SQLiteDatabase database = mHelper.getReadableDatabase();
+        return database.rawQuery(
                 "select * from stop_times " +
                         "join trips on stop_times.trip_id = trips.trip_id " +
                         "join days on days.service_id = trips.service_id " +
@@ -173,5 +184,5 @@ public class OcTranspoDataAccess {
         return result;
     }
 
-    private SQLiteDatabase mDatabase;
+    OcTranspoDbHelper mHelper;
 }
