@@ -47,7 +47,14 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".ui.EditFavouriteActivity" />
         </activity>
-        <activity android:name=".ui.ViewFavouriteActivity"></activity>
+        <activity
+            android:name=".ui.ViewFavouriteActivity"
+            android:label="@string/title_activity_view_favourite"
+            android:parentActivityName=".ui.ListFavouritesActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".ui.ListFavouritesActivity" />
+        </activity>
     </application>
 
 </manifest>
