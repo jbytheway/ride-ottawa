@@ -15,7 +15,7 @@ import java.util.List;
 
 import io.github.jbytheway.octranspoalarm.Favourite;
 import io.github.jbytheway.octranspoalarm.ForthcomingTrip;
-import io.github.jbytheway.octranspoalarm.IndirectArrayAdapter;
+import io.github.jbytheway.octranspoalarm.utils.IndirectArrayAdapter;
 import io.github.jbytheway.octranspoalarm.OcTranspoApplication;
 import io.github.jbytheway.octranspoalarm.OcTranspoDataAccess;
 import io.github.jbytheway.octranspoalarm.R;

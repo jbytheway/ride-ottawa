@@ -1,4 +1,4 @@
-package io.github.jbytheway.octranspoalarm;
+package io.github.jbytheway.octranspoalarm.utils;
 
 import android.content.Context;
 import android.support.annotation.LayoutRes;
