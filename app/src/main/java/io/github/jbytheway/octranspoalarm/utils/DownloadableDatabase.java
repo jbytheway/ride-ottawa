@@ -75,7 +75,7 @@ public abstract class DownloadableDatabase extends SQLiteOpenHelper {
                     @Override
                     public void onHeaders(HeadersResponse headers) {
                         String newEtag = headers.getHeaders().get("ETag");
-                        if (newEtag.equals(existingEtag)) {
+                        if (existingEtag.equals(newEtag)) {
                             mDownload.cancel(true);
                         } else {
                             progressDialog.setMessage(mContext.getString(R.string.downloading_new));
@@ -92,18 +92,21 @@ public abstract class DownloadableDatabase extends SQLiteOpenHelper {
                             code = result.getHeaders().code();
                         }
                         Log.d(TAG, "Completed download; e=" + e + "; code=" + code);
-                        if (e != null) {
-                            if (e.getClass() == CancellationException.class) {
+                        if (e != null || code != 200) {
+                            if (e != null && e.getClass() == CancellationException.class) {
                                 // We are fine; no update was necessary
                                 listener.onSuccess();
                             } else {
+                                // The download failed.  Figure out whether we have a database
+                                // already (if not, then we cannot continue)
                                 boolean fatal = true;
                                 try {
                                     fatal = getEtag().isEmpty();
                                 } catch (IOException etagError) {
-                                    Log.e(TAG, "Error clearing ETag", etagError);
+                                    Log.e(TAG, "Error determining ETag", etagError);
                                     // Apart from the log, we pretty much have to ignore that error
                                 }
+                                Log.d(TAG, "Download failed; e=" + e + "; fatal=" + fatal);
                                 listener.onFail(e, fatal);
                             }
                             return;

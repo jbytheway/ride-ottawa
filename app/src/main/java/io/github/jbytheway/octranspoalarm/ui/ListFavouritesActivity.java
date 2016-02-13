@@ -10,12 +10,10 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
-import java.io.File;
 import java.io.IOException;
 
 import io.github.jbytheway.octranspoalarm.OcTranspoApplication;
 import io.github.jbytheway.octranspoalarm.OcTranspoDataAccess;
-import io.github.jbytheway.octranspoalarm.OcTranspoDbHelper;
 import io.github.jbytheway.octranspoalarm.R;
 import io.github.jbytheway.octranspoalarm.utils.DownloadableDatabase;
 
@@ -64,7 +62,7 @@ public class ListFavouritesActivity extends AppCompatActivity {
                     if (fatal) {
                         fail();
                     } else {
-                        Toast.makeText(ListFavouritesActivity.this, R.string.download_failed_but_continuing, Toast.LENGTH_LONG);
+                        Toast.makeText(ListFavouritesActivity.this, R.string.download_failed_but_continuing, Toast.LENGTH_LONG).show();
                         dialog.dismiss();
                     }
                 }
