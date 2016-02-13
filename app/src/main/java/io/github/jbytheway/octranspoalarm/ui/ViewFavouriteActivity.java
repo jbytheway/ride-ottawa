@@ -15,6 +15,7 @@ public class ViewFavouriteActivity extends AppCompatActivity {
         setContentView(R.layout.activity_view_favourite);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+        //noinspection ConstantConditions
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         ViewFavouriteActivityFragment fragment =
