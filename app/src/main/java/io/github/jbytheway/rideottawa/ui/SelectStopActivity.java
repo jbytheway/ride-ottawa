@@ -1,4 +1,4 @@
-package io.github.jbytheway.octranspoalarm.ui;
+package io.github.jbytheway.rideottawa.ui;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -13,10 +13,10 @@ import android.widget.FilterQueryProvider;
 import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
 
-import io.github.jbytheway.octranspoalarm.OcTranspoApplication;
-import io.github.jbytheway.octranspoalarm.OcTranspoDataAccess;
-import io.github.jbytheway.octranspoalarm.R;
-import io.github.jbytheway.octranspoalarm.Stop;
+import io.github.jbytheway.rideottawa.RideOttawaApplication;
+import io.github.jbytheway.rideottawa.OcTranspoDataAccess;
+import io.github.jbytheway.rideottawa.R;
+import io.github.jbytheway.rideottawa.Stop;
 
 public class SelectStopActivity extends Activity {
     public static final String SELECTED_STOP = "selected_stop";
@@ -25,7 +25,7 @@ public class SelectStopActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        mOcTranspo = ((OcTranspoApplication) getApplication()).getOcTranspo();
+        mOcTranspo = ((RideOttawaApplication) getApplication()).getOcTranspo();
 
         setContentView(R.layout.activity_select_stop);
 

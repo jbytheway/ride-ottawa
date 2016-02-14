@@ -1,4 +1,4 @@
-package io.github.jbytheway.octranspoalarm;
+package io.github.jbytheway.rideottawa;
 
 public class ForthcomingTrip {
     public ForthcomingTrip(Stop stop, Route route, String headSign, int time) {

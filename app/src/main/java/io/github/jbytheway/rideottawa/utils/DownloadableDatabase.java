@@ -1,4 +1,4 @@
-package io.github.jbytheway.octranspoalarm.utils;
+package io.github.jbytheway.rideottawa.utils;
 
 import android.app.ProgressDialog;
 import android.content.Context;
@@ -24,7 +24,7 @@ import java.util.concurrent.Future;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.ZipInputStream;
 
-import io.github.jbytheway.octranspoalarm.R;
+import io.github.jbytheway.rideottawa.R;
 
 /**
  * Helper class for managing a readonly database taken from the internet

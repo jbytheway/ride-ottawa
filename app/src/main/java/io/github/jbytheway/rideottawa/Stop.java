@@ -1,4 +1,4 @@
-package io.github.jbytheway.octranspoalarm;
+package io.github.jbytheway.rideottawa;
 
 public class Stop {
     Stop(String id, String code, String name) {

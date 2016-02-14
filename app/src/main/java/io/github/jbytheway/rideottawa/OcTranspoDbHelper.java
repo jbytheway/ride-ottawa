@@ -1,9 +1,9 @@
-package io.github.jbytheway.octranspoalarm;
+package io.github.jbytheway.rideottawa;
 
 import android.content.Context;
 import com.readystatesoftware.sqliteasset.SQLiteAssetHelper;
 
-import io.github.jbytheway.octranspoalarm.utils.DownloadableDatabase;
+import io.github.jbytheway.rideottawa.utils.DownloadableDatabase;
 
 public class OcTranspoDbHelper extends DownloadableDatabase {
     public static final int DATABASE_VERSION = 1;

@@ -1,4 +1,4 @@
-package io.github.jbytheway.octranspoalarm;
+package io.github.jbytheway.rideottawa;
 
 import android.app.Application;
 import android.test.ApplicationTestCase;

@@ -23,7 +23,7 @@
 
     <fragment
         android:id="@+id/fragment"
-        android:name="io.github.jbytheway.octranspoalarm.ui.EditFavouriteActivityFragment"
+        android:name="io.github.jbytheway.rideottawa.ui.EditFavouriteActivityFragment"
         android:layout_marginTop="?android:attr/actionBarSize"
         android:layout_width="match_parent"
         android:layout_height="match_parent"

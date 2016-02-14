@@ -1,4 +1,4 @@
-package io.github.jbytheway.octranspoalarm.ui;
+package io.github.jbytheway.rideottawa.ui;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -13,14 +13,14 @@ import android.widget.TextView;
 import java.util.ArrayList;
 import java.util.List;
 
-import io.github.jbytheway.octranspoalarm.Favourite;
-import io.github.jbytheway.octranspoalarm.ForthcomingTrip;
-import io.github.jbytheway.octranspoalarm.utils.IndirectArrayAdapter;
-import io.github.jbytheway.octranspoalarm.OcTranspoApplication;
-import io.github.jbytheway.octranspoalarm.OcTranspoDataAccess;
-import io.github.jbytheway.octranspoalarm.R;
-import io.github.jbytheway.octranspoalarm.Route;
-import io.github.jbytheway.octranspoalarm.Stop;
+import io.github.jbytheway.rideottawa.Favourite;
+import io.github.jbytheway.rideottawa.ForthcomingTrip;
+import io.github.jbytheway.rideottawa.utils.IndirectArrayAdapter;
+import io.github.jbytheway.rideottawa.RideOttawaApplication;
+import io.github.jbytheway.rideottawa.OcTranspoDataAccess;
+import io.github.jbytheway.rideottawa.R;
+import io.github.jbytheway.rideottawa.Route;
+import io.github.jbytheway.rideottawa.Stop;
 
 public class ViewFavouriteActivityFragment extends Fragment {
     private static final String TAG = "ViewFavouriteFragment";
@@ -36,7 +36,7 @@ public class ViewFavouriteActivityFragment extends Fragment {
         // Don't destroy Fragment on reconfiguration
         setRetainInstance(true);
 
-        mOcTranspo = ((OcTranspoApplication) getActivity().getApplication()).getOcTranspo();
+        mOcTranspo = ((RideOttawaApplication) getActivity().getApplication()).getOcTranspo();
     }
 
     @Override

@@ -1,4 +1,4 @@
-package io.github.jbytheway.octranspoalarm.ui;
+package io.github.jbytheway.rideottawa.ui;
 
 import android.app.ProgressDialog;
 import android.content.Intent;
@@ -12,10 +12,10 @@ import android.widget.Toast;
 
 import java.io.IOException;
 
-import io.github.jbytheway.octranspoalarm.OcTranspoApplication;
-import io.github.jbytheway.octranspoalarm.OcTranspoDataAccess;
-import io.github.jbytheway.octranspoalarm.R;
-import io.github.jbytheway.octranspoalarm.utils.DownloadableDatabase;
+import io.github.jbytheway.rideottawa.RideOttawaApplication;
+import io.github.jbytheway.rideottawa.OcTranspoDataAccess;
+import io.github.jbytheway.rideottawa.R;
+import io.github.jbytheway.rideottawa.utils.DownloadableDatabase;
 
 public class ListFavouritesActivity extends AppCompatActivity {
     private static final String TAG = "ListFavouritesActivity";
@@ -46,7 +46,7 @@ public class ListFavouritesActivity extends AppCompatActivity {
 //        Log.i(TAG, "Deleting database at " + file.getAbsolutePath());
 //        file.delete();
 
-        OcTranspoDataAccess ocTranspo = ((OcTranspoApplication) getApplication()).getOcTranspo();
+        OcTranspoDataAccess ocTranspo = ((RideOttawaApplication) getApplication()).getOcTranspo();
         final ProgressDialog dialog = new ProgressDialog(this);
         dialog.setMessage(getString(R.string.checking_for_updates));
         dialog.show();

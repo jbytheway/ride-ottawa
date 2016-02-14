@@ -1,4 +1,4 @@
-package io.github.jbytheway.octranspoalarm.ui;
+package io.github.jbytheway.rideottawa.ui;
 
 import android.content.Intent;
 import android.support.v4.app.Fragment;
@@ -14,9 +14,9 @@ import org.apache.commons.collections4.IteratorUtils;
 
 import java.util.List;
 
-import io.github.jbytheway.octranspoalarm.Favourite;
-import io.github.jbytheway.octranspoalarm.utils.IndirectArrayAdapter;
-import io.github.jbytheway.octranspoalarm.R;
+import io.github.jbytheway.rideottawa.Favourite;
+import io.github.jbytheway.rideottawa.utils.IndirectArrayAdapter;
+import io.github.jbytheway.rideottawa.R;
 
 public class ListFavouritesActivityFragment extends Fragment {
     private static final String TAG = "ListFavouritesFragment";

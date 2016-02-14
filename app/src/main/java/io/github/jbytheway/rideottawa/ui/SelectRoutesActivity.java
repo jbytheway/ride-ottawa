@@ -1,11 +1,11 @@
-package io.github.jbytheway.octranspoalarm.ui;
+package io.github.jbytheway.rideottawa.ui;
 
 import android.os.Bundle;
 import android.app.Activity;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 
-import io.github.jbytheway.octranspoalarm.R;
+import io.github.jbytheway.rideottawa.R;
 
 public class SelectRoutesActivity extends AppCompatActivity {
     public static final String STOP_ID = "stop_id";

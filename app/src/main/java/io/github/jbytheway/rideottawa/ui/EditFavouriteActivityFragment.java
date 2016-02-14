@@ -1,4 +1,4 @@
-package io.github.jbytheway.octranspoalarm.ui;
+package io.github.jbytheway.rideottawa.ui;
 
 import android.app.Activity;
 import android.app.Fragment;
@@ -20,15 +20,15 @@ import android.widget.TextView;
 import java.util.ArrayList;
 import java.util.List;
 
-import io.github.jbytheway.octranspoalarm.Favourite;
-import io.github.jbytheway.octranspoalarm.FavouriteRoute;
-import io.github.jbytheway.octranspoalarm.FavouriteStop;
-import io.github.jbytheway.octranspoalarm.utils.IndirectArrayAdapter;
-import io.github.jbytheway.octranspoalarm.OcTranspoApplication;
-import io.github.jbytheway.octranspoalarm.OcTranspoDataAccess;
-import io.github.jbytheway.octranspoalarm.R;
-import io.github.jbytheway.octranspoalarm.Route;
-import io.github.jbytheway.octranspoalarm.Stop;
+import io.github.jbytheway.rideottawa.Favourite;
+import io.github.jbytheway.rideottawa.FavouriteRoute;
+import io.github.jbytheway.rideottawa.FavouriteStop;
+import io.github.jbytheway.rideottawa.utils.IndirectArrayAdapter;
+import io.github.jbytheway.rideottawa.RideOttawaApplication;
+import io.github.jbytheway.rideottawa.OcTranspoDataAccess;
+import io.github.jbytheway.rideottawa.R;
+import io.github.jbytheway.rideottawa.Route;
+import io.github.jbytheway.rideottawa.Stop;
 
 public class EditFavouriteActivityFragment extends Fragment {
     private static final String TAG = "EditFavouriteFragment";
@@ -49,7 +49,7 @@ public class EditFavouriteActivityFragment extends Fragment {
         // This Fragment adds options to the ActionBar
         setHasOptionsMenu(true);
 
-        mOcTranspo = ((OcTranspoApplication) getActivity().getApplication()).getOcTranspo();
+        mOcTranspo = ((RideOttawaApplication) getActivity().getApplication()).getOcTranspo();
     }
 
     @Override

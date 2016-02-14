@@ -1,4 +1,4 @@
-package io.github.jbytheway.octranspoalarm;
+package io.github.jbytheway.rideottawa;
 
 import android.database.Cursor;
 

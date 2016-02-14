@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">OcTranspo Alarm</string>
+    <string name="app_name">Ride Ottawa</string>
     <string name="checking_for_updates">Checking for database updates…</string>
     <string name="downloading_new">New version available; downloading…</string>
     <string name="decompressing">Decompressing database…</string>
@@ -11,7 +11,7 @@
     <string name="name_label">Name:</string>
     <string name="save">Save</string>
     <string name="stop_title">%1$s: %2$s</string>
-    <string name="add_route">Add route</string>
+    <string name="choose_routes">Choose routes</string>
     <string name="add_destination">Add destination</string>
     <string name="title_activity_select_stop">Select Stop</string>
     <string name="title_activity_select_routes">SelectRoutesActivity</string>

@@ -1,4 +1,4 @@
-package io.github.jbytheway.octranspoalarm.utils;
+package io.github.jbytheway.rideottawa.utils;
 
 import android.content.Context;
 import android.support.annotation.LayoutRes;

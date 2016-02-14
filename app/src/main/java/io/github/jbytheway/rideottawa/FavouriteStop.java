@@ -1,4 +1,4 @@
-package io.github.jbytheway.octranspoalarm;
+package io.github.jbytheway.rideottawa;
 
 import com.orm.SugarRecord;
 import com.orm.dsl.Ignore;

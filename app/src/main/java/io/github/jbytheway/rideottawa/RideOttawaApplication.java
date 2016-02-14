@@ -1,11 +1,11 @@
-package io.github.jbytheway.octranspoalarm;
+package io.github.jbytheway.rideottawa;
 
 import com.orm.SugarApp;
 
 import net.danlew.android.joda.JodaTimeAndroid;
 
-public class OcTranspoApplication extends SugarApp {
-    public OcTranspoApplication() {
+public class RideOttawaApplication extends SugarApp {
+    public RideOttawaApplication() {
     }
 
     @Override

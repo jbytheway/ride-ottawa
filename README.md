@@ -1,7 +1,7 @@
 Summary
 =======
 
-OCTranspo Alarm is intended to be an Android app which alerts you when your
-desired bus is a certain time away.
+Ride Ottawa is intended to be an Android app providing Ottawa transit info,
+including live updates and alarms.
 
 It is in early development.

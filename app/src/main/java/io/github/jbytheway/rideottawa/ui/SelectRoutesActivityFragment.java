@@ -1,4 +1,4 @@
-package io.github.jbytheway.octranspoalarm.ui;
+package io.github.jbytheway.rideottawa.ui;
 
 import android.app.Activity;
 import android.app.Fragment;
@@ -17,11 +17,11 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 
-import io.github.jbytheway.octranspoalarm.utils.IndirectArrayAdapter;
-import io.github.jbytheway.octranspoalarm.OcTranspoApplication;
-import io.github.jbytheway.octranspoalarm.OcTranspoDataAccess;
-import io.github.jbytheway.octranspoalarm.R;
-import io.github.jbytheway.octranspoalarm.Route;
+import io.github.jbytheway.rideottawa.utils.IndirectArrayAdapter;
+import io.github.jbytheway.rideottawa.RideOttawaApplication;
+import io.github.jbytheway.rideottawa.OcTranspoDataAccess;
+import io.github.jbytheway.rideottawa.R;
+import io.github.jbytheway.rideottawa.Route;
 
 public class SelectRoutesActivityFragment extends Fragment {
 
@@ -35,7 +35,7 @@ public class SelectRoutesActivityFragment extends Fragment {
         // Don't destroy Fragment on reconfiguration
         setRetainInstance(true);
 
-        mOcTranspo = ((OcTranspoApplication) getActivity().getApplication()).getOcTranspo();
+        mOcTranspo = ((RideOttawaApplication) getActivity().getApplication()).getOcTranspo();
     }
 
     @Override

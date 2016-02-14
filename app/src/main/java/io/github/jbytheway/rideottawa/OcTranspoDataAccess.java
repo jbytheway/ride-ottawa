@@ -1,4 +1,4 @@
-package io.github.jbytheway.octranspoalarm;
+package io.github.jbytheway.rideottawa;
 
 import android.app.ProgressDialog;
 import android.content.Context;
@@ -16,7 +16,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import io.github.jbytheway.octranspoalarm.utils.DownloadableDatabase;
+import io.github.jbytheway.rideottawa.utils.DownloadableDatabase;
 
 public class OcTranspoDataAccess {
     OcTranspoDataAccess(Context context) {
