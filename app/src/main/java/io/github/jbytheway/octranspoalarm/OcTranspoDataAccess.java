@@ -87,8 +87,9 @@ public class OcTranspoDataAccess {
 
     public Cursor getAllStopsMatching(String constraint, String orderBy) {
         SQLiteDatabase database = mHelper.getReadableDatabase();
-        String pattern = "%"+constraint+"%";
-        return database.query("stops", STOP_COLUMNS, "stop_name like ?", new String[]{pattern}, null, null, orderBy);
+        String namePattern = "%"+constraint+"%";
+        String codePattern = constraint+"%";
+        return database.query("stops", STOP_COLUMNS, "stop_name like ? or stop_code like ?", new String[]{namePattern, codePattern}, null, null, orderBy);
     }
 
     public Stop getStop(String stopId) {
