@@ -4,8 +4,12 @@ import android.app.Activity;
 import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.EditText;
+import android.widget.FilterQueryProvider;
 import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
 
@@ -25,7 +29,7 @@ public class SelectStopActivity extends Activity {
 
         setContentView(R.layout.activity_select_stop);
 
-        mStopList = (ListView) findViewById(R.id.stop_list);
+        ListView stopList = (ListView) findViewById(R.id.stop_list);
 
         // For the cursor adapter, specify which columns go into which views
         String[] fromColumns = {"stop_code", "stop_name"};
@@ -36,10 +40,16 @@ public class SelectStopActivity extends Activity {
         mAdapter = new SimpleCursorAdapter(this,
                 R.layout.select_stop_list_item, cursor,
                 fromColumns, toViews, 0);
+        mAdapter.setFilterQueryProvider(new FilterQueryProvider() {
+            @Override
+            public Cursor runQuery(CharSequence constraint) {
+                return mOcTranspo.getAllStopsMatching(constraint.toString(), "stop_name");
+            }
+        });
 
-        mStopList.setAdapter(mAdapter);
+        stopList.setAdapter(mAdapter);
 
-        mStopList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        stopList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Intent result = new Intent();
@@ -50,9 +60,24 @@ public class SelectStopActivity extends Activity {
                 finish();
             }
         });
+
+        EditText stopFilter = (EditText) findViewById(R.id.stop_filter);
+        stopFilter.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                mAdapter.getFilter().filter(s.toString());
+            }
+        });
     }
 
     private OcTranspoDataAccess mOcTranspo;
-    private ListView mStopList;
     private SimpleCursorAdapter mAdapter;
 }
