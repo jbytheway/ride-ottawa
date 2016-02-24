@@ -4,6 +4,7 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.util.Log;
 
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
@@ -14,13 +15,22 @@ import org.joda.time.format.DateTimeFormatter;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 
 import io.github.jbytheway.rideottawa.utils.DownloadableDatabase;
 
 public class OcTranspoDataAccess {
+    public static final String TAG = "OcTranspoDataAccess";
+
     OcTranspoDataAccess(Context context) {
         mHelper = new OcTranspoDbHelper(context);
+        mApi = new OcTranspoApi(context);
+        mOttawaTimeZone = DateTimeZone.forID("America/Toronto");
+        mIsoDateFormatter = DateTimeFormat.forPattern("yyyyMMdd");
     }
 
     public void checkForUpdates(ProgressDialog progressDialog, DownloadableDatabase.UpdateListener listener) throws IOException {
@@ -124,36 +134,43 @@ public class OcTranspoDataAccess {
         return new Stop(stopId, stopCode, stopName);
     }
 
-    public Cursor getForthcomingTrips(String stopId, String routeName, int direction) {
+    public DateTime getNow() {
         // Get the current instant in the Ottawa time zone
         DateTime now = new DateTime();
-        DateTime nowOttawa = now.withZone(DateTimeZone.forID("America/Toronto"));
+        return now.withZone(mOttawaTimeZone);
+    }
+
+    public Cursor getForthcomingTrips(String stopId, String routeName, int direction) {
+        DateTime now = getNow();
 
         // Next we need to figure out the midnight that started this day in Ottawa
-        DateTime startOfDay = nowOttawa.withTimeAtStartOfDay();
+        DateTime startOfDay = now.withTimeAtStartOfDay();
         // And how much time has passed since then
-        Interval intervalSinceMidnight = new Interval(startOfDay, nowOttawa);
+        Interval intervalSinceMidnight = new Interval(startOfDay, now);
         Duration sinceMidnight = intervalSinceMidnight.toDuration();
         long minutesSinceMidnight = sinceMidnight.getStandardMinutes();
         long minTime = minutesSinceMidnight - 5;
 
         // Format the date in ISO format (which is what the db uses)
-        DateTimeFormatter isoDate = DateTimeFormat.forPattern("yyyyMMdd");
-        String today = isoDate.print(nowOttawa);
+        String today = mIsoDateFormatter.print(now);
 
         // Now we can finally make a query
         SQLiteDatabase database = mHelper.getReadableDatabase();
         return database.rawQuery(
-                "select * from stop_times " +
+                "select stop_times.stop_id, stop_code, stop_name, route_short_name, direction_id, " +
+                        "trip_headsign, date, stop_times.arrival_time, " +
+                        "stop_times_start.arrival_time as start_arrival_time from stop_times " +
                         "join trips on stop_times.trip_id = trips.trip_id " +
                         "join days on days.service_id = trips.service_id " +
                         "join routes on trips.route_id = routes.route_id " +
                         "join stops on stop_times.stop_id = stops._id " +
+                        "join stop_times as stop_times_start on stop_times_start.trip_id = trips.trip_id " +
                         "where stops.stop_id = ? " +
                         "and routes.route_short_name = ? " +
                         "and trips.direction_id = ? " +
                         "and days.date = ? " +
                         "and stop_times.arrival_time >= ? " +
+                        "and stop_times_start.stop_sequence = 1 " +
                         "order by stop_times.arrival_time " +
                         "limit 10",
                 new String[]{stopId, routeName, "" + direction, today, ""+minTime});
@@ -170,7 +187,9 @@ public class OcTranspoDataAccess {
             int route_name_column = c.getColumnIndex("route_short_name");
             int direction_column = c.getColumnIndex("direction_id");
             int head_sign_column = c.getColumnIndex("trip_headsign");
+            int date_column = c.getColumnIndex("date");
             int arrival_time_column = c.getColumnIndex("arrival_time");
+            int start_time_column = c.getColumnIndex("start_arrival_time");
 
             while (true) {
                 String stopId = c.getString(stop_id_column);
@@ -179,8 +198,12 @@ public class OcTranspoDataAccess {
                 String routeName = c.getString(route_name_column);
                 int direction = c.getInt(direction_column);
                 String headSign = c.getString(head_sign_column);
+                String date = c.getString(date_column);
                 int arrivalTime = c.getInt(arrival_time_column);
-                result.add(new ForthcomingTrip(new Stop(stopId, stopCode, stopName), new Route(routeName, direction), headSign, arrivalTime));
+                int startTime = c.getInt(start_time_column);
+                DateTime midnight = mIsoDateFormatter.parseDateTime(date).withZoneRetainFields(mOttawaTimeZone);
+                //Log.d(TAG, "arrivalTime="+arrivalTime+", startTime="+startTime);
+                result.add(new ForthcomingTrip(new Stop(stopId, stopCode, stopName), new Route(routeName, direction), headSign, midnight, arrivalTime, startTime));
 
                 if (!c.moveToNext()) {
                     break;
@@ -191,5 +214,30 @@ public class OcTranspoDataAccess {
         return result;
     }
 
+    public void getLiveDataForTrips(Context context, Collection<ForthcomingTrip> trips, OcTranspoApi.Listener apiListener) {
+        // Uniqify the info we need to pass to the API
+        // FIXME: Do we worry about cases where we don't think there should be a bus (because the last one was too long ago)
+        // but in fact there is (because the last one is very late)?  Currently such will not be caught.
+        HashMap<TimeQuery, ArrayList<ForthcomingTrip>> queries = new HashMap<>();
+        for (ForthcomingTrip trip : trips) {
+            TimeQuery query = new TimeQuery(trip.getStop().getCode(), trip.getRoute());
+            if (queries.containsKey(query)) {
+                queries.get(query).add(trip);
+            } else {
+                ArrayList<ForthcomingTrip> theseTrips = new ArrayList<>();
+                theseTrips.add(trip);
+                queries.put(query, theseTrips);
+            }
+        }
+
+        // Trigger all those queries
+        for (Map.Entry<TimeQuery, ArrayList<ForthcomingTrip>> entry : queries.entrySet()) {
+            mApi.queryTimes(context, entry.getKey(), entry.getValue(), apiListener);
+        }
+    }
+
     OcTranspoDbHelper mHelper;
+    OcTranspoApi mApi;
+    DateTimeZone mOttawaTimeZone;
+    DateTimeFormatter mIsoDateFormatter;
 }
