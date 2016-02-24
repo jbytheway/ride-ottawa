@@ -11,5 +11,4 @@ __pycache__
 /build
 /captures
 /data
-app/src/main/assets/databases
 app/src/main/res/values/api.xml
