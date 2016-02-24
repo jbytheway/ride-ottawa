@@ -33,6 +33,10 @@ public class OcTranspoApi {
 
     public OcTranspoApi(Context context) {
         mDirectionCache = new HashMap<>();
+        // If you get a compile error here it is because you must provide the code an API key
+        // These can be obtained by signing up at https://octranspo-new.3scale.net/signup
+        // Having obtained an app id and API key, create a file app/src/main/res/values/api.xml
+        // defining them as string resources with the names used here.
         mAppId = context.getString(R.string.app_id);
         mApiKey = context.getString(R.string.api_key);
         mProcessingTimeFormat = DateTimeFormat.forPattern("yyyyMMddHHmmss");
