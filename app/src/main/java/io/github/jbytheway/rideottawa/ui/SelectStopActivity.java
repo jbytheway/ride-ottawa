@@ -1,9 +1,9 @@
 package io.github.jbytheway.rideottawa.ui;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.View;
@@ -18,7 +18,7 @@ import io.github.jbytheway.rideottawa.OcTranspoDataAccess;
 import io.github.jbytheway.rideottawa.R;
 import io.github.jbytheway.rideottawa.Stop;
 
-public class SelectStopActivity extends Activity {
+public class SelectStopActivity extends AppCompatActivity {
     public static final String SELECTED_STOP = "selected_stop";
 
     @Override
