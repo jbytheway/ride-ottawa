@@ -1,6 +1,10 @@
 package io.github.jbytheway.rideottawa.ui;
 
+import android.app.AlertDialog;
+import android.app.Dialog;
+import android.app.DialogFragment;
 import android.app.ProgressDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
@@ -10,10 +14,12 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
+import java.io.File;
 import java.io.IOException;
 
 import io.github.jbytheway.rideottawa.RideOttawaApplication;
 import io.github.jbytheway.rideottawa.OcTranspoDataAccess;
+import io.github.jbytheway.rideottawa.OcTranspoDbHelper;
 import io.github.jbytheway.rideottawa.R;
 import io.github.jbytheway.rideottawa.utils.DownloadableDatabase;
 
@@ -39,42 +45,59 @@ public class ListFavouritesActivity extends AppCompatActivity {
             }
         });
 
-        // For testing purposes this code will the database on startup, to help test the behaviour of new installs
-//        File dir = getFilesDir();
-//        File databasesDir = new File(dir.getParentFile(), "databases");
-//        File file = new File(databasesDir, OcTranspoDbHelper.DATABASE_NAME);
-//        Log.i(TAG, "Deleting database at " + file.getAbsolutePath());
-//        file.delete();
+        boolean wifiOnly = true;
 
         OcTranspoDataAccess ocTranspo = ((RideOttawaApplication) getApplication()).getOcTranspo();
+
+        // For testing purposes this code will the database on startup, to help test the behaviour of new installs
+        //ocTranspo.deleteDatabase();
+
         final ProgressDialog dialog = new ProgressDialog(this);
         dialog.setMessage(getString(R.string.checking_for_updates));
         dialog.show();
-        try {
-            ocTranspo.checkForUpdates(dialog, new DownloadableDatabase.UpdateListener() {
-                @Override
-                public void onSuccess() {
+        ocTranspo.checkForUpdates(wifiOnly, dialog, new DownloadableDatabase.UpdateListener() {
+            @Override
+            public void onSuccess() {
+                dialog.dismiss();
+            }
+
+            @Override
+            public void onFail(Exception e, String message, boolean fatal) {
+                if (fatal) {
+                    fail(e, message);
+                } else {
+                    String toastText = getString(R.string.continuing_with_old_db, message);
+                    Toast.makeText(ListFavouritesActivity.this, toastText, Toast.LENGTH_LONG).show();
                     dialog.dismiss();
                 }
-
-                @Override
-                public void onFail(Exception e, boolean fatal) {
-                    if (fatal) {
-                        fail();
-                    } else {
-                        Toast.makeText(ListFavouritesActivity.this, R.string.download_failed_but_continuing, Toast.LENGTH_LONG).show();
-                        dialog.dismiss();
-                    }
-                }
-            });
-        } catch (IOException e) {
-            Log.e(TAG, "Error checking for database updates", e);
-            fail();
-        }
+            }
+        });
     }
 
-    private void fail() {
-        // TODO: Pop up a message so the user knows why we died
-        finish();
+    private class FatalErrorDialog extends DialogFragment {
+        FatalErrorDialog(Exception e, String message) {
+            mMessage = message;
+        }
+
+        @Override
+        public Dialog onCreateDialog(Bundle savedInstance) {
+            AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+            builder
+                    .setMessage(mMessage)
+                    .setNeutralButton(R.string.close_app, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            ListFavouritesActivity.this.finish();
+                        }
+                    });
+            return builder.create();
+        }
+
+        private String mMessage;
+    }
+
+    private void fail(Exception e, String message) {
+        String dialogMessage = getString(R.string.no_database_fatal_error, message);
+        new FatalErrorDialog(e, dialogMessage).show(getFragmentManager(), "FatalErrorDialog");
     }
 }

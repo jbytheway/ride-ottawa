@@ -32,8 +32,12 @@ public class OcTranspoDataAccess {
         mIsoDateFormatter = DateTimeFormat.forPattern("yyyyMMdd");
     }
 
-    public void checkForUpdates(ProgressDialog progressDialog, DownloadableDatabase.UpdateListener listener) throws IOException {
-        mHelper.checkForUpdates(progressDialog, listener);
+    public void checkForUpdates(boolean wifiOnly, ProgressDialog progressDialog, DownloadableDatabase.UpdateListener listener) {
+        mHelper.checkForUpdates(wifiOnly, progressDialog, listener);
+    }
+
+    public void deleteDatabase() {
+        mHelper.deleteDatabase();
     }
 
     private static final String[] STOP_COLUMNS = new String[]{"_id", "stop_id", "stop_code", "stop_name"};

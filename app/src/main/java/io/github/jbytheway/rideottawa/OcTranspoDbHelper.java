@@ -1,10 +1,14 @@
 package io.github.jbytheway.rideottawa;
 
 import android.content.Context;
+import android.util.Log;
+
+import java.io.File;
 
 import io.github.jbytheway.rideottawa.utils.DownloadableDatabase;
 
-class OcTranspoDbHelper extends DownloadableDatabase {
+public class OcTranspoDbHelper extends DownloadableDatabase {
+    private static final String TAG = "OcTranspoDbHelper";
     private static final int DATABASE_VERSION = 1;
     private static final String DATABASE_NAME = "octranspo_data.sqlite";
     private static final String DATABASE_URL = "https://github.com/jbytheway/octranspo-db/raw/master/octranspo_data.sqlite.gz";
