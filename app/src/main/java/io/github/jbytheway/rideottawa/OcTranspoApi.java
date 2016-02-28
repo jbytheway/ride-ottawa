@@ -22,7 +22,7 @@ import java.util.concurrent.CancellationException;
 
 public class OcTranspoApi {
     public static final String TAG = "OcTranspoApi";
-    public static final String URL_ROOT = "http://api.octranspo1.com/v1.2/";
+    public static final String URL_ROOT = "https://api.octranspo1.com/v1.2/";
     public static final String NEXT_TRIPS_URL = URL_ROOT + "GetNextTripsForStop";
     public static final String ROUTE_SUMMARY_URL = URL_ROOT + "GetRouteSummaryForStop";
 
