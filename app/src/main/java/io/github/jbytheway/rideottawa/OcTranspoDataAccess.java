@@ -4,7 +4,6 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.util.Log;
 
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
@@ -17,13 +16,13 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
 import io.github.jbytheway.rideottawa.utils.DownloadableDatabase;
 
 public class OcTranspoDataAccess {
+    @SuppressWarnings("unused")
     public static final String TAG = "OcTranspoDataAccess";
 
     OcTranspoDataAccess(Context context) {
@@ -38,7 +37,6 @@ public class OcTranspoDataAccess {
     }
 
     private static final String[] STOP_COLUMNS = new String[]{"_id", "stop_id", "stop_code", "stop_name"};
-    private static final String[] ROUTE_COLUMNS = new String[]{"route_short_name", "direction_id"};
 
     public Cursor getRoutesForStopById(String stopId) {
         SQLiteDatabase database = mHelper.getReadableDatabase();
@@ -52,9 +50,11 @@ public class OcTranspoDataAccess {
     }
 
     /*
+    private static final String[] ROUTE_COLUMNS = new String[]{"route_short_name", "direction_id"};
+
     Cursor getRoutesByIds(Collection<String> routeIds) {
         String[] routeIdArray = routeIds.toArray(new String[routeIds.size()]);
-        return getRoutesByIds(routeIdArray);
+rm         return getRoutesByIds(routeIdArray);
     }
 
     Cursor getRoutesByIds(String[] routeIds) {
@@ -236,8 +236,8 @@ public class OcTranspoDataAccess {
         }
     }
 
-    OcTranspoDbHelper mHelper;
-    OcTranspoApi mApi;
-    DateTimeZone mOttawaTimeZone;
-    DateTimeFormatter mIsoDateFormatter;
+    private final OcTranspoDbHelper mHelper;
+    private final OcTranspoApi mApi;
+    private final DateTimeZone mOttawaTimeZone;
+    private final DateTimeFormatter mIsoDateFormatter;
 }

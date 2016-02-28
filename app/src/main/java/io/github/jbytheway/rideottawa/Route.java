@@ -17,8 +17,8 @@ public class Route implements Parcelable {
     public int getDirection() { return mDirection; }
 
     //private String mId;
-    private String mName;
-    private int mDirection;
+    private final String mName;
+    private final int mDirection;
 
     @Override
     public int hashCode() {

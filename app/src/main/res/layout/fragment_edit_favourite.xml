@@ -24,14 +24,16 @@
                 android:textAppearance="?android:attr/textAppearanceMedium"
                 android:text="@string/name_label"
                 android:id="@+id/name_label"
-                android:layout_centerVertical="true" />
+                android:layout_centerVertical="true"
+                android:labelFor="@id/name" />
 
             <EditText
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 android:id="@+id/name"
                 android:layout_alignTop="@+id/name_label"
-                android:layout_toEndOf="@+id/name_label" />
+                android:layout_toEndOf="@+id/name_label"
+                android:inputType="text" />
         </RelativeLayout>
 
         <ListView

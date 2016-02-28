@@ -97,5 +97,5 @@ public class Favourite extends SugarRecord {
     }
 
     @Ignore
-    private ArrayList<FavouriteStop> mPendingStops;
+    private final ArrayList<FavouriteStop> mPendingStops;
 }

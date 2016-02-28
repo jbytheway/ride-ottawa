@@ -65,7 +65,7 @@ public class EditFavouriteActivityFragment extends Fragment {
                     @Override
                     public List<FavouriteStop> makeList() {
                         if (mFavourite == null) {
-                            return new ArrayList<FavouriteStop>();
+                            return new ArrayList<>();
                         } else {
                             return mFavourite.getStops();
                         }

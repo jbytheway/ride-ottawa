@@ -2,17 +2,15 @@ package io.github.jbytheway.rideottawa.utils;
 
 import android.content.Context;
 import android.support.annotation.LayoutRes;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 
-import com.orm.SugarRecord;
-
 import java.util.List;
 
 public class IndirectArrayAdapter<T> extends BaseAdapter {
+    @SuppressWarnings("unused")
     private static final String TAG = "IndirectArrayAdapter";
 
     public interface ListGenerator<T> {
@@ -67,9 +65,9 @@ public class IndirectArrayAdapter<T> extends BaseAdapter {
         return convertView;
     }
 
-    private Context mContext;
-    private @LayoutRes int mResource;
-    private ListGenerator<T> mListGenerator;
-    private ViewGenerator<T> mViewGenerator;
+    private final Context mContext;
+    private final @LayoutRes int mResource;
+    private final ListGenerator<T> mListGenerator;
+    private final ViewGenerator<T> mViewGenerator;
     private List<T> mList;
 }

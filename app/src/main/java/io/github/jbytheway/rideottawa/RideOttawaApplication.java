@@ -21,5 +21,5 @@ public class RideOttawaApplication extends SugarApp {
         return mOcTranspo;
     }
 
-    OcTranspoDataAccess mOcTranspo;
+    private OcTranspoDataAccess mOcTranspo;
 }

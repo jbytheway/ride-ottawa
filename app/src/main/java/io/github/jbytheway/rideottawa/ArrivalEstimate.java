@@ -21,6 +21,6 @@ public class ArrivalEstimate {
         return mType;
     }
 
-    DateTime mTime;
-    Type mType;
+    private final DateTime mTime;
+    private final Type mType;
 }

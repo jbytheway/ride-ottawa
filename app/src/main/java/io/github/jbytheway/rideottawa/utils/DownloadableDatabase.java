@@ -22,7 +22,6 @@ import java.io.InputStream;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.Future;
 import java.util.zip.GZIPInputStream;
-import java.util.zip.ZipInputStream;
 
 import io.github.jbytheway.rideottawa.R;
 
@@ -32,7 +31,7 @@ import io.github.jbytheway.rideottawa.R;
 public abstract class DownloadableDatabase extends SQLiteOpenHelper {
     private static final String TAG = "DownloadableDatabase";
 
-    public DownloadableDatabase(Context context, String name, String url, SQLiteDatabase.CursorFactory factory, int version) {
+    protected DownloadableDatabase(Context context, String name, String url, SQLiteDatabase.CursorFactory factory, int version) {
         super(context, name, factory, version);
 
         mContext = context;
@@ -92,7 +91,7 @@ public abstract class DownloadableDatabase extends SQLiteOpenHelper {
                             code = result.getHeaders().code();
                         }
                         Log.d(TAG, "Completed download; e=" + e + "; code=" + code);
-                        if (e != null || code != 200) {
+                        if (e != null || code == null || code != 200) {
                             if (e != null && e.getClass() == CancellationException.class) {
                                 // We are fine; no update was necessary
                                 listener.onSuccess();
@@ -116,6 +115,7 @@ public abstract class DownloadableDatabase extends SQLiteOpenHelper {
                             uncompressNewDatabase(result.getResult(), progressDialog, listener);
                             setEtag(result.getHeaders().getHeaders().get("ETag"));
                         } finally {
+                            //noinspection ResultOfMethodCallIgnored
                             temporaryFile.delete();
                         }
 
@@ -124,7 +124,7 @@ public abstract class DownloadableDatabase extends SQLiteOpenHelper {
                 });
     }
 
-    public void uncompressNewDatabase(File from, ProgressDialog progressDialog, UpdateListener listener) {
+    private void uncompressNewDatabase(File from, ProgressDialog progressDialog, UpdateListener listener) {
         try {
             progressDialog.setMessage(mContext.getString(R.string.decompressing));
             Log.d(TAG, "Decompressing " + from.getPath() + " to " + getPath());
@@ -137,7 +137,7 @@ public abstract class DownloadableDatabase extends SQLiteOpenHelper {
             Log.d(TAG, "Decompression done");
         } catch (IOException e) {
             Log.e(TAG, "Decompressing failed", e);
-            // This has to be a fatal error because we might have partially written the database
+            // Unset the ETag because we might have partially written the database
             setEtag("");
             listener.onFail(e, true);
         }
@@ -152,19 +152,19 @@ public abstract class DownloadableDatabase extends SQLiteOpenHelper {
         return super.getReadableDatabase();
     }
 
-    String getPathWith(String extension) {
+    private String getPathWith(String extension) {
         return mContext.getDatabasePath(super.getDatabaseName() + extension).getPath();
     }
 
-    String getPath() {
+    private String getPath() {
         return getPathWith("");
     }
 
-    String getEtagPath() {
+    private String getEtagPath() {
         return getPathWith(".etag");
     }
 
-    String getEtag() throws IOException {
+    private String getEtag() throws IOException {
         File etagFile = new File(getEtagPath());
         if (!etagFile.exists()) {
             return "";
@@ -173,7 +173,7 @@ public abstract class DownloadableDatabase extends SQLiteOpenHelper {
         return IOUtils.toString(is);
     }
 
-    void setEtag(String etag) {
+    private void setEtag(String etag) {
         try {
             FileOutputStream os = new FileOutputStream(getEtagPath());
             IOUtils.write(etag, os);
@@ -183,7 +183,7 @@ public abstract class DownloadableDatabase extends SQLiteOpenHelper {
         }
     }
 
-    Context mContext;
-    String mUrl;
-    Future<Response<File>> mDownload;
+    private final Context mContext;
+    private final String mUrl;
+    private Future<Response<File>> mDownload;
 }

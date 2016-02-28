@@ -19,7 +19,7 @@ import io.github.jbytheway.rideottawa.utils.DownloadableDatabase;
 
 public class ListFavouritesActivity extends AppCompatActivity {
     private static final String TAG = "ListFavouritesActivity";
-    int REQUEST_NEW_FAVOURITE = 0;
+    private static final int REQUEST_NEW_FAVOURITE = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -73,7 +73,7 @@ public class ListFavouritesActivity extends AppCompatActivity {
         }
     }
 
-    void fail() {
+    private void fail() {
         // TODO: Pop up a message so the user knows why we died
         finish();
     }

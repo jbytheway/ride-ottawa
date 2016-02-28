@@ -19,6 +19,7 @@ import io.github.jbytheway.rideottawa.utils.IndirectArrayAdapter;
 import io.github.jbytheway.rideottawa.R;
 
 public class ListFavouritesActivityFragment extends Fragment {
+    @SuppressWarnings("unused")
     private static final String TAG = "ListFavouritesFragment";
 
     public ListFavouritesActivityFragment() {

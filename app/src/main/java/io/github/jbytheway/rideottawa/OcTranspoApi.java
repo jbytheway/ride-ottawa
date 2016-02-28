@@ -21,10 +21,10 @@ import java.util.Objects;
 import java.util.concurrent.CancellationException;
 
 public class OcTranspoApi {
-    public static final String TAG = "OcTranspoApi";
-    public static final String URL_ROOT = "https://api.octranspo1.com/v1.2/";
-    public static final String NEXT_TRIPS_URL = URL_ROOT + "GetNextTripsForStop";
-    public static final String ROUTE_SUMMARY_URL = URL_ROOT + "GetRouteSummaryForStop";
+    private static final String TAG = "OcTranspoApi";
+    private static final String URL_ROOT = "https://api.octranspo1.com/v1.2/";
+    private static final String NEXT_TRIPS_URL = URL_ROOT + "GetNextTripsForStop";
+    private static final String ROUTE_SUMMARY_URL = URL_ROOT + "GetRouteSummaryForStop";
 
     public interface Listener {
         void onApiFail(@Nullable Exception e);
@@ -95,7 +95,7 @@ public class OcTranspoApi {
             });
     }
 
-    void ProcessJsonResponse(Context context, String jsonString, TimeQuery query, Collection<ForthcomingTrip> trips) throws JSONException {
+    private void ProcessJsonResponse(Context context, String jsonString, TimeQuery query, Collection<ForthcomingTrip> trips) throws JSONException {
         JSONObject json = new JSONObject(jsonString);
         JSONArray routeDirections = GetArrayOrObject(json.getJSONObject("GetNextTripsForStopResult").getJSONObject("Route"), "RouteDirection");
         final String stopCode = query.StopCode;
@@ -222,8 +222,8 @@ public class OcTranspoApi {
             Route = route;
         }
 
-        String StopCode;
-        Route Route;
+        final String StopCode;
+        final Route Route;
 
         @Override
         public int hashCode() {
@@ -241,9 +241,9 @@ public class OcTranspoApi {
         }
     }
 
-    String mAppId;
-    String mApiKey;
-    DateTimeFormatter mProcessingTimeFormat;
+    private final String mAppId;
+    private final String mApiKey;
+    private final DateTimeFormatter mProcessingTimeFormat;
     // Mapping from database directions to cardinal directions
-    HashMap<DirectionKey, String> mDirectionCache;
+    private final HashMap<DirectionKey, String> mDirectionCache;
 }

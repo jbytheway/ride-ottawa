@@ -91,8 +91,9 @@ public class FavouriteStop extends SugarRecord {
     }
 
     public String StopId;
+    @SuppressWarnings("unused")
     public Favourite Favourite;
 
     @Ignore
-    private ArrayList<FavouriteRoute> mPendingRoutes;
+    private final ArrayList<FavouriteRoute> mPendingRoutes;
 }

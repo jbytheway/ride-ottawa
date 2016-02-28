@@ -20,6 +20,6 @@
         android:id="@+id/destination"
         android:layout_alignParentTop="true"
         android:layout_toEndOf="@+id/route_name"
-        android:layout_marginLeft="10dp" />
+        android:layout_marginStart="10dp" />
 
 </RelativeLayout>

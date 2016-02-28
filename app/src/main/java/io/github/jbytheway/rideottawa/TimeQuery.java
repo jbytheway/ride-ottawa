@@ -2,14 +2,14 @@ package io.github.jbytheway.rideottawa;
 
 import java.util.Objects;
 
-public class TimeQuery {
+class TimeQuery {
     public TimeQuery(String stopCode, io.github.jbytheway.rideottawa.Route route) {
         StopCode = stopCode;
         Route = route;
     }
 
-    public String StopCode;
-    public Route Route;
+    public final String StopCode;
+    public final Route Route;
 
     @Override
     public int hashCode() {

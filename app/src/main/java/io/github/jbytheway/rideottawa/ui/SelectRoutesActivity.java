@@ -1,7 +1,6 @@
 package io.github.jbytheway.rideottawa.ui;
 
 import android.os.Bundle;
-import android.app.Activity;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 
@@ -17,6 +16,7 @@ public class SelectRoutesActivity extends AppCompatActivity {
         setContentView(R.layout.activity_select_routes);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+        //noinspection ConstantConditions
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
     }
 

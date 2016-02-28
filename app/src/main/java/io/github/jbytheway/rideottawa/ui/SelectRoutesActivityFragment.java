@@ -55,7 +55,7 @@ public class SelectRoutesActivityFragment extends Fragment {
 
         Cursor cursor = mOcTranspo.getRoutesForStopById(stopId);
         final List<Route> routes = mOcTranspo.routeCursorToList(cursor);
-        mAdapter = new IndirectArrayAdapter<>(
+        IndirectArrayAdapter<Route> adapter = new IndirectArrayAdapter<>(
                 getActivity(),
                 R.layout.select_route_list_item,
                 new IndirectArrayAdapter.ListGenerator<Route>() {
@@ -88,7 +88,7 @@ public class SelectRoutesActivityFragment extends Fragment {
                 }
         );
 
-        routeList.setAdapter(mAdapter);
+        routeList.setAdapter(adapter);
 
         Button saveButton = (Button) view.findViewById(R.id.save_button);
 
@@ -108,6 +108,5 @@ public class SelectRoutesActivityFragment extends Fragment {
     }
 
     private OcTranspoDataAccess mOcTranspo;
-    private IndirectArrayAdapter<Route> mAdapter;
     private HashSet<Route> mSelectedRoutes;
 }

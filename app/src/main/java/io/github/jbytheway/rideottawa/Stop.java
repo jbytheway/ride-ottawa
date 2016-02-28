@@ -11,7 +11,7 @@ public class Stop {
     public String getCode() { return mCode; }
     public String getName() { return mName; }
 
-    private String mId;
-    private String mCode;
-    private String mName;
+    private final String mId;
+    private final String mCode;
+    private final String mName;
 }

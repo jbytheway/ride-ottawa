@@ -56,11 +56,11 @@ public class ForthcomingTrip {
         return formatter.print(dateTime);
     }
 
-    Stop mStop;
-    Route mRoute;
-    String mHeadSign;
-    DateTime mMidnight; // the origin from which times are measured
-    int mTime;
-    int mStartTime;
-    DateTime mEstimatedArrival;
+    private final Stop mStop;
+    private final Route mRoute;
+    private final String mHeadSign;
+    private final DateTime mMidnight; // the origin from which times are measured
+    private final int mTime;
+    private final int mStartTime;
+    private DateTime mEstimatedArrival;
 }
