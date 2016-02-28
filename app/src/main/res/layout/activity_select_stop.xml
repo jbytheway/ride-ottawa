@@ -27,7 +27,8 @@
             android:id="@+id/stop_filter"
             android:layout_alignParentTop="true"
             android:layout_alignParentStart="true"
-            android:inputType="textFilter|textCapCharacters" />
+            android:inputType="textFilter|textCapCharacters"
+            android:hint="@string/filter_hint" />
     </RelativeLayout>
 
 </android.support.design.widget.CoordinatorLayout>
