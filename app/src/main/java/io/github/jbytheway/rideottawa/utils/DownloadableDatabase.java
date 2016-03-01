@@ -92,6 +92,7 @@ public abstract class DownloadableDatabase extends SQLiteOpenHelper {
                         @Override
                         public void onHeaders(HeadersResponse headers) {
                             String newEtag = headers.getHeaders().get("ETag");
+                            Log.d(TAG, "Existing etag = '"+existingEtag+"', new etag = '"+newEtag+"'");
                             if (existingEtag.equals(newEtag)) {
                                 mDownload.cancel(true);
                             } else {
