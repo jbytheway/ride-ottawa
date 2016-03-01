@@ -66,7 +66,7 @@ public abstract class DownloadableDatabase extends SQLiteOpenHelper {
 
     public interface UpdateListener {
         void onSuccess();
-        void onFail(Exception e, String message, boolean fatal);
+        void onFail(Exception e, String message, boolean wifiRelated, boolean fatal);
     }
 
     public void checkForUpdates(boolean wifiOnly, final ProgressDialog progressDialog, final UpdateListener listener) {
@@ -79,7 +79,7 @@ public abstract class DownloadableDatabase extends SQLiteOpenHelper {
             boolean onWifi = connectivity.getNetworkInfo(ConnectivityManager.TYPE_WIFI).isConnected();
 
             if (!onWifi && wifiOnly) {
-                downloadFailed(null, mContext.getString(R.string.not_downloading_without_wifi), listener);
+                downloadFailed(null, mContext.getString(R.string.not_downloading_without_wifi), true, listener);
                 return;
             }
 
@@ -114,7 +114,7 @@ public abstract class DownloadableDatabase extends SQLiteOpenHelper {
                                     // We are fine; cancelled in the onHeaders above; no update was necessary
                                     listener.onSuccess();
                                 } else {
-                                    downloadFailed(e, mContext.getString(R.string.download_failed_but_continuing), listener);
+                                    downloadFailed(e, mContext.getString(R.string.download_failed_but_continuing), false, listener);
                                 }
                                 return;
                             }
@@ -132,11 +132,11 @@ public abstract class DownloadableDatabase extends SQLiteOpenHelper {
                     });
         } catch (IOException e) {
             // the only way this can happen is if we fail to get the existing eTag, which is really bad
-            listener.onFail(e, mContext.getString(R.string.database_update_io_error), true);
+            listener.onFail(e, mContext.getString(R.string.database_update_io_error), false, true);
         }
     }
 
-    private void downloadFailed(Exception e, String message, UpdateListener listener) {
+    private void downloadFailed(Exception e, String message, boolean wifiRelated, UpdateListener listener) {
         // The download failed.  Figure out whether we have a database
         // already (if not, then we cannot continue)
         boolean fatal = true;
@@ -147,7 +147,7 @@ public abstract class DownloadableDatabase extends SQLiteOpenHelper {
             // Apart from the log, we pretty much have to ignore that error
         }
         Log.d(TAG, "Download failed; e=" + e + "; fatal=" + fatal);
-        listener.onFail(e, message, fatal);
+        listener.onFail(e, message, wifiRelated, fatal);
     }
 
     private void uncompressNewDatabase(File from, ProgressDialog progressDialog, UpdateListener listener) {
@@ -165,7 +165,7 @@ public abstract class DownloadableDatabase extends SQLiteOpenHelper {
             Log.e(TAG, "Decompressing failed", e);
             // Unset the ETag because we might have partially written the database
             setEtag("");
-            listener.onFail(e, mContext.getString(R.string.database_decompression_error), true);
+            listener.onFail(e, mContext.getString(R.string.database_decompression_error), false, true);
         }
     }
 

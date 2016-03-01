@@ -10,6 +10,7 @@
     <string name="continuing_with_old_db">%1$s  Using existing database.</string>
     <string name="no_database_fatal_error">%1$s  Cannot continue without database.</string>
     <string name="close_app">Close</string>
+    <string name="try_again_without_wifi">Download regardless</string>
     <string name="action_settings">Settings</string>
     <string name="action_delete">Delete</string>
     <string name="title_activity_list_favourites">Favourites</string>
