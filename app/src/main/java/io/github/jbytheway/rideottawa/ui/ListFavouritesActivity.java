@@ -16,6 +16,9 @@ import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.Toast;
 
+import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
+
 import io.github.jbytheway.rideottawa.RideOttawaApplication;
 import io.github.jbytheway.rideottawa.OcTranspoDataAccess;
 import io.github.jbytheway.rideottawa.R;
@@ -43,22 +46,23 @@ public class ListFavouritesActivity extends AppCompatActivity {
             }
         });
 
-        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
-        boolean wifiOnly = sharedPreferences.getBoolean(SettingsActivityFragment.PREF_WIFI_ONLY, true);
-
         mOcTranspo = ((RideOttawaApplication) getApplication()).getOcTranspo();
 
         // For testing purposes this code will the database on startup, to help test the behaviour of new installs
         //mOcTranspo.deleteDatabase();
 
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+        boolean wifiOnly = sharedPreferences.getBoolean(SettingsActivityFragment.PREF_WIFI_ONLY, true);
+
         tryDatabaseUpdate(wifiOnly);
     }
 
     private void tryDatabaseUpdate(boolean wifiOnly) {
+        DateTime ifOlderThan = new DateTime().withZone(DateTimeZone.UTC).minusDays(1);
         final ProgressDialog dialog = new ProgressDialog(this);
         dialog.setMessage(getString(R.string.checking_for_updates));
         dialog.show();
-        mOcTranspo.checkForUpdates(wifiOnly, dialog, new DownloadableDatabase.UpdateListener() {
+        mOcTranspo.checkForUpdates(wifiOnly, ifOlderThan, dialog, new DownloadableDatabase.UpdateListener() {
             @Override
             public void onSuccess() {
                 dialog.dismiss();

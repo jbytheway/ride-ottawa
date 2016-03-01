@@ -13,7 +13,10 @@ import com.koushikdutta.ion.HeadersResponse;
 import com.koushikdutta.ion.Ion;
 import com.koushikdutta.ion.Response;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
+import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -69,9 +72,21 @@ public abstract class DownloadableDatabase extends SQLiteOpenHelper {
         void onFail(Exception e, String message, boolean wifiRelated, boolean fatal);
     }
 
-    public void checkForUpdates(boolean wifiOnly, final ProgressDialog progressDialog, final UpdateListener listener) {
+    public void checkForUpdates(boolean wifiOnly, DateTime ifOlderThan, final ProgressDialog progressDialog, final UpdateListener listener) {
         try {
             final String existingEtag = getEtag();
+
+            if (existingEtag != "") {
+                // We have a DB already; if it's new enough we won't bother to check for updates
+                long timestamp = new File(getEtagPath()).lastModified();
+                DateTime lastModified = new DateTime(timestamp, DateTimeZone.UTC);
+                Log.d(TAG, "lastModified = "+lastModified+", ifOlderThan="+ifOlderThan);
+                if (lastModified.isAfter(ifOlderThan)) {
+                    // No need to update
+                    listener.onSuccess();
+                    return;
+                }
+            }
             final String temporaryFileName = getDatabaseName() + ".tmp";
             final File temporaryFile = mContext.getFileStreamPath(temporaryFileName);
 
@@ -95,6 +110,7 @@ public abstract class DownloadableDatabase extends SQLiteOpenHelper {
                             Log.d(TAG, "Existing etag = '"+existingEtag+"', new etag = '"+newEtag+"'");
                             if (existingEtag.equals(newEtag)) {
                                 mDownload.cancel(true);
+                                touchEtag();
                             } else {
                                 progressDialog.setMessage(mContext.getString(R.string.downloading_new));
                             }
@@ -207,6 +223,16 @@ public abstract class DownloadableDatabase extends SQLiteOpenHelper {
         } catch (IOException e) {
             Log.e(TAG, "Failed to update etag", e);
             // Not really anything we can do to recover from this; just have to live with downloading the file again next time
+        }
+    }
+
+    private void touchEtag() {
+        // Update the last-modified date on the ETag so we know when we last checked for updates
+        try {
+            FileUtils.touch(new File(getEtagPath()));
+        } catch (IOException e) {
+            Log.e(TAG, "Error touching etag", e);
+            // Otherwise, ignore error
         }
     }
 

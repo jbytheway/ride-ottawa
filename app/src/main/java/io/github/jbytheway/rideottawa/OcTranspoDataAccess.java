@@ -32,8 +32,8 @@ public class OcTranspoDataAccess {
         mIsoDateFormatter = DateTimeFormat.forPattern("yyyyMMdd");
     }
 
-    public void checkForUpdates(boolean wifiOnly, ProgressDialog progressDialog, DownloadableDatabase.UpdateListener listener) {
-        mHelper.checkForUpdates(wifiOnly, progressDialog, listener);
+    public void checkForUpdates(boolean wifiOnly, DateTime ifOlderThan, ProgressDialog progressDialog, DownloadableDatabase.UpdateListener listener) {
+        mHelper.checkForUpdates(wifiOnly, ifOlderThan, progressDialog, listener);
     }
 
     public void deleteDatabase() {
