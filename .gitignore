@@ -10,5 +10,4 @@ __pycache__
 .DS_Store
 /build
 /captures
-/data
 app/src/main/res/values/api.xml
