@@ -31,4 +31,11 @@
     <string name="example_arrival_time">12:00</string>
     <string name="example_head_sign">Bus to Somewhere</string>
     <string name="example_minutes">10m</string>
+    <string name="title_activity_settings">Settings</string>
+
+    <!-- Strings related to Settings -->
+    <string name="pref_title_download_wifi_only">Download databases on WiFi only</string>
+    <string name="pref_description_download_wifi_only">Will only check for or download updates to the
+        transit information database when connected to WiFi.
+    </string>
 </resources>

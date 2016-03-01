@@ -4,6 +4,9 @@ import android.content.Intent;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -23,6 +26,17 @@ public class ListFavouritesActivityFragment extends Fragment {
     private static final String TAG = "ListFavouritesFragment";
 
     public ListFavouritesActivityFragment() {
+    }
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        // Don't destroy Fragment on reconfiguration
+        setRetainInstance(true);
+
+        // This Fragment adds options to the ActionBar
+        setHasOptionsMenu(true);
     }
 
     @Override
@@ -79,6 +93,23 @@ public class ListFavouritesActivityFragment extends Fragment {
     }
 
     @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        inflater.inflate(R.menu.menu_list_favourites, menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.menu_settings:
+                Intent intent = new Intent(getActivity(), SettingsActivity.class);
+                startActivity(intent);
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
+
+    @Override
     public void onResume() {
         super.onResume();
         mAdapter.notifyDataSetChanged();
@@ -86,6 +117,7 @@ public class ListFavouritesActivityFragment extends Fragment {
 
     @Override
     public void onDestroyView() {
+        super.onDestroyView();
         mFavouriteList = null;
         super.onDestroyView();
     }
