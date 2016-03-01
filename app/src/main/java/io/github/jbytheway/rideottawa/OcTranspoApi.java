@@ -142,7 +142,8 @@ public class OcTranspoApi {
                     if (trip.getStartTimeString().equals(tripStartTime)) {
                         Log.d(TAG, "Found matching trip!");
                         int minutesAway = Integer.parseInt(liveTrip.getString("AdjustedScheduleTime"));
-                        if (minutesAway != -1) {
+                        double adjustmentAge = Double.parseDouble(liveTrip.getString("AdjustmentAge"));
+                        if (adjustmentAge != -1) {
                             trip.provideLiveData(processingTime, minutesAway);
                         }
                         break;
