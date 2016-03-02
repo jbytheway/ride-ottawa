@@ -5,10 +5,14 @@ import android.os.Bundle;
 import android.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import org.joda.time.DateTime;
 import org.joda.time.Interval;
@@ -43,6 +47,9 @@ public class ViewFavouriteActivityFragment extends Fragment implements OcTranspo
 
         // Don't destroy Fragment on reconfiguration
         setRetainInstance(true);
+
+        // This Fragment adds options to the ActionBar
+        setHasOptionsMenu(true);
 
         mOcTranspo = ((RideOttawaApplication) getActivity().getApplication()).getOcTranspo();
         // Need an empty list of trips to start with because the ListView will
@@ -133,14 +140,42 @@ public class ViewFavouriteActivityFragment extends Fragment implements OcTranspo
         }
     }
 
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        inflater.inflate(R.menu.menu_view_favourite, menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.menu_refresh:
+                refresh();
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
+
     private void populateFromFavourite() {
         mName.setText(mFavourite.Name);
         mForthcomingTrips = mFavourite.getForthcomingTrips(mOcTranspo);
+        mLastRefresh = new DateTime();
         mOcTranspo.getLiveDataForTrips(getActivity(), mForthcomingTrips, this);
         mTripAdapter.notifyDataSetChanged();
     }
 
+    private void refresh() {
+        DateTime now = new DateTime();
+        if (now.minusSeconds(30).isBefore(mLastRefresh)) {
+            Toast.makeText(getActivity(), getString(R.string.skipping_refresh_too_soon), Toast.LENGTH_LONG).show();
+        } else {
+            mOcTranspo.getLiveDataForTrips(getActivity(), mForthcomingTrips, this);
+            mLastRefresh = now;
+        }
+    }
+
     public void onApiFail(Exception e) {
+        Log.e(TAG, "API error", e);
         // TODO: report to user somehow?
     }
 
@@ -151,6 +186,7 @@ public class ViewFavouriteActivityFragment extends Fragment implements OcTranspo
     private OcTranspoDataAccess mOcTranspo;
     private Favourite mFavourite;
     private List<ForthcomingTrip> mForthcomingTrips;
+    private DateTime mLastRefresh;
     private IndirectArrayAdapter<ForthcomingTrip> mTripAdapter;
     private TextView mName;
 }
