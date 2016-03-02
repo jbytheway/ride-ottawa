@@ -1,8 +1,10 @@
 package io.github.jbytheway.rideottawa;
 
+import android.support.annotation.NonNull;
+
 import org.joda.time.DateTime;
 
-public class ArrivalEstimate {
+public class ArrivalEstimate implements java.lang.Comparable<ArrivalEstimate> {
     public enum Type {
         Schedule,
         Gps,
@@ -19,6 +21,11 @@ public class ArrivalEstimate {
 
     public Type getType() {
         return mType;
+    }
+
+    @Override
+    public int compareTo(@NonNull ArrivalEstimate r) {
+        return getTime().compareTo(r.getTime());
     }
 
     private final DateTime mTime;

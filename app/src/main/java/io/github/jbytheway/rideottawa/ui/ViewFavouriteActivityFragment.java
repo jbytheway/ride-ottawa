@@ -14,6 +14,9 @@ import org.joda.time.DateTime;
 import org.joda.time.Interval;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import io.github.jbytheway.rideottawa.ArrivalEstimate;
@@ -62,6 +65,12 @@ public class ViewFavouriteActivityFragment extends Fragment implements OcTranspo
                 new IndirectArrayAdapter.ListGenerator<ForthcomingTrip>() {
                     @Override
                     public List<ForthcomingTrip> makeList() {
+                        Collections.sort(mForthcomingTrips, new Comparator<ForthcomingTrip>() {
+                            @Override
+                            public int compare(ForthcomingTrip lhs, ForthcomingTrip rhs) {
+                                return lhs.getEstimatedArrival().compareTo(rhs.getEstimatedArrival());
+                            }
+                        });
                         return mForthcomingTrips;
                     }
                 },
@@ -127,7 +136,6 @@ public class ViewFavouriteActivityFragment extends Fragment implements OcTranspo
     private void populateFromFavourite() {
         mName.setText(mFavourite.Name);
         mForthcomingTrips = mFavourite.getForthcomingTrips(mOcTranspo);
-        // TODO: sort forthcoming trips
         mOcTranspo.getLiveDataForTrips(getActivity(), mForthcomingTrips, this);
         mTripAdapter.notifyDataSetChanged();
     }
