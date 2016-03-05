@@ -10,7 +10,8 @@
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:supportsRtl="true"
-        android:theme="@style/AppTheme.NoActionBar">
+        android:theme="@style/AppTheme.NoActionBar"
+        android:fullBackupContent="@xml/backupscheme">
         <meta-data
             android:name="DOMAIN_PACKAGE_NAME"
             android:value="io.github.jbytheway.rideottawa" />
