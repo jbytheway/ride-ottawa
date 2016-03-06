@@ -28,7 +28,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/choose_routes"
-            android:id="@+id/add_route_button" />
+            android:id="@+id/choose_routes_button" />
 
         <Button
             android:layout_width="wrap_content"
@@ -36,7 +36,7 @@
             android:text="@string/add_destination"
             android:id="@+id/add_destination_button"
             android:layout_alignParentTop="true"
-            android:layout_toEndOf="@+id/add_route_button" />
+            android:layout_toEndOf="@+id/choose_routes_button" />
     </RelativeLayout>
 
 </LinearLayout>

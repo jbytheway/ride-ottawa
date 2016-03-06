@@ -80,7 +80,7 @@ public class EditFavouriteActivityFragment extends Fragment {
                         stop_code.setText(stop.getCode());
                         stop_name.setText(stop.getName());
 
-                        Button addRouteButton = (Button) v.findViewById(R.id.add_route_button);
+                        Button addRouteButton = (Button) v.findViewById(R.id.choose_routes_button);
                         addRouteButton.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
