@@ -4,6 +4,7 @@ import com.orm.SugarRecord;
 import com.orm.dsl.Ignore;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 public class Favourite extends SugarRecord {
@@ -83,14 +84,35 @@ public class Favourite extends SugarRecord {
         mPendingStops.add(stop);
     }
 
-    public List<ForthcomingTrip> getForthcomingTrips(OcTranspoDataAccess ocTranspo) {
+    public ArrayList<ForthcomingTrip> updateForthcomingTrips(OcTranspoDataAccess ocTranspo, ArrayList<ForthcomingTrip> trips) {
         if (!mPendingStops.isEmpty()) {
             throw new AssertionError("Should only be called on saved Favourites");
         }
 
+        // First split the input trips by stop
+        HashMap<String, ArrayList<ForthcomingTrip>> tripsSplit = new HashMap<>();
+
+        for (ForthcomingTrip trip : trips) {
+            String key = trip.getStop().getId();
+            if (tripsSplit.containsKey(key)) {
+                tripsSplit.get(key).add(trip);
+            } else {
+                ArrayList<ForthcomingTrip> newList = new ArrayList<>();
+                newList.add(trip);
+                tripsSplit.put(key, newList);
+            }
+        }
+
         ArrayList<ForthcomingTrip> result = new ArrayList<>();
         for (FavouriteStop stop : getStops()) {
-            result.addAll(stop.getForthcomingTrips(ocTranspo));
+            String key = stop.StopId;
+            ArrayList<ForthcomingTrip> tripsForThisStop;
+            if (tripsSplit.containsKey(key)) {
+                tripsForThisStop = tripsSplit.get(key);
+            } else {
+                tripsForThisStop = new ArrayList<>();
+            }
+            result.addAll(stop.updateForthcomingTrips(ocTranspo, tripsForThisStop));
         }
 
         return result;

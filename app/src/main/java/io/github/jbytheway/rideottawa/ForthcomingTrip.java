@@ -5,10 +5,11 @@ import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 
 public class ForthcomingTrip {
-    public ForthcomingTrip(Stop stop, Route route, String headSign, DateTime midnight, int time, int startTime) {
+    public ForthcomingTrip(Stop stop, Route route, String headSign, int tripId, DateTime midnight, int time, int startTime) {
         mStop = stop;
         mRoute = route;
         mHeadSign = headSign;
+        mTripId = tripId;
         mMidnight = midnight;
         mTime = time;
         mStartTime = startTime;
@@ -24,6 +25,10 @@ public class ForthcomingTrip {
 
     public String getHeadSign() {
         return mHeadSign;
+    }
+
+    public int getTripId() {
+        return mTripId;
     }
 
     public String getArrivalTimeString() {
@@ -59,6 +64,7 @@ public class ForthcomingTrip {
     private final Stop mStop;
     private final Route mRoute;
     private final String mHeadSign;
+    private final int mTripId;
     private final DateTime mMidnight; // the origin from which times are measured
     private final int mTime;
     private final int mStartTime;

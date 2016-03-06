@@ -162,7 +162,7 @@ rm         return getRoutesByIds(routeIdArray);
         SQLiteDatabase database = mHelper.getReadableDatabase();
         return database.rawQuery(
                 "select stop_times.stop_id, stop_code, stop_name, route_short_name, direction_id, " +
-                        "trip_headsign, date, stop_times.arrival_time, " +
+                        "trips.trip_id, trip_headsign, date, stop_times.arrival_time, " +
                         "stop_times_start.arrival_time as start_arrival_time from stop_times " +
                         "join trips on stop_times.trip_id = trips.trip_id " +
                         "join days on days.service_id = trips.service_id " +
@@ -191,6 +191,7 @@ rm         return getRoutesByIds(routeIdArray);
             int route_name_column = c.getColumnIndex("route_short_name");
             int direction_column = c.getColumnIndex("direction_id");
             int head_sign_column = c.getColumnIndex("trip_headsign");
+            int trip_id_column = c.getColumnIndex("trip_id");
             int date_column = c.getColumnIndex("date");
             int arrival_time_column = c.getColumnIndex("arrival_time");
             int start_time_column = c.getColumnIndex("start_arrival_time");
@@ -202,12 +203,13 @@ rm         return getRoutesByIds(routeIdArray);
                 String routeName = c.getString(route_name_column);
                 int direction = c.getInt(direction_column);
                 String headSign = c.getString(head_sign_column);
+                int trip_id = c.getInt(trip_id_column);
                 String date = c.getString(date_column);
                 int arrivalTime = c.getInt(arrival_time_column);
                 int startTime = c.getInt(start_time_column);
                 DateTime midnight = mIsoDateFormatter.parseDateTime(date).withZoneRetainFields(mOttawaTimeZone);
                 //Log.d(TAG, "arrivalTime="+arrivalTime+", startTime="+startTime);
-                result.add(new ForthcomingTrip(new Stop(stopId, stopCode, stopName), new Route(routeName, direction), headSign, midnight, arrivalTime, startTime));
+                result.add(new ForthcomingTrip(new Stop(stopId, stopCode, stopName), new Route(routeName, direction), headSign, trip_id, midnight, arrivalTime, startTime));
 
                 if (!c.moveToNext()) {
                     break;

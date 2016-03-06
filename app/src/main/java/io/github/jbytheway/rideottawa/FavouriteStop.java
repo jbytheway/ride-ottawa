@@ -4,6 +4,7 @@ import com.orm.SugarRecord;
 import com.orm.dsl.Ignore;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 
@@ -77,14 +78,35 @@ public class FavouriteStop extends SugarRecord {
         }
     }
 
-    public List<ForthcomingTrip> getForthcomingTrips(OcTranspoDataAccess ocTranspo) {
+    public List<ForthcomingTrip> updateForthcomingTrips(OcTranspoDataAccess ocTranspo, ArrayList<ForthcomingTrip> trips) {
         if (!mPendingRoutes.isEmpty()) {
             throw new AssertionError("Should only be called on saved Stops");
         }
 
+        // First split the input trips by route
+        HashMap<Route, ArrayList<ForthcomingTrip>> tripsSplit = new HashMap<>();
+
+        for (ForthcomingTrip trip : trips) {
+            Route key = trip.getRoute();
+            if (tripsSplit.containsKey(key)) {
+                tripsSplit.get(key).add(trip);
+            } else {
+                ArrayList<ForthcomingTrip> newList = new ArrayList<>();
+                newList.add(trip);
+                tripsSplit.put(key, newList);
+            }
+        }
+
         ArrayList<ForthcomingTrip> result = new ArrayList<>();
         for (FavouriteRoute route : getRoutes()) {
-            result.addAll(route.getForthcomingTrips(ocTranspo));
+            Route key = route.asRoute();
+            ArrayList<ForthcomingTrip> tripsForThisRoute;
+            if (tripsSplit.containsKey(key)) {
+                tripsForThisRoute = tripsSplit.get(key);
+            } else {
+                tripsForThisRoute = new ArrayList<>();
+            }
+            result.addAll(route.updateForthcomingTrips(ocTranspo, tripsForThisRoute));
         }
 
         return result;

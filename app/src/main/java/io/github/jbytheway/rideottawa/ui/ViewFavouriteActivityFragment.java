@@ -18,7 +18,6 @@ import org.joda.time.DateTime;
 import org.joda.time.Interval;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -149,7 +148,7 @@ public class ViewFavouriteActivityFragment extends Fragment implements OcTranspo
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.menu_refresh:
-                refresh();
+                refreshIfLateEnough();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -158,20 +157,23 @@ public class ViewFavouriteActivityFragment extends Fragment implements OcTranspo
 
     private void populateFromFavourite() {
         mName.setText(mFavourite.Name);
-        mForthcomingTrips = mFavourite.getForthcomingTrips(mOcTranspo);
-        mLastRefresh = new DateTime();
-        mOcTranspo.getLiveDataForTrips(getActivity(), mForthcomingTrips, this);
-        mTripAdapter.notifyDataSetChanged();
+        refresh();
     }
 
-    private void refresh() {
+    private void refreshIfLateEnough() {
         DateTime now = new DateTime();
         if (now.minusSeconds(30).isBefore(mLastRefresh)) {
             Toast.makeText(getActivity(), getString(R.string.skipping_refresh_too_soon), Toast.LENGTH_LONG).show();
         } else {
-            mOcTranspo.getLiveDataForTrips(getActivity(), mForthcomingTrips, this);
-            mLastRefresh = now;
+            refresh();
         }
+    }
+
+    private void refresh() {
+        mForthcomingTrips = mFavourite.updateForthcomingTrips(mOcTranspo, mForthcomingTrips);
+        mLastRefresh = new DateTime();
+        mOcTranspo.getLiveDataForTrips(getActivity(), mForthcomingTrips, this);
+        mTripAdapter.notifyDataSetChanged();
     }
 
     public void onApiFail(Exception e) {
@@ -185,7 +187,7 @@ public class ViewFavouriteActivityFragment extends Fragment implements OcTranspo
 
     private OcTranspoDataAccess mOcTranspo;
     private Favourite mFavourite;
-    private List<ForthcomingTrip> mForthcomingTrips;
+    private ArrayList<ForthcomingTrip> mForthcomingTrips;
     private DateTime mLastRefresh;
     private IndirectArrayAdapter<ForthcomingTrip> mTripAdapter;
     private TextView mName;
