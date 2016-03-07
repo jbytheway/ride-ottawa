@@ -25,18 +25,30 @@
         android:layout_height="wrap_content">
 
         <Button
+            style="?android:attr/buttonStyleSmall"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/choose_routes"
             android:id="@+id/choose_routes_button" />
 
         <Button
+            style="?android:attr/buttonStyleSmall"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/add_destination"
             android:id="@+id/add_destination_button"
             android:layout_alignParentTop="true"
             android:layout_toEndOf="@+id/choose_routes_button" />
+
+        <Button
+            style="?android:attr/buttonStyleSmall"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/action_delete"
+            android:id="@+id/delete_button"
+            android:layout_alignParentTop="true"
+            android:layout_toEndOf="@+id/add_destination_button" />
+
     </RelativeLayout>
 
 </LinearLayout>

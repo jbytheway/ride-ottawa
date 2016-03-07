@@ -84,6 +84,15 @@ public class Favourite extends SugarRecord {
         mPendingStops.add(stop);
     }
 
+    public void removeStop(FavouriteStop stop) {
+        if (stop.getId() == null) {
+            // It should be in the pending list
+            mPendingStops.remove(stop);
+        } else {
+            stop.deleteRecursively();
+        }
+    }
+
     public ArrayList<ForthcomingTrip> updateForthcomingTrips(OcTranspoDataAccess ocTranspo, ArrayList<ForthcomingTrip> trips) {
         if (!mPendingStops.isEmpty()) {
             throw new AssertionError("Should only be called on saved Favourites");

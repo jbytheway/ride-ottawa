@@ -96,6 +96,15 @@ public class EditFavouriteActivityFragment extends Fragment {
                             }
                         });
 
+                        Button deleteStopButton = (Button) v.findViewById(R.id.delete_button);
+                        deleteStopButton.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                mFavourite.removeStop(favouriteStop);
+                                mStopAdapter.notifyDataSetChanged();
+                            }
+                        });
+
                         LinearLayout routeList = (LinearLayout) v.findViewById(R.id.route_list);
                         routeList.removeAllViews();
                         List<FavouriteRoute> routes = favouriteStop.getRoutes();
