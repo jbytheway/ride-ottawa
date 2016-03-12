@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="pref_sort_stop_by_entries">
+        <item>By stop name</item>
+        <item>By stop code</item>
+        <item>By distance from current location</item>
+    </string-array>
+    <string-array name="pref_sort_stop_by_values">
+        <item>stop_name</item>
+        <item>stop_code</item>
+        <item>proximity</item>
+    </string-array>
+</resources>

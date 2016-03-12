@@ -7,6 +7,7 @@ import io.github.jbytheway.rideottawa.R;
 
 public class SettingsActivityFragment extends PreferenceFragment {
     public static final String PREF_WIFI_ONLY = "pref_download_wifi_only";
+    public static final String PREF_SORT_STOPS = "pref_sort_stops_by";
 
     public SettingsActivityFragment() {
         // Required empty public constructor

@@ -40,4 +40,10 @@
     <string name="pref_description_download_wifi_only">Will only check for or download updates to the
         transit information database when connected to WiFi.
     </string>
+
+    <string name="pref_title_sort_stops_by">Sort stops by&#8230;</string>
+    <string name="pref_description_sort_stops_by">When selecting a stop, how should the stops be
+        sorted?
+    </string>
+    <string name="pref_default_sort_stops_by">proximity</string>
 </resources>

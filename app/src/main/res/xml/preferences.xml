@@ -6,4 +6,12 @@
         android:summary="@string/pref_description_download_wifi_only"
         android:defaultValue="true" />
 
+    <ListPreference
+        android:key="pref_sort_stops_by"
+        android:title="@string/pref_title_sort_stops_by"
+        android:dialogTitle="@string/pref_description_sort_stops_by"
+        android:entries="@array/pref_sort_stop_by_entries"
+        android:entryValues="@array/pref_sort_stop_by_values"
+        android:defaultValue="@string/pref_default_sort_stops_by" />
+
 </PreferenceScreen>

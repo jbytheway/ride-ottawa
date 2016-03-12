@@ -4,7 +4,9 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.location.Location;
 
+import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.joda.time.Duration;
@@ -94,16 +96,30 @@ rm         return getRoutesByIds(routeIdArray);
         return result;
     }
 
-    public Cursor getAllStops(String orderBy) {
-        SQLiteDatabase database = mHelper.getReadableDatabase();
-        return database.query("stops", STOP_COLUMNS, null, null, null, null, orderBy);
+    public Cursor getAllStops(String orderBy, Location location) {
+        return getAllStopsMatching("", orderBy, location);
     }
 
-    public Cursor getAllStopsMatching(String constraint, String orderBy) {
-        SQLiteDatabase database = mHelper.getReadableDatabase();
+    public Cursor getAllStopsMatching(String constraint, String orderBy, Location location) {
+        String cols = StringUtils.join(STOP_COLUMNS, ", ");
         String namePattern = "%"+constraint+"%";
         String codePattern = constraint+"%";
-        return database.query("stops", STOP_COLUMNS, "stop_name like ? or stop_code like ?", new String[]{namePattern, codePattern}, null, null, orderBy);
+        String[] args = new String[]{namePattern, codePattern};
+
+        if (orderBy.equals("proximity")) {
+            // We need to sort by distance.  This means we need our current location
+            if (location == null) {
+                orderBy = "stop_name";
+            } else {
+                orderBy = "(stop_lat-?)*(stop_lat-?)+(stop_lon-?)*(stop_lon-?)";
+                String lat = ""+location.getLatitude();
+                String lon = ""+location.getLongitude();
+                args = new String[]{namePattern, codePattern, lat, lat, lon, lon};
+            }
+        }
+
+        SQLiteDatabase database = mHelper.getReadableDatabase();
+        return database.rawQuery("select " + cols + " from stops where (stop_name like ? or stop_code like ?) order by "+orderBy, args);
     }
 
     public Stop getStop(String stopId) {
