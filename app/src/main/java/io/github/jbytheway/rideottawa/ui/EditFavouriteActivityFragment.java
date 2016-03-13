@@ -3,6 +3,7 @@ package io.github.jbytheway.rideottawa.ui;
 import android.app.Activity;
 import android.app.Fragment;
 import android.content.Intent;
+import android.database.Cursor;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.util.Log;
@@ -16,6 +17,7 @@ import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -84,15 +86,7 @@ public class EditFavouriteActivityFragment extends Fragment {
                         addRouteButton.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
-                                Intent intent = new Intent(getActivity(), SelectRoutesActivity.class);
-                                intent.putExtra(SelectRoutesActivity.STOP_ID, stop.getId());
-                                List<FavouriteRoute> routes = favouriteStop.getRoutes();
-                                ArrayList<Route> selectedRoutes = new ArrayList<>();
-                                for (FavouriteRoute route : routes) {
-                                    selectedRoutes.add(route.asRoute());
-                                }
-                                intent.putParcelableArrayListExtra(SelectRoutesActivity.SELECTED_ROUTES, selectedRoutes);
-                                startActivityForResult(intent, REQUEST_ROUTES);
+                                selectRoutesForStop(favouriteStop);
                             }
                         });
 
@@ -183,6 +177,18 @@ public class EditFavouriteActivityFragment extends Fragment {
         }
     }
 
+    private void selectRoutesForStop(FavouriteStop favouriteStop) {
+        Intent intent = new Intent(getActivity(), SelectRoutesActivity.class);
+        intent.putExtra(SelectRoutesActivity.STOP_ID, favouriteStop.StopId);
+        List<FavouriteRoute> routes = favouriteStop.getRoutes();
+        ArrayList<Route> selectedRoutes = new ArrayList<>();
+        for (FavouriteRoute route : routes) {
+            selectedRoutes.add(route.asRoute());
+        }
+        intent.putParcelableArrayListExtra(SelectRoutesActivity.SELECTED_ROUTES, selectedRoutes);
+        startActivityForResult(intent, REQUEST_ROUTES);
+    }
+
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         switch (requestCode) {
@@ -190,6 +196,19 @@ public class EditFavouriteActivityFragment extends Fragment {
                 if (resultCode == Activity.RESULT_OK) {
                     String stopId = data.getStringExtra(SelectStopActivity.SELECTED_STOP);
                     mFavourite.addStop(stopId);
+                    // In the event that this stop has but a single Route, we wish to add it forthwith.
+                    Cursor c = mOcTranspo.getRoutesForStopById(stopId);
+                    FavouriteStop stop = mFavourite.getStop(stopId);
+                    if (c.getCount() == 1) {
+                        List<Route> routes = mOcTranspo.routeCursorToList(c);
+                        stop.addRoute(routes.get(0));
+                    } else if (c.getCount() > 1) {
+                        // Assume that the user wants to select routes for this stop, so do that
+                        selectRoutesForStop(stop);
+                    } else {
+                        // Strange case; there are no routes for this stop.
+                        Toast.makeText(getActivity(), getString(R.string.no_routes_available), Toast.LENGTH_LONG).show();
+                    }
                     mStopAdapter.notifyDataSetChanged();
                 }
                 break;

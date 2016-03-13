@@ -22,9 +22,10 @@
     <string name="choose_routes">Routes</string>
     <string name="add_destination">Add destination</string>
     <string name="select_all">Select all</string>
+    <string name="no_routes_available">This stop has no routes.</string>
     <string name="filter_hint">Type here to filter stops</string>
     <string name="title_activity_select_stop">Select Stop</string>
-    <string name="title_activity_select_routes">SelectRoutesActivity</string>
+    <string name="title_activity_select_routes">Select Routes</string>
     <string name="title_activity_view_favourite">View Favourite</string>
     <string name="minutes_format">%1$dm</string>
     <string name="scheduled_abbrev">Sched</string>
