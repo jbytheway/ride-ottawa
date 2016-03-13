@@ -89,8 +89,8 @@ public abstract class DownloadableDatabase extends SQLiteOpenHelper {
                     return;
                 }
             }
-            final String temporaryFileName = getDatabaseName() + ".tmp";
-            final File temporaryFile = mContext.getFileStreamPath(temporaryFileName);
+            final String gzFileName = getDatabaseName() + ".gz";
+            final File temporaryFile = mContext.getFileStreamPath(gzFileName);
 
             ConnectivityManager connectivity = (ConnectivityManager)mContext.getSystemService(Context.CONNECTIVITY_SERVICE);
             //noinspection deprecation
@@ -173,14 +173,19 @@ public abstract class DownloadableDatabase extends SQLiteOpenHelper {
     private void uncompressNewDatabase(File from, ProgressDialog progressDialog, UpdateListener listener) {
         try {
             progressDialog.setMessage(mContext.getString(R.string.decompressing));
-            Log.d(TAG, "Decompressing " + from.getPath() + " to " + getPath());
+            final String tmpFileName = getDatabaseName() + ".tmp";
+            final File tmpFile = mContext.getFileStreamPath(tmpFileName);
+            Log.d(TAG, "Decompressing " + from.getPath() + " to " + tmpFile.getPath());
             FileInputStream fin = new FileInputStream(from);
             GZIPInputStream zin = new GZIPInputStream(fin);
 
-            FileOutputStream fout = new FileOutputStream(getPath());
+            FileOutputStream fout = new FileOutputStream(tmpFile);
 
             IOUtils.copy(zin, fout);
             Log.d(TAG, "Decompression done");
+            if (!tmpFile.renameTo(new File(getPath()))) {
+                throw new IOException("Failed to rename "+tmpFile+" to "+getPath());
+            }
         } catch (IOException e) {
             Log.e(TAG, "Decompressing failed", e);
             // Unset the ETag because we might have partially written the database

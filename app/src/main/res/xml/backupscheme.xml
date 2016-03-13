@@ -2,6 +2,7 @@
 <full-backup-content>
     <exclude domain="database" path="octranspo_data.sqlite"/>
     <exclude domain="database" path="octranspo_data.sqlite-journal"/>
-    <exclude domain="database" path="octranspo_data.sqlite.tmp"/>
     <exclude domain="database" path="octranspo_data.sqlite.etag"/>
+    <exclude domain="file" path="octranspo_data.sqlite.gz"/>
+    <exclude domain="file" path="octranspo_data.sqlite.tmp"/>
 </full-backup-content>
