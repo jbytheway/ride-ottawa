@@ -181,7 +181,7 @@ rm         return getRoutesByIds(routeIdArray);
         // Now we can finally make a query
         SQLiteDatabase database = mHelper.getReadableDatabase();
         return database.rawQuery(
-                "select stop_times.stop_id, stop_code, stop_name, route_short_name, direction_id, " +
+                "select stops.stop_id, stop_code, stop_name, route_short_name, direction_id, " +
                         "trips.trip_id, trip_headsign, date, stop_times.arrival_time, " +
                         "stop_times_start.arrival_time as start_arrival_time from stop_times " +
                         "join trips on stop_times.trip_id = trips.trip_id " +
