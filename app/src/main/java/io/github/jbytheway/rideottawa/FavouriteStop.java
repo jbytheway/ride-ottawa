@@ -4,6 +4,7 @@ import com.orm.SugarRecord;
 import com.orm.dsl.Ignore;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -40,6 +41,7 @@ public class FavouriteStop extends SugarRecord {
             all.addAll(FavouriteRoute.find(FavouriteRoute.class, "stop = ?", id.toString()));
         }
         all.addAll(mPendingRoutes);
+        Collections.sort(all);
         return all;
     }
 

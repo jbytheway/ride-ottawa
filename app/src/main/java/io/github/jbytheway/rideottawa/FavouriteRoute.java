@@ -1,6 +1,7 @@
 package io.github.jbytheway.rideottawa;
 
 import android.database.Cursor;
+import android.support.annotation.NonNull;
 
 import com.orm.SugarRecord;
 
@@ -8,7 +9,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-public class FavouriteRoute extends SugarRecord {
+public class FavouriteRoute extends SugarRecord implements Comparable<FavouriteRoute> {
     @SuppressWarnings("unused")
     public FavouriteRoute() {
         // Required for Sugar
@@ -52,6 +53,15 @@ public class FavouriteRoute extends SugarRecord {
         }
 
         return result;
+    }
+
+    @Override
+    public int compareTo(@NonNull FavouriteRoute another) {
+        int stringCompare = RouteName.compareTo(another.RouteName);
+        if (stringCompare != 0) {
+            return stringCompare;
+        }
+        return Integer.compare(Direction, another.Direction);
     }
 
     public String RouteName;
