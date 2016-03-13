@@ -111,7 +111,7 @@ public class EditFavouriteActivityFragment extends Fragment {
                         for (FavouriteRoute route : routes) {
                             View routeView = inflater.inflate(R.layout.edit_stop_route_list_item, routeList, false);
                             TextView routeName = (TextView) routeView.findViewById(R.id.route_name);
-                            routeName.setText(route.RouteName);
+                            route.asRoute().applyToTextView(routeName);
                             TextView destination = (TextView) routeView.findViewById(R.id.destination);
                             destination.setText(""); // TODO: destination in FavouriteRoute
                             routeList.addView(routeView);

@@ -3,6 +3,7 @@ package io.github.jbytheway.rideottawa;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.support.v4.graphics.ColorUtils;
+import android.widget.TextView;
 
 import java.util.Objects;
 
@@ -23,6 +24,11 @@ public class Route implements Parcelable {
     //private String mId;
     private final String mName;
     private final int mDirection;
+
+    public void applyToTextView(TextView view) {
+        view.setText(getName());
+        view.setTextColor(getColour());
+    }
 
     public int getColour() {
         final double INT_RANGE = Math.pow(2, 32);

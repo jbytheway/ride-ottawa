@@ -68,7 +68,7 @@ public class SelectRoutesActivityFragment extends Fragment {
                     @Override
                     public void applyView(View v, final Route route) {
                         CheckBox check = (CheckBox) v.findViewById(R.id.check);
-                        check.setText(route.getName());
+                        route.applyToTextView(check);
                         // Must remove the listener first because if this View is reused from a
                         // previous call then it might mess with mSelectedRoutes in a bad way
                         // when we set the checked state here.
