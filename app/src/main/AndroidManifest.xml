@@ -45,11 +45,7 @@
         </activity>
         <activity
             android:name=".ui.SelectRoutesActivity"
-            android:label="@string/title_activity_select_routes"
-            android:parentActivityName=".ui.EditFavouriteActivity">
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value=".ui.EditFavouriteActivity" />
+            android:label="@string/title_activity_select_routes">
         </activity>
         <activity
             android:name=".ui.ViewFavouriteActivity"

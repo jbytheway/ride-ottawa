@@ -16,8 +16,6 @@ public class SelectRoutesActivity extends AppCompatActivity {
         setContentView(R.layout.activity_select_routes);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        //noinspection ConstantConditions
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
     }
 
 }
