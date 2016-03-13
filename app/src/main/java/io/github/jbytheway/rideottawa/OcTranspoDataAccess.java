@@ -225,7 +225,9 @@ rm         return getRoutesByIds(routeIdArray);
                 int startTime = c.getInt(start_time_column);
                 DateTime midnight = mIsoDateFormatter.parseDateTime(date).withZoneRetainFields(mOttawaTimeZone);
                 //Log.d(TAG, "arrivalTime="+arrivalTime+", startTime="+startTime);
-                result.add(new ForthcomingTrip(new Stop(stopId, stopCode, stopName), new Route(routeName, direction), headSign, trip_id, midnight, arrivalTime, startTime));
+                Stop stop = new Stop(stopId, stopCode, stopName);
+                Route route = new Route(routeName, direction);
+                result.add(new ForthcomingTrip(stop, route, headSign, trip_id, midnight, arrivalTime, startTime));
 
                 if (!c.moveToNext()) {
                     break;

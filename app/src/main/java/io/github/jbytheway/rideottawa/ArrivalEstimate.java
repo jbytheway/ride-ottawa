@@ -8,6 +8,7 @@ public class ArrivalEstimate implements java.lang.Comparable<ArrivalEstimate> {
     public enum Type {
         Schedule,
         Gps,
+        GpsOld,
     }
 
     ArrivalEstimate(DateTime time, Type type) {

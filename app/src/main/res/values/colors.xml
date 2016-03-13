@@ -3,4 +3,9 @@
     <color name="colorPrimary">#F44336</color>
     <color name="colorPrimaryDark">#D32F2F</color>
     <color name="colorAccent">#9E9E9E</color>
+
+    <color name="time_gps">@android:color/holo_green_light</color>
+    <color name="time_gps_old">@android:color/holo_orange_light</color>
+    <color name="time_scheduled">@android:color/white</color>
+    <color name="time_past">@android:color/holo_red_light</color>
 </resources>

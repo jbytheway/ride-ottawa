@@ -45,14 +45,21 @@ public class ForthcomingTrip {
 
     public ArrivalEstimate getEstimatedArrival() {
         if (mEstimatedArrival != null) {
-            return new ArrivalEstimate(mEstimatedArrival, ArrivalEstimate.Type.Gps);
+            ArrivalEstimate.Type type;
+            if (mEstimateAge != null && mEstimateAge > 1) {
+                type = ArrivalEstimate.Type.GpsOld;
+            } else {
+                type = ArrivalEstimate.Type.Gps;
+            }
+            return new ArrivalEstimate(mEstimatedArrival, type);
         }
 
         return new ArrivalEstimate(getArrivalTimeDateTime(), ArrivalEstimate.Type.Schedule);
     }
 
-    public void provideLiveData(DateTime processingTime, int minutesAway) {
+    public void provideLiveData(DateTime processingTime, int minutesAway, double estimateAge) {
         mEstimatedArrival = processingTime.plusMinutes(minutesAway);
+        mEstimateAge = estimateAge;
     }
 
     private String stringifyTime(int time) {
@@ -69,4 +76,5 @@ public class ForthcomingTrip {
     private final int mTime;
     private final int mStartTime;
     private DateTime mEstimatedArrival;
+    private Double mEstimateAge;
 }

@@ -144,7 +144,7 @@ public class OcTranspoApi {
                         int minutesAway = Integer.parseInt(liveTrip.getString("AdjustedScheduleTime"));
                         double adjustmentAge = Double.parseDouble(liveTrip.getString("AdjustmentAge"));
                         if (adjustmentAge != -1) {
-                            trip.provideLiveData(processingTime, minutesAway);
+                            trip.provideLiveData(processingTime, minutesAway, adjustmentAge);
                         }
                         break;
                     }
