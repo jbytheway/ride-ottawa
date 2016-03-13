@@ -96,6 +96,7 @@ public class ViewFavouriteActivityFragment extends Fragment implements OcTranspo
                         stop_name.setText(stop.getName());
                         Route route = trip.getRoute();
                         route_name.setText(route.getName());
+                        route_name.setTextColor(route.getColour());
                         head_sign.setText(trip.getHeadSign());
                         arrival_time.setText(trip.getArrivalTimeString());
                         ArrivalEstimate ae = trip.getEstimatedArrival();

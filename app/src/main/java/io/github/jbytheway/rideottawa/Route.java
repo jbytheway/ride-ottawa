@@ -1,11 +1,16 @@
 package io.github.jbytheway.rideottawa;
 
+import android.graphics.Color;
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.support.v4.graphics.ColorUtils;
+import android.util.Log;
 
 import java.util.Objects;
 
 public class Route implements Parcelable {
+    private static final String TAG = "Route";
+
     Route(String name, int direction) {
         //mId = id;
         mName = name;
@@ -19,6 +24,26 @@ public class Route implements Parcelable {
     //private String mId;
     private final String mName;
     private final int mDirection;
+
+    public int getColour() {
+        final double INT_RANGE = Math.pow(2, 32);
+        int hash = mName.hashCode() * 1284865837;
+        double hue = hash * 360.0 / INT_RANGE;
+        // Make colours for opposite direction complementary
+        if (mDirection == 1) {
+            hue += 180;
+        }
+        // Make sure hue is in valid range
+        if (hue < 0) {
+            hue += 360;
+        } else {
+            hue %= 360;
+        }
+        Log.d(TAG, "Route=" + mName + ", hash=" + hash + ", hue=" + hue);
+        float saturation = 1;
+        float lightness = 0.7f;
+        return ColorUtils.HSLToColor(new float[]{(float)hue, saturation, lightness});
+    }
 
     @Override
     public int hashCode() {
