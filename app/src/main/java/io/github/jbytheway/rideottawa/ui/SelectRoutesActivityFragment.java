@@ -90,7 +90,7 @@ public class SelectRoutesActivityFragment extends Fragment {
 
         routeList.setAdapter(adapter);
 
-        Button saveButton = (Button) view.findViewById(R.id.save_button);
+        Button saveButton = (Button) view.findViewById(R.id.save);
 
         saveButton.setOnClickListener(new View.OnClickListener() {
             @Override

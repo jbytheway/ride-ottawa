@@ -18,6 +18,7 @@
     <string name="title_activity_edit_favourite">Edit Favourite</string>
     <string name="name_label">Name:</string>
     <string name="save">Save</string>
+    <string name="add_stop">Add stop</string>
     <string name="choose_routes">Routes</string>
     <string name="add_destination">Add destination</string>
     <string name="filter_hint">Type here to filter stops</string>

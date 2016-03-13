@@ -43,23 +43,23 @@
             android:layout_height="match_parent"
             android:id="@+id/stop_list"
             android:layout_below="@+id/relativeLayout"
-            android:layout_above="@+id/save_button" />
+            android:layout_above="@+id/save" />
 
         <Button
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/save"
-            android:id="@+id/save_button"
+            android:id="@+id/save"
             android:layout_alignParentBottom="true"
             android:layout_alignParentStart="true" />
 
-    </RelativeLayout>
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/add_stop"
+            android:id="@+id/add_stop"
+            android:layout_alignBottom="@+id/save"
+            android:layout_toEndOf="@+id/save" />
 
-    <android.support.design.widget.FloatingActionButton
-        android:id="@+id/fab"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom|end"
-        android:layout_margin="@dimen/fab_margin"
-        android:src="@drawable/plus" />
+    </RelativeLayout>
 </android.support.design.widget.CoordinatorLayout>

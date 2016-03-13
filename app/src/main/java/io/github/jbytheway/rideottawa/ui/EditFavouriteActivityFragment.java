@@ -124,8 +124,8 @@ public class EditFavouriteActivityFragment extends Fragment {
 
         mName = (TextView) view.findViewById(R.id.name);
 
-        FloatingActionButton fab = (FloatingActionButton) view.findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
+        Button addStopButton = (Button) view.findViewById(R.id.add_stop);
+        addStopButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(getActivity(), SelectStopActivity.class);
@@ -133,7 +133,7 @@ public class EditFavouriteActivityFragment extends Fragment {
             }
         });
 
-        Button saveButton = (Button) view.findViewById(R.id.save_button);
+        Button saveButton = (Button) view.findViewById(R.id.save);
         saveButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
