@@ -18,6 +18,8 @@ import org.apache.commons.collections4.IteratorUtils;
 import java.util.List;
 
 import io.github.jbytheway.rideottawa.Favourite;
+import io.github.jbytheway.rideottawa.OcTranspoDataAccess;
+import io.github.jbytheway.rideottawa.RideOttawaApplication;
 import io.github.jbytheway.rideottawa.utils.IndirectArrayAdapter;
 import io.github.jbytheway.rideottawa.R;
 
@@ -37,6 +39,8 @@ public class ListFavouritesActivityFragment extends Fragment {
 
         // This Fragment adds options to the ActionBar
         setHasOptionsMenu(true);
+
+        mOcTranspo = ((RideOttawaApplication) getActivity().getApplication()).getOcTranspo();
     }
 
     @Override
@@ -67,6 +71,10 @@ public class ListFavouritesActivityFragment extends Fragment {
         mFavouriteList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                if (!mOcTranspo.isDatabaseAvailable()) {
+                    mActivity.notifyNoDatabase();
+                    return;
+                }
                 Favourite item = mAdapter.getItem(position);
                 Intent intent = new Intent(getActivity(), ViewFavouriteActivity.class);
                 intent.putExtra(ViewFavouriteActivity.FAVOURITE_ID, item.getId());
@@ -78,6 +86,10 @@ public class ListFavouritesActivityFragment extends Fragment {
         mFavouriteList.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
             @Override
             public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+                if (!mOcTranspo.isDatabaseAvailable()) {
+                    mActivity.notifyNoDatabase();
+                    return true;
+                }
                 Favourite item = mAdapter.getItem(position);
                 Intent intent = new Intent(getActivity(), EditFavouriteActivity.class);
                 intent.putExtra(EditFavouriteActivity.NEW_FAVOURITE, false);
@@ -90,6 +102,12 @@ public class ListFavouritesActivityFragment extends Fragment {
         });
 
         return view;
+    }
+
+    @Override
+    public void onActivityCreated(Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        mActivity = (ListFavouritesActivity) getActivity();
     }
 
     @Override
@@ -122,6 +140,8 @@ public class ListFavouritesActivityFragment extends Fragment {
         super.onDestroyView();
     }
 
+    private OcTranspoDataAccess mOcTranspo;
+    private ListFavouritesActivity mActivity;
     private ListView mFavouriteList;
     private IndirectArrayAdapter<Favourite> mAdapter;
 }

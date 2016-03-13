@@ -37,6 +37,10 @@ public class OcTranspoDataAccess {
         mHelper.checkForUpdates(wifiOnly, ifOlderThan, progressDialog, listener);
     }
 
+    public boolean isDatabaseAvailable() {
+        return mHelper.isDatabaseAvailable();
+    }
+
     @SuppressWarnings("unused")
     public void deleteDatabase() {
         mHelper.deleteDatabase();

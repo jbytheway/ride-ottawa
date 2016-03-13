@@ -194,6 +194,14 @@ public abstract class DownloadableDatabase extends SQLiteOpenHelper {
         }
     }
 
+    public boolean isDatabaseAvailable() {
+        try {
+            return !getEtag().isEmpty();
+        } catch (IOException e) {
+            return false;
+        }
+    }
+
     @Override
     public SQLiteDatabase getReadableDatabase() {
         File file = new File (getPath());

@@ -9,6 +9,7 @@
     <string name="database_update_io_error">I/O error while checking for database update.</string>
     <string name="continuing_with_old_db">%1$s  Using existing database.</string>
     <string name="no_database_fatal_error">%1$s  Cannot continue without database.</string>
+    <string name="cannot_proceed_without_database">Cannot proceed without database.</string>
     <string name="close_app">Close</string>
     <string name="try_again_without_wifi">Download regardless</string>
     <string name="action_settings">Settings</string>

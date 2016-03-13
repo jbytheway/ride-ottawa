@@ -40,6 +40,10 @@ public class ListFavouritesActivity extends AppCompatActivity {
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                if (!mOcTranspo.isDatabaseAvailable()) {
+                    notifyNoDatabase();
+                    return;
+                }
                 Intent intent = new Intent(ListFavouritesActivity.this, EditFavouriteActivity.class);
                 intent.putExtra(EditFavouriteActivity.NEW_FAVOURITE, true);
 
@@ -156,6 +160,10 @@ public class ListFavouritesActivity extends AppCompatActivity {
                 ListFavouritesActivity.this.tryDatabaseUpdate(false);
             }
         };
+    }
+
+    public void notifyNoDatabase() {
+        Toast.makeText(this, getString(R.string.cannot_proceed_without_database), Toast.LENGTH_LONG).show();
     }
 
     private OcTranspoDataAccess mOcTranspo;
