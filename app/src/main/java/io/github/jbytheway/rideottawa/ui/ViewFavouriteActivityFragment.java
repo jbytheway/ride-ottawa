@@ -1,7 +1,6 @@
 package io.github.jbytheway.rideottawa.ui;
 
 import android.content.Intent;
-import android.content.res.Resources;
 import android.os.Bundle;
 import android.app.Fragment;
 import android.util.Log;
@@ -115,17 +114,21 @@ public class ViewFavouriteActivityFragment extends Fragment implements OcTranspo
                         switch (ae.getType()) {
                             case Gps:
                                 time_type.setText(getString(R.string.gps_abbrev));
+                                //noinspection deprecation
                                 minutes_away.setTextColor(getResources().getColor(R.color.time_gps));
                                 break;
                             case GpsOld:
                                 time_type.setText(getString(R.string.gps_old_abbrev));
+                                //noinspection deprecation
                                 minutes_away.setTextColor(getResources().getColor(R.color.time_gps_old));
                                 break;
                             case Schedule:
                                 time_type.setText(getString(R.string.scheduled_abbrev));
                                 if (minutesAway < 0) {
+                                    //noinspection deprecation
                                     minutes_away.setTextColor(getResources().getColor(R.color.time_past));
                                 } else {
+                                    //noinspection deprecation
                                     minutes_away.setTextColor(getResources().getColor(R.color.time_scheduled));
                                 }
                                 break;

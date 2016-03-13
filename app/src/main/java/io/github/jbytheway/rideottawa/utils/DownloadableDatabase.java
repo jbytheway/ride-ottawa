@@ -45,10 +45,12 @@ public abstract class DownloadableDatabase extends SQLiteOpenHelper {
     public void deleteDatabase() {
         File file = new File(getEtagPath());
         Log.i(TAG, "Deleting etag at " + file.getAbsolutePath());
+        //noinspection ResultOfMethodCallIgnored
         file.delete();
 
         file = new File(getPath());
         Log.i(TAG, "Deleting database at " + file.getAbsolutePath());
+        //noinspection ResultOfMethodCallIgnored
         file.delete();
     }
 
@@ -76,7 +78,7 @@ public abstract class DownloadableDatabase extends SQLiteOpenHelper {
         try {
             final String existingEtag = getEtag();
 
-            if (existingEtag != "") {
+            if (!existingEtag.equals("")) {
                 // We have a DB already; if it's new enough we won't bother to check for updates
                 long timestamp = new File(getEtagPath()).lastModified();
                 DateTime lastModified = new DateTime(timestamp, DateTimeZone.UTC);
@@ -91,6 +93,7 @@ public abstract class DownloadableDatabase extends SQLiteOpenHelper {
             final File temporaryFile = mContext.getFileStreamPath(temporaryFileName);
 
             ConnectivityManager connectivity = (ConnectivityManager)mContext.getSystemService(Context.CONNECTIVITY_SERVICE);
+            //noinspection deprecation
             boolean onWifi = connectivity.getNetworkInfo(ConnectivityManager.TYPE_WIFI).isConnected();
 
             if (!onWifi && wifiOnly) {

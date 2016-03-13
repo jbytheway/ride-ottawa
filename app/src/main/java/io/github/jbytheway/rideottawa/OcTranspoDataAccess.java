@@ -14,7 +14,6 @@ import org.joda.time.Interval;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -38,6 +37,7 @@ public class OcTranspoDataAccess {
         mHelper.checkForUpdates(wifiOnly, ifOlderThan, progressDialog, listener);
     }
 
+    @SuppressWarnings("unused")
     public void deleteDatabase() {
         mHelper.deleteDatabase();
     }

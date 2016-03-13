@@ -25,6 +25,7 @@ import io.github.jbytheway.rideottawa.R;
 import io.github.jbytheway.rideottawa.utils.DownloadableDatabase;
 
 public class ListFavouritesActivity extends AppCompatActivity {
+    @SuppressWarnings("unused")
     private static final String TAG = "ListFavouritesActivity";
     private static final int REQUEST_NEW_FAVOURITE = 0;
 
@@ -143,7 +144,7 @@ public class ListFavouritesActivity extends AppCompatActivity {
         errorDialog.show(getFragmentManager(), "FatalErrorDialog");
     }
 
-    FatalErrorDialog.FatalErrorListener getFatalErrorListener() {
+    private FatalErrorDialog.FatalErrorListener getFatalErrorListener() {
         return new FatalErrorDialog.FatalErrorListener() {
             @Override
             public void abort() {

@@ -1,14 +1,13 @@
 package io.github.jbytheway.rideottawa;
 
-import android.graphics.Color;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.support.v4.graphics.ColorUtils;
-import android.util.Log;
 
 import java.util.Objects;
 
 public class Route implements Parcelable {
+    @SuppressWarnings("unused")
     private static final String TAG = "Route";
 
     Route(String name, int direction) {
@@ -39,10 +38,9 @@ public class Route implements Parcelable {
         } else {
             hue %= 360;
         }
-        Log.d(TAG, "Route=" + mName + ", hash=" + hash + ", hue=" + hue);
         float saturation = 1;
         float lightness = 0.7f;
-        return ColorUtils.HSLToColor(new float[]{(float)hue, saturation, lightness});
+        return ColorUtils.HSLToColor(new float[]{(float) hue, saturation, lightness});
     }
 
     @Override
