@@ -43,7 +43,7 @@ public class SelectRoutesActivityFragment extends Fragment {
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_select_routes, container, false);
 
-        ListView routeList = (ListView) view.findViewById(R.id.route_list);
+        final ListView routeList = (ListView) view.findViewById(R.id.route_list);
 
         Intent intent = getActivity().getIntent();
         final String stopId = intent.getStringExtra(SelectRoutesActivity.STOP_ID);
@@ -55,7 +55,7 @@ public class SelectRoutesActivityFragment extends Fragment {
 
         Cursor cursor = mOcTranspo.getRoutesForStopById(stopId);
         final List<Route> routes = mOcTranspo.routeCursorToList(cursor);
-        IndirectArrayAdapter<Route> adapter = new IndirectArrayAdapter<>(
+        final IndirectArrayAdapter<Route> adapter = new IndirectArrayAdapter<>(
                 getActivity(),
                 R.layout.select_route_list_item,
                 new IndirectArrayAdapter.ListGenerator<Route>() {
@@ -101,6 +101,21 @@ public class SelectRoutesActivityFragment extends Fragment {
                 result.putParcelableArrayListExtra(SelectRoutesActivity.SELECTED_ROUTES, selectedRoutesArrayList);
                 getActivity().setResult(Activity.RESULT_OK, result);
                 getActivity().finish();
+            }
+        });
+
+        Button selectAllButton = (Button) view.findViewById(R.id.select_all);
+
+        selectAllButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (mSelectedRoutes.containsAll(routes)) {
+                    // Change semantics to deselect all instead
+                    mSelectedRoutes.clear();
+                } else {
+                    mSelectedRoutes.addAll(routes);
+                }
+                adapter.notifyDataSetChanged();
             }
         });
 
