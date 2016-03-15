@@ -57,12 +57,12 @@ public class FavouriteStop extends SugarRecord {
         mPendingRoutes.add(route);
     }
 
-    public void updateRoutes(List<Route> routes) {
+    public void updateRoutes(List<Route> routes, OcTranspoDataAccess ocTranspo) {
         // This is supposed to set the current set of routes to be those given in the argument
         HashSet<Route> desiredRoutes = new HashSet<>(routes);
 
         for (FavouriteRoute favRoute : getRoutes()) {
-            Route rawRoute = favRoute.asRoute();
+            Route rawRoute = favRoute.asRoute(ocTranspo);
             if (desiredRoutes.contains(rawRoute)) {
                 desiredRoutes.remove(rawRoute);
             } else {
@@ -80,7 +80,7 @@ public class FavouriteStop extends SugarRecord {
         }
     }
 
-    public List<ForthcomingTrip> updateForthcomingTrips(OcTranspoDataAccess ocTranspo, ArrayList<ForthcomingTrip> trips) {
+    public List<ForthcomingTrip> updateForthcomingTrips(ArrayList<ForthcomingTrip> trips, OcTranspoDataAccess ocTranspo) {
         if (!mPendingRoutes.isEmpty()) {
             throw new AssertionError("Should only be called on saved Stops");
         }
@@ -101,7 +101,7 @@ public class FavouriteStop extends SugarRecord {
 
         ArrayList<ForthcomingTrip> result = new ArrayList<>();
         for (FavouriteRoute route : getRoutes()) {
-            Route key = route.asRoute();
+            Route key = route.asRoute(ocTranspo);
             ArrayList<ForthcomingTrip> tripsForThisRoute;
             if (tripsSplit.containsKey(key)) {
                 tripsForThisRoute = tripsSplit.get(key);

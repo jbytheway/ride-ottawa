@@ -11,19 +11,17 @@ public class Route implements Parcelable {
     @SuppressWarnings("unused")
     private static final String TAG = "Route";
 
-    Route(String name, int direction) {
+    Route(String name, int direction, String modalHeadSign) {
         //mId = id;
         mName = name;
         mDirection = direction;
+        mModalHeadSign = modalHeadSign;
     }
 
     //public String getRouteId() { return mId; }
     public String getName() { return mName; }
     public int getDirection() { return mDirection; }
-
-    //private String mId;
-    private final String mName;
-    private final int mDirection;
+    public String getModalHeadSign() { return mModalHeadSign; }
 
     public void applyToTextView(TextView view) {
         view.setText(getName());
@@ -71,17 +69,24 @@ public class Route implements Parcelable {
     public void writeToParcel(Parcel out, int flags) {
         out.writeString(mName);
         out.writeInt(mDirection);
+        out.writeString(mModalHeadSign);
     }
 
     public static final Parcelable.Creator<Route> CREATOR = new Parcelable.Creator<Route>() {
         public Route createFromParcel(Parcel in) {
             String name = in.readString();
             int direction = in.readInt();
-            return new Route(name, direction);
+            String modalHeadSign = in.readString();
+            return new Route(name, direction, modalHeadSign);
         }
 
         public Route[] newArray(int size) {
             return new Route[size];
         }
     };
+
+    //private String mId;
+    private final String mName;
+    private final int mDirection;
+    private final String mModalHeadSign;
 }

@@ -12,6 +12,7 @@ import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -84,6 +85,8 @@ public class SelectRoutesActivityFragment extends Fragment {
                                 }
                             }
                         });
+                        TextView headSign = (TextView) v.findViewById(R.id.head_sign);
+                        headSign.setText(route.getModalHeadSign());
                     }
                 }
         );

@@ -105,7 +105,7 @@ public class EditFavouriteActivityFragment extends Fragment {
                         for (FavouriteRoute route : routes) {
                             View routeView = inflater.inflate(R.layout.edit_stop_route_list_item, routeList, false);
                             TextView routeName = (TextView) routeView.findViewById(R.id.route_name);
-                            route.asRoute().applyToTextView(routeName);
+                            route.asRoute(mOcTranspo).applyToTextView(routeName);
                             TextView destination = (TextView) routeView.findViewById(R.id.destination);
                             destination.setText(""); // TODO: destination in FavouriteRoute
                             routeList.addView(routeView);
@@ -183,7 +183,7 @@ public class EditFavouriteActivityFragment extends Fragment {
         List<FavouriteRoute> routes = favouriteStop.getRoutes();
         ArrayList<Route> selectedRoutes = new ArrayList<>();
         for (FavouriteRoute route : routes) {
-            selectedRoutes.add(route.asRoute());
+            selectedRoutes.add(route.asRoute(mOcTranspo));
         }
         intent.putParcelableArrayListExtra(SelectRoutesActivity.SELECTED_ROUTES, selectedRoutes);
         startActivityForResult(intent, REQUEST_ROUTES);
@@ -217,7 +217,7 @@ public class EditFavouriteActivityFragment extends Fragment {
                     String stopId = data.getStringExtra(SelectRoutesActivity.STOP_ID);
                     FavouriteStop stop = mFavourite.getStop(stopId);
                     ArrayList<Route> selectedRoutes = data.getParcelableArrayListExtra(SelectRoutesActivity.SELECTED_ROUTES);
-                    stop.updateRoutes(selectedRoutes);
+                    stop.updateRoutes(selectedRoutes, mOcTranspo);
                     if (stop.getId() != null) {
                         stop.saveRecursively();
                     }

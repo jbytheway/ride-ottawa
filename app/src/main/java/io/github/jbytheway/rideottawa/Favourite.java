@@ -121,7 +121,7 @@ public class Favourite extends SugarRecord {
             } else {
                 tripsForThisStop = new ArrayList<>();
             }
-            result.addAll(stop.updateForthcomingTrips(ocTranspo, tripsForThisStop));
+            result.addAll(stop.updateForthcomingTrips(tripsForThisStop, ocTranspo));
         }
 
         return result;
