@@ -186,6 +186,9 @@ public abstract class DownloadableDatabase extends SQLiteOpenHelper {
             if (!tmpFile.renameTo(new File(getPath()))) {
                 throw new IOException("Failed to rename "+tmpFile+" to "+getPath());
             }
+            // We want to force any future access to be from the new database, not the old one
+            // so we force a close on this.  (TODO: test if this is really effective)
+            close();
         } catch (IOException e) {
             Log.e(TAG, "Decompressing failed", e);
             // Unset the ETag because we might have partially written the database
