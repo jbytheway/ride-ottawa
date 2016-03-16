@@ -59,11 +59,14 @@ public class ListFavouritesActivity extends AppCompatActivity {
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         boolean wifiOnly = sharedPreferences.getBoolean(SettingsActivityFragment.PREF_WIFI_ONLY, true);
 
-        tryDatabaseUpdate(wifiOnly);
+        tryDatabaseUpdate(wifiOnly, true);
     }
 
-    private void tryDatabaseUpdate(boolean wifiOnly) {
-        DateTime ifOlderThan = new DateTime().withZone(DateTimeZone.UTC).minusDays(1);
+    private void tryDatabaseUpdate(boolean wifiOnly, boolean onlyIfOld) {
+        DateTime ifOlderThan = null;
+        if (onlyIfOld) {
+            ifOlderThan = new DateTime().withZone(DateTimeZone.UTC).minusDays(1);
+        }
         final ProgressDialog dialog = new ProgressDialog(this);
         dialog.setMessage(getString(R.string.checking_for_updates));
         dialog.show();
@@ -157,7 +160,16 @@ public class ListFavouritesActivity extends AppCompatActivity {
 
             @Override
             public void tryAgainWithoutWifi() {
-                ListFavouritesActivity.this.tryDatabaseUpdate(false);
+                ListFavouritesActivity.this.tryDatabaseUpdate(false, true);
+            }
+        };
+    }
+
+    public ListFavouritesActivityFragment.DatabaseCheckDialog.DatabaseCheckListener getDatabaseCheckListener() {
+        return new ListFavouritesActivityFragment.DatabaseCheckDialog.DatabaseCheckListener() {
+            @Override
+            public void doDatabaseUpdate() {
+                tryDatabaseUpdate(false, false);
             }
         };
     }

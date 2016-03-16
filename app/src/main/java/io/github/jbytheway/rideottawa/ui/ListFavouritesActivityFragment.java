@@ -1,5 +1,10 @@
 package io.github.jbytheway.rideottawa.ui;
 
+import android.app.Activity;
+import android.app.AlertDialog;
+import android.app.Dialog;
+import android.app.DialogFragment;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
@@ -14,6 +19,8 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import org.apache.commons.collections4.IteratorUtils;
+import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
 
 import java.util.List;
 
@@ -122,9 +129,69 @@ public class ListFavouritesActivityFragment extends Fragment {
                 Intent intent = new Intent(getActivity(), SettingsActivity.class);
                 startActivity(intent);
                 return true;
+            case R.id.menu_database:
+                DatabaseCheckDialog databaseCheckDialog = new DatabaseCheckDialog();
+                DateTimeFormatter formatter = DateTimeFormat.fullDate();
+                String databaseEndDate = formatter.print(mOcTranspo.getDatabaseEndDate());
+                Bundle args = new Bundle();
+                args.putString(DatabaseCheckDialog.DATABASE_END_DATE, databaseEndDate);
+                databaseCheckDialog.setArguments(args);
+                databaseCheckDialog.show(getActivity().getFragmentManager(), "DatabaseCheckDialog");
+                return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
+    }
+
+    public static class DatabaseCheckDialog extends DialogFragment {
+        public static final String DATABASE_END_DATE = "DatabaseEndDate";
+
+        interface DatabaseCheckListener {
+            void doDatabaseUpdate();
+        }
+
+        public DatabaseCheckDialog() {
+            // Default constructor required for DialogFragments
+            // Real construction happens in onAttach
+        }
+
+        @Override
+        public void onAttach(Activity activity) {
+            super.onAttach(activity);
+            Bundle args = getArguments();
+
+            mDatabaseEndDate = args.getString(DATABASE_END_DATE);
+            mListener = ((ListFavouritesActivity) activity).getDatabaseCheckListener();
+        }
+
+        @Override
+        public Dialog onCreateDialog(Bundle savedInstance) {
+            AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+            String message;
+            if (mDatabaseEndDate == null) {
+                message = getString(R.string.no_database_yet);
+            } else {
+                message = getString(R.string.database_check_message, mDatabaseEndDate);
+            }
+            builder
+                    .setMessage(message)
+                    .setNegativeButton(R.string.close_dialog, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            dismiss();
+                        }
+                    })
+                    .setPositiveButton(R.string.force_database_update, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        mListener.doDatabaseUpdate();
+                    }
+                });
+            return builder.create();
+        }
+
+        private String mDatabaseEndDate;
+        private DatabaseCheckListener mListener;
     }
 
     @Override

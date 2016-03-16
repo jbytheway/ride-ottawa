@@ -78,7 +78,7 @@ public abstract class DownloadableDatabase extends SQLiteOpenHelper {
         try {
             final String existingEtag = getEtag();
 
-            if (!existingEtag.equals("")) {
+            if (!existingEtag.equals("") && ifOlderThan != null) {
                 // We have a DB already; if it's new enough we won't bother to check for updates
                 long timestamp = new File(getEtagPath()).lastModified();
                 DateTime lastModified = new DateTime(timestamp, DateTimeZone.UTC);

@@ -5,6 +5,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.location.Location;
+import android.support.annotation.Nullable;
 
 import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
@@ -39,6 +40,21 @@ public class OcTranspoDataAccess {
 
     public boolean isDatabaseAvailable() {
         return mHelper.isDatabaseAvailable();
+    }
+
+    public @Nullable DateTime getDatabaseEndDate() {
+        if (isDatabaseAvailable()) {
+            SQLiteDatabase database = mHelper.getReadableDatabase();
+            Cursor c = database.rawQuery(
+                    "select date from days order by date desc limit 1", new String[]{});
+            int col = c.getColumnIndex("date");
+            c.moveToFirst();
+            String date = c.getString(col);
+            c.close();
+            return mIsoDateFormatter.parseDateTime(date);
+        } else {
+            return null;
+        }
     }
 
     @SuppressWarnings("unused")
