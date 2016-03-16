@@ -19,6 +19,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import org.apache.commons.collections4.IteratorUtils;
+import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 
@@ -131,10 +132,19 @@ public class ListFavouritesActivityFragment extends Fragment {
                 return true;
             case R.id.menu_database:
                 DatabaseCheckDialog databaseCheckDialog = new DatabaseCheckDialog();
-                DateTimeFormatter formatter = DateTimeFormat.fullDate();
-                String databaseEndDate = formatter.print(mOcTranspo.getDatabaseEndDate());
+                String databaseEndDate;
+                String lastUpdateCheck;
+                if (mOcTranspo.isDatabaseAvailable()) {
+                    DateTimeFormatter formatter = DateTimeFormat.fullDate();
+                    databaseEndDate = formatter.print(mOcTranspo.getDatabaseEndDate());
+                    lastUpdateCheck = formatter.print(mOcTranspo.getLastUpdateCheck());
+                } else {
+                    databaseEndDate = null;
+                    lastUpdateCheck = null;
+                }
                 Bundle args = new Bundle();
                 args.putString(DatabaseCheckDialog.DATABASE_END_DATE, databaseEndDate);
+                args.putString(DatabaseCheckDialog.LAST_UPDATE_CHECK, lastUpdateCheck);
                 databaseCheckDialog.setArguments(args);
                 databaseCheckDialog.show(getActivity().getFragmentManager(), "DatabaseCheckDialog");
                 return true;
@@ -144,6 +154,7 @@ public class ListFavouritesActivityFragment extends Fragment {
     }
 
     public static class DatabaseCheckDialog extends DialogFragment {
+        public static final String LAST_UPDATE_CHECK = "LastUpdateCheck";
         public static final String DATABASE_END_DATE = "DatabaseEndDate";
 
         interface DatabaseCheckListener {
@@ -160,6 +171,7 @@ public class ListFavouritesActivityFragment extends Fragment {
             super.onAttach(activity);
             Bundle args = getArguments();
 
+            mLastUpdateCheck = args.getString(LAST_UPDATE_CHECK);
             mDatabaseEndDate = args.getString(DATABASE_END_DATE);
             mListener = ((ListFavouritesActivity) activity).getDatabaseCheckListener();
         }
@@ -171,7 +183,7 @@ public class ListFavouritesActivityFragment extends Fragment {
             if (mDatabaseEndDate == null) {
                 message = getString(R.string.no_database_yet);
             } else {
-                message = getString(R.string.database_check_message, mDatabaseEndDate);
+                message = getString(R.string.database_check_message, mLastUpdateCheck, mDatabaseEndDate);
             }
             builder
                     .setMessage(message)
@@ -190,6 +202,7 @@ public class ListFavouritesActivityFragment extends Fragment {
             return builder.create();
         }
 
+        private String mLastUpdateCheck;
         private String mDatabaseEndDate;
         private DatabaseCheckListener mListener;
     }

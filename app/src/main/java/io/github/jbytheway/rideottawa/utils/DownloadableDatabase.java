@@ -5,6 +5,7 @@ import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.net.ConnectivityManager;
+import android.support.annotation.Nullable;
 import android.util.Log;
 
 import com.koushikdutta.async.future.FutureCallback;
@@ -74,16 +75,24 @@ public abstract class DownloadableDatabase extends SQLiteOpenHelper {
         void onFail(Exception e, String message, boolean wifiRelated, boolean fatal);
     }
 
+    public @Nullable DateTime getLastUpdateCheck() {
+        if (isDatabaseAvailable()) {
+            long timestamp = new File(getEtagPath()).lastModified();
+            return new DateTime(timestamp, DateTimeZone.UTC);
+        } else {
+            return null;
+        }
+    }
+
     public void checkForUpdates(boolean wifiOnly, DateTime ifOlderThan, final ProgressDialog progressDialog, final UpdateListener listener) {
         try {
             final String existingEtag = getEtag();
 
-            if (!existingEtag.equals("") && ifOlderThan != null) {
+            if (ifOlderThan != null) {
                 // We have a DB already; if it's new enough we won't bother to check for updates
-                long timestamp = new File(getEtagPath()).lastModified();
-                DateTime lastModified = new DateTime(timestamp, DateTimeZone.UTC);
+                DateTime lastModified = getLastUpdateCheck();
                 Log.d(TAG, "lastModified = "+lastModified+", ifOlderThan="+ifOlderThan);
-                if (lastModified.isAfter(ifOlderThan)) {
+                if (lastModified != null && lastModified.isAfter(ifOlderThan)) {
                     // No need to update
                     listener.onSuccess();
                     return;

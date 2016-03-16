@@ -10,7 +10,7 @@
     <string name="continuing_with_old_db">%1$s  Using existing database.</string>
     <string name="no_database_fatal_error">%1$s  Cannot continue without database.</string>
     <string name="cannot_proceed_without_database">Cannot proceed without database.</string>
-    <string name="database_check_message">Current database is valid until %1$s.</string>
+    <string name="database_check_message">Last database update check was %1$s.\nCurrent database is valid until %2$s.</string>
     <string name="no_database_yet">You have not yet downloaded a database.</string>
     <string name="force_database_update">Force update check</string>
     <string name="close_app">Close</string>

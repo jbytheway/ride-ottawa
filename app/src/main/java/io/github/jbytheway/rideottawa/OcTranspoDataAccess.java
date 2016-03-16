@@ -42,6 +42,10 @@ public class OcTranspoDataAccess {
         return mHelper.isDatabaseAvailable();
     }
 
+    public @Nullable DateTime getLastUpdateCheck() {
+        return mHelper.getLastUpdateCheck();
+    }
+
     public @Nullable DateTime getDatabaseEndDate() {
         if (isDatabaseAvailable()) {
             SQLiteDatabase database = mHelper.getReadableDatabase();
