@@ -16,6 +16,8 @@ import android.widget.Toast;
 
 import org.joda.time.DateTime;
 import org.joda.time.Interval;
+import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -38,6 +40,7 @@ public class ViewFavouriteActivityFragment extends Fragment implements OcTranspo
 
     public ViewFavouriteActivityFragment() {
         // Required empty public constructor
+        mTimeFormatter = DateTimeFormat.forPattern("HH:mm");
     }
 
     @Override
@@ -96,7 +99,7 @@ public class ViewFavouriteActivityFragment extends Fragment implements OcTranspo
                         Route route = trip.getRoute();
                         route.applyToTextView(route_name);
                         head_sign.setText(trip.getHeadSign());
-                        arrival_time.setText(trip.getArrivalTimeString());
+                        arrival_time.setText(mTimeFormatter.print(trip.getArrivalTime()));
                         ArrivalEstimate ae = trip.getEstimatedArrival();
                         DateTime estimatedArrival = ae.getTime();
                         DateTime now = mOcTranspo.getNow();
@@ -205,4 +208,6 @@ public class ViewFavouriteActivityFragment extends Fragment implements OcTranspo
     private DateTime mLastRefresh;
     private IndirectArrayAdapter<ForthcomingTrip> mTripAdapter;
     private TextView mName;
+    private final DateTimeFormatter mTimeFormatter;
+
 }

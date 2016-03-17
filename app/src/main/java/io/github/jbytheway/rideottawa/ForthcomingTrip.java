@@ -31,16 +31,12 @@ public class ForthcomingTrip {
         return mTripId;
     }
 
-    public String getArrivalTimeString() {
-        return stringifyTime(mTime);
-    }
-
-    public DateTime getArrivalTimeDateTime() {
+    public DateTime getArrivalTime() {
         return mMidnight.plusMinutes(mTime);
     }
 
-    public String getStartTimeString() {
-        return stringifyTime(mStartTime);
+    public DateTime getStartTime() {
+        return mMidnight.plusMinutes(mStartTime);
     }
 
     public ArrivalEstimate getEstimatedArrival() {
@@ -54,18 +50,12 @@ public class ForthcomingTrip {
             return new ArrivalEstimate(mEstimatedArrival, type);
         }
 
-        return new ArrivalEstimate(getArrivalTimeDateTime(), ArrivalEstimate.Type.Schedule);
+        return new ArrivalEstimate(getArrivalTime(), ArrivalEstimate.Type.Schedule);
     }
 
     public void provideLiveData(DateTime processingTime, int minutesAway, double estimateAge) {
         mEstimatedArrival = processingTime.plusMinutes(minutesAway);
         mEstimateAge = estimateAge;
-    }
-
-    private String stringifyTime(int time) {
-        DateTime dateTime = mMidnight.plusMinutes(time);
-        DateTimeFormatter formatter = DateTimeFormat.forPattern("HH:mm");
-        return formatter.print(dateTime);
     }
 
     private final Stop mStop;

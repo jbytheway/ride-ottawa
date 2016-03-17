@@ -39,7 +39,8 @@ public class OcTranspoApi {
         // defining them as string resources with the names used here.
         mAppId = context.getString(R.string.app_id);
         mApiKey = context.getString(R.string.api_key);
-        mProcessingTimeFormat = DateTimeFormat.forPattern("yyyyMMddHHmmss");
+        mStartTimeFormat = DateTimeFormat.forPattern("HH:mm");
+        mProcessingDateTimeFormat = DateTimeFormat.forPattern("yyyyMMddHHmmss");
     }
 
     public void queryTimes(final Context context, final TimeQuery query, final Collection<ForthcomingTrip> trips, final Listener listener) {
@@ -131,7 +132,7 @@ public class OcTranspoApi {
             }
 
             // We want to process the provided trips in this direction
-            DateTime processingTime = mProcessingTimeFormat.parseDateTime(routeDirection.getString("RequestProcessingTime"));
+            DateTime processingTime = mProcessingDateTimeFormat.parseDateTime(routeDirection.getString("RequestProcessingTime"));
 
             JSONArray liveTrips = GetArrayOrObject(routeDirection.getJSONObject("Trips"), "Trip");
             for (int j = 0; j < liveTrips.length(); ++j) {
@@ -139,7 +140,9 @@ public class OcTranspoApi {
                 String tripStartTime = liveTrip.getString("TripStartTime");
 
                 for (ForthcomingTrip trip : trips) {
-                    if (trip.getStartTimeString().equals(tripStartTime)) {
+                    DateTime startTime = trip.getStartTime();
+                    String startTimeString = mStartTimeFormat.print(startTime);
+                    if (startTimeString.equals(tripStartTime)) {
                         Log.d(TAG, "Found matching trip!");
                         int minutesAway = Integer.parseInt(liveTrip.getString("AdjustedScheduleTime"));
                         double adjustmentAge = Double.parseDouble(liveTrip.getString("AdjustmentAge"));
@@ -244,7 +247,8 @@ public class OcTranspoApi {
 
     private final String mAppId;
     private final String mApiKey;
-    private final DateTimeFormatter mProcessingTimeFormat;
+    private final DateTimeFormatter mProcessingDateTimeFormat;
+    private final DateTimeFormatter mStartTimeFormat;
     // Mapping from database directions to cardinal directions
     private final HashMap<DirectionKey, String> mDirectionCache;
 }
