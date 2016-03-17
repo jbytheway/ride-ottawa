@@ -42,7 +42,7 @@
     <string name="example_route_name">999</string>
     <string name="example_arrival_time">12:00</string>
     <string name="example_head_sign">Bus to Somewhere</string>
-    <string name="example_minutes">10m</string>
+    <string name="example_minutes">999m</string>
     <string name="title_activity_settings">Settings</string>
 
     <!-- Strings related to Settings -->

@@ -90,7 +90,9 @@ public class ViewFavouriteActivityFragment extends Fragment implements OcTranspo
                         TextView stop_name = (TextView) v.findViewById(R.id.stop_name);
                         TextView route_name = (TextView) v.findViewById(R.id.route_name);
                         TextView head_sign = (TextView) v.findViewById(R.id.head_sign);
-                        TextView arrival_time = (TextView) v.findViewById(R.id.arrival_time);
+                        TextView arrival_time_scheduled = (TextView) v.findViewById(R.id.arrival_time_scheduled);
+                        TextView arrival_time_estimated = (TextView) v.findViewById(R.id.arrival_time_estimated);
+                        TextView label_time_estimated = (TextView) v.findViewById(R.id.label_time_estimated);
                         TextView minutes_away = (TextView) v.findViewById(R.id.minutes_away);
                         TextView time_type = (TextView) v.findViewById(R.id.time_type);
                         Stop stop = trip.getStop();
@@ -99,7 +101,7 @@ public class ViewFavouriteActivityFragment extends Fragment implements OcTranspo
                         Route route = trip.getRoute();
                         route.applyToTextView(route_name);
                         head_sign.setText(trip.getHeadSign());
-                        arrival_time.setText(mTimeFormatter.print(trip.getArrivalTime()));
+                        arrival_time_scheduled.setText(mTimeFormatter.print(trip.getArrivalTime()));
                         ArrivalEstimate ae = trip.getEstimatedArrival();
                         DateTime estimatedArrival = ae.getTime();
                         DateTime now = mOcTranspo.getNow();
@@ -113,18 +115,33 @@ public class ViewFavouriteActivityFragment extends Fragment implements OcTranspo
                         }
                         minutes_away.setText(getString(R.string.minutes_format, minutesAway));
 
+                        if (ae.getType() == ArrivalEstimate.Type.Schedule) {
+                            arrival_time_estimated.setVisibility(View.INVISIBLE);
+                            label_time_estimated.setVisibility(View.INVISIBLE);
+                        } else {
+                            arrival_time_estimated.setVisibility(View.VISIBLE);
+                            label_time_estimated.setVisibility(View.VISIBLE);
+                            arrival_time_estimated.setText(mTimeFormatter.print(estimatedArrival));
+                        }
+
                         switch (ae.getType()) {
-                            case Gps:
+                            case Gps: {
                                 time_type.setText(getString(R.string.gps_abbrev));
                                 //noinspection deprecation
-                                minutes_away.setTextColor(getResources().getColor(R.color.time_gps));
+                                int colour = getResources().getColor(R.color.time_gps);
+                                minutes_away.setTextColor(colour);
+                                arrival_time_estimated.setTextColor(colour);
                                 break;
-                            case GpsOld:
+                            }
+                            case GpsOld: {
                                 time_type.setText(getString(R.string.gps_old_abbrev));
                                 //noinspection deprecation
-                                minutes_away.setTextColor(getResources().getColor(R.color.time_gps_old));
+                                int colour = getResources().getColor(R.color.time_gps_old);
+                                minutes_away.setTextColor(colour);
+                                arrival_time_estimated.setTextColor(colour);
                                 break;
-                            case Schedule:
+                            }
+                            case Schedule: {
                                 time_type.setText(getString(R.string.scheduled_abbrev));
                                 if (minutesAway < 0) {
                                     //noinspection deprecation
@@ -134,6 +151,7 @@ public class ViewFavouriteActivityFragment extends Fragment implements OcTranspo
                                     minutes_away.setTextColor(getResources().getColor(R.color.time_scheduled));
                                 }
                                 break;
+                            }
                             default:
                                 throw new AssertionError("Unexpected estimate type "+ae.getType());
                         }

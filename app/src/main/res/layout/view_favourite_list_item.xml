@@ -4,7 +4,7 @@
     android:layout_height="wrap_content">
 
     <TextView
-        android:layout_width="40dp"
+        android:layout_width="40sp"
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceSmall"
         android:text="@string/example_stop_code"
@@ -19,18 +19,20 @@
         android:id="@+id/stop_name"
         android:layout_alignParentTop="true"
         android:layout_toEndOf="@+id/stop_code"
-        android:layout_marginStart="10dp" />
+        android:layout_marginStart="10dp"
+        android:layout_marginEnd="10dp"
+        android:layout_toStartOf="@+id/time_type" />
 
     <TextView
-        android:layout_width="40dp"
+        android:layout_width="40sp"
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceLarge"
         android:id="@+id/route_name"
         android:textAlignment="textEnd"
         android:layout_alignParentTop="false"
         android:layout_alignParentStart="false"
-        android:layout_below="@+id/stop_code"
-        android:text="@string/example_route_name"/>
+        android:text="@string/example_route_name"
+        android:layout_below="@+id/stop_name" />
 
     <TextView
         android:layout_width="wrap_content"
@@ -40,20 +42,53 @@
         android:id="@+id/head_sign"
         android:layout_toEndOf="@+id/route_name"
         android:layout_marginStart="10dp"
-        android:layout_alignBottom="@+id/route_name" />
+        android:layout_toStartOf="@+id/arrival_time_scheduled"
+        android:layout_alignTop="@+id/route_name" />
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:textAppearance="?android:attr/textAppearanceSmall"
         android:text="@string/example_arrival_time"
-        android:id="@+id/arrival_time"
-        android:layout_toEndOf="@+id/head_sign"
-        android:layout_marginStart="10dp"
-        android:layout_alignBottom="@+id/head_sign" />
+        android:id="@+id/arrival_time_scheduled"
+        android:layout_marginEnd="6dp"
+        android:layout_toStartOf="@+id/arrival_time_estimated"
+        android:layout_below="@+id/label_time_scheduled" />
 
     <TextView
         android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:text="@string/scheduled_abbrev"
+        android:id="@+id/label_time_scheduled"
+        android:layout_alignStart="@+id/arrival_time_scheduled"
+        android:textSize="12sp"
+        android:layout_marginBottom="-3sp"
+        android:layout_below="@+id/stop_name"
+        android:layout_marginTop="-3sp" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:text="@string/example_arrival_time"
+        android:id="@+id/arrival_time_estimated"
+        android:layout_marginEnd="-5sp"
+        android:layout_alignBottom="@+id/arrival_time_scheduled"
+        android:layout_toStartOf="@+id/minutes_away" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:text="@string/gps_abbrev"
+        android:id="@+id/label_time_estimated"
+        android:layout_alignStart="@+id/arrival_time_estimated"
+        android:textSize="12sp"
+        android:layout_alignBottom="@+id/label_time_scheduled" />
+
+    <TextView
+        android:layout_width="60sp"
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceLarge"
         android:text="@string/example_minutes"
@@ -61,7 +96,8 @@
         android:layout_alignParentTop="false"
         android:layout_alignParentEnd="false"
         android:layout_below="@+id/time_type"
-        android:layout_alignEnd="@+id/time_type" />
+        android:layout_alignEnd="@+id/time_type"
+        android:textAlignment="textEnd" />
 
     <TextView
         android:layout_width="wrap_content"
