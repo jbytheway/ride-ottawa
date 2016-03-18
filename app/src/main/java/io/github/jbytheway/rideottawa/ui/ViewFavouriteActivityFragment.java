@@ -3,6 +3,7 @@ package io.github.jbytheway.rideottawa.ui;
 import android.content.Intent;
 import android.os.Bundle;
 import android.app.Fragment;
+import android.os.Handler;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -37,6 +38,8 @@ import io.github.jbytheway.rideottawa.Stop;
 
 public class ViewFavouriteActivityFragment extends Fragment implements OcTranspoApi.Listener {
     private static final String TAG = "ViewFavouriteFragment";
+    private static final int AUTO_REFRESH_SECONDS = 30;
+    private static final int MINIMUM_REFRESH_SECONDS = 15;
 
     public ViewFavouriteActivityFragment() {
         // Required empty public constructor
@@ -57,6 +60,7 @@ public class ViewFavouriteActivityFragment extends Fragment implements OcTranspo
         // Need an empty list of trips to start with because the ListView will
         // be rendered before we get informed of our Favourite.
         mForthcomingTrips = new ArrayList<>();
+        mHandler = new Handler();
     }
 
     @Override
@@ -180,10 +184,16 @@ public class ViewFavouriteActivityFragment extends Fragment implements OcTranspo
     }
 
     @Override
+    public void onResume() {
+        super.onResume();
+        refreshIfLateEnough(false);
+    }
+
+    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.menu_refresh:
-                refreshIfLateEnough();
+                refreshIfLateEnough(true);
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -195,10 +205,12 @@ public class ViewFavouriteActivityFragment extends Fragment implements OcTranspo
         refresh();
     }
 
-    private void refreshIfLateEnough() {
+    private void refreshIfLateEnough(boolean showMessage) {
         DateTime now = new DateTime();
-        if (now.minusSeconds(30).isBefore(mLastRefresh)) {
-            Toast.makeText(getActivity(), getString(R.string.skipping_refresh_too_soon), Toast.LENGTH_LONG).show();
+        if (now.minusSeconds(MINIMUM_REFRESH_SECONDS).isBefore(mLastRefresh)) {
+            if (showMessage) {
+                Toast.makeText(getActivity(), getString(R.string.skipping_refresh_too_soon), Toast.LENGTH_LONG).show();
+            }
         } else {
             refresh();
         }
@@ -209,6 +221,14 @@ public class ViewFavouriteActivityFragment extends Fragment implements OcTranspo
         mLastRefresh = new DateTime();
         mOcTranspo.getLiveDataForTrips(getActivity(), mForthcomingTrips, this);
         mTripAdapter.notifyDataSetChanged();
+        mHandler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                if (isResumed()) {
+                    refreshIfLateEnough(false);
+                }
+            }
+        }, AUTO_REFRESH_SECONDS * 1000);
     }
 
     public void onApiFail(Exception e) {
@@ -221,6 +241,7 @@ public class ViewFavouriteActivityFragment extends Fragment implements OcTranspo
     }
 
     private OcTranspoDataAccess mOcTranspo;
+    private Handler mHandler;
     private Favourite mFavourite;
     private ArrayList<ForthcomingTrip> mForthcomingTrips;
     private DateTime mLastRefresh;
