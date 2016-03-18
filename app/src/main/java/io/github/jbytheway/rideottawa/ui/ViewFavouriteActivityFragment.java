@@ -100,7 +100,7 @@ public class ViewFavouriteActivityFragment extends Fragment implements OcTranspo
                         stop_name.setText(stop.getName());
                         Route route = trip.getRoute();
                         route.applyToTextView(route_name);
-                        head_sign.setText(trip.getHeadSign());
+                        head_sign.setText(trip.getLastStop().getName());
                         arrival_time_scheduled.setText(mTimeFormatter.print(trip.getArrivalTime()));
                         ArrivalEstimate ae = trip.getEstimatedArrival();
                         DateTime estimatedArrival = ae.getTime();

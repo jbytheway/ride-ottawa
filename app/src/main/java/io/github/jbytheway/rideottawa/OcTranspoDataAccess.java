@@ -219,9 +219,13 @@ rm         return getRoutesByIds(routeIdArray);
         // Now we can finally make a query
         SQLiteDatabase database = mHelper.getReadableDatabase();
         return database.rawQuery(
-                "select stops.stop_id, stop_code, stop_name, route_short_name, trips.direction_id, " +
+                "select stops.stop_id, stops.stop_code, stops.stop_name, " +
+                        "route_short_name, trips.direction_id, " +
                         "trips.trip_id, trip_headsign, date, stop_times.arrival_time, " +
                         "stop_times_start.arrival_time as start_arrival_time, " +
+                        "last_stop.stop_id as last_stop_id, " +
+                        "last_stop.stop_code as last_stop_code, " +
+                        "last_stop.stop_name as last_stop_name, " +
                         "route_modal_headsign from stop_times " +
                         "join trips on stop_times.trip_id = trips.trip_id " +
                         "join days on days.service_id = trips.service_id " +
@@ -229,6 +233,8 @@ rm         return getRoutesByIds(routeIdArray);
                         "join directed_routes on trips.route_id = directed_routes.route_id " +
                         "join stops on stop_times.stop_id = stops._id " +
                         "join stop_times as stop_times_start on stop_times_start.trip_id = trips.trip_id " +
+                        "join stop_times as last_stop_time on last_stop_time.trip_id = trips.trip_id " +
+                        "join stops as last_stop on last_stop._id = last_stop_time.stop_id " +
                         "where stops.stop_id = ? " +
                         "and routes.route_short_name = ? " +
                         "and trips.direction_id = ? " +
@@ -236,11 +242,13 @@ rm         return getRoutesByIds(routeIdArray);
                         "and days.date = ? " +
                         "and stop_times.arrival_time >= ? " +
                         "and stop_times_start.stop_sequence = 1 " +
+                        "and last_stop_time.stop_sequence = trips.last_stop_sequence " +
                         "order by stop_times.arrival_time " +
                         "limit 10",
                 new String[]{stopId, routeName, "" + direction, today, ""+minTime});
 
         // FIXME: also fetch trips with times which derive from the previous day (i.e. which started yesterday)
+        // and the next day
     }
 
     public List<ForthcomingTrip> stopTimeCursorToList(Cursor c) {
@@ -249,6 +257,9 @@ rm         return getRoutesByIds(routeIdArray);
             int stop_id_column = c.getColumnIndex("stop_id");
             int stop_code_column = c.getColumnIndex("stop_code");
             int stop_name_column = c.getColumnIndex("stop_name");
+            int last_stop_id_column = c.getColumnIndex("last_stop_id");
+            int last_stop_code_column = c.getColumnIndex("last_stop_code");
+            int last_stop_name_column = c.getColumnIndex("last_stop_name");
             int route_name_column = c.getColumnIndex("route_short_name");
             int route_modal_headsign_column = c.getColumnIndex("route_modal_headsign");
             int direction_column = c.getColumnIndex("direction_id");
@@ -262,6 +273,9 @@ rm         return getRoutesByIds(routeIdArray);
                 String stopId = c.getString(stop_id_column);
                 String stopCode = c.getString(stop_code_column);
                 String stopName = c.getString(stop_name_column);
+                String lastStopId = c.getString(last_stop_id_column);
+                String lastStopCode = c.getString(last_stop_code_column);
+                String lastStopName = c.getString(last_stop_name_column);
                 String routeName = c.getString(route_name_column);
                 String modalHeadsign = c.getString(route_modal_headsign_column);
                 int direction = c.getInt(direction_column);
@@ -273,8 +287,9 @@ rm         return getRoutesByIds(routeIdArray);
                 DateTime midnight = mIsoDateFormatter.parseDateTime(date).withZoneRetainFields(mOttawaTimeZone);
                 //Log.d(TAG, "arrivalTime="+arrivalTime+", startTime="+startTime);
                 Stop stop = new Stop(stopId, stopCode, stopName);
+                Stop lastStop = new Stop(lastStopId, lastStopCode, lastStopName);
                 Route route = new Route(routeName, direction, modalHeadsign);
-                result.add(new ForthcomingTrip(stop, route, headsign, trip_id, midnight, arrivalTime, startTime));
+                result.add(new ForthcomingTrip(stop, route, headsign, lastStop, trip_id, midnight, arrivalTime, startTime));
 
                 if (!c.moveToNext()) {
                     break;
