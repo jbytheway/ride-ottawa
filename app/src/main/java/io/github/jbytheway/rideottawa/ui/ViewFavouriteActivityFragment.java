@@ -15,6 +15,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import org.apache.commons.lang3.text.WordUtils;
 import org.joda.time.DateTime;
 import org.joda.time.Interval;
 import org.joda.time.format.DateTimeFormat;
@@ -104,7 +105,8 @@ public class ViewFavouriteActivityFragment extends Fragment implements OcTranspo
                         stop_name.setText(stop.getName());
                         Route route = trip.getRoute();
                         route.applyToTextView(route_name);
-                        head_sign.setText(trip.getLastStop().getName());
+                        String lastStopName = trip.getLastStop().getName();
+                        head_sign.setText(WordUtils.capitalizeFully(lastStopName, ' ', '1', '2', '3', '4'));
                         arrival_time_scheduled.setText(mTimeFormatter.print(trip.getArrivalTime()));
                         ArrivalEstimate ae = trip.getEstimatedArrival();
                         DateTime estimatedArrival = ae.getTime();
