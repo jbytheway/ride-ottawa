@@ -35,16 +35,16 @@ public class FavouriteRoute extends SugarRecord implements Comparable<FavouriteR
         // and not include old ones which aren't in the new ones
 
         // Convert old to HashMap
-        HashMap<Integer, ForthcomingTrip> oldTripsById = new HashMap<>();
+        HashMap<TripUid, ForthcomingTrip> oldTripsById = new HashMap<>();
 
         for (ForthcomingTrip trip : oldTrips) {
-            oldTripsById.put(trip.getTripId(), trip);
+            oldTripsById.put(trip.getTripUid(), trip);
         }
 
         ArrayList<ForthcomingTrip> result = new ArrayList<>();
 
         for (ForthcomingTrip trip : newTrips) {
-            int key = trip.getTripId();
+            TripUid key = trip.getTripUid();
             if (oldTripsById.containsKey(key)) {
                 result.add(oldTripsById.get(key));
             } else {

@@ -42,6 +42,8 @@ public class ForthcomingTrip {
         return mMidnight.plusMinutes(mStartTime);
     }
 
+    public TripUid getTripUid() { return new TripUid(getTripId(), mMidnight); }
+
     public ArrivalEstimate getEstimatedArrival() {
         if (mEstimatedArrival != null) {
             ArrivalEstimate.Type type;
