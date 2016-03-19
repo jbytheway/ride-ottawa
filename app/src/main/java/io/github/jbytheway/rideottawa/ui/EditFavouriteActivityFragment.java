@@ -80,7 +80,7 @@ public class EditFavouriteActivityFragment extends Fragment {
                         TextView stop_name = (TextView) v.findViewById(R.id.stop_name);
                         final Stop stop = mOcTranspo.getStop(favouriteStop.StopId);
                         stop_code.setText(stop.getCode());
-                        stop_name.setText(stop.getName());
+                        stop_name.setText(stop.getName(getActivity()));
 
                         Button addRouteButton = (Button) v.findViewById(R.id.choose_routes_button);
                         addRouteButton.setOnClickListener(new View.OnClickListener() {

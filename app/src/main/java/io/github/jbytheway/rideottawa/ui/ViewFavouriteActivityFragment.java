@@ -1,9 +1,12 @@
 package io.github.jbytheway.rideottawa.ui;
 
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.app.Fragment;
 import android.os.Handler;
+import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -57,7 +60,9 @@ public class ViewFavouriteActivityFragment extends Fragment implements OcTranspo
         // This Fragment adds options to the ActionBar
         setHasOptionsMenu(true);
 
+        mContext = getActivity();
         mOcTranspo = ((RideOttawaApplication) getActivity().getApplication()).getOcTranspo();
+        mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(mContext);
         // Need an empty list of trips to start with because the ListView will
         // be rendered before we get informed of our Favourite.
         mForthcomingTrips = new ArrayList<>();
@@ -102,11 +107,16 @@ public class ViewFavouriteActivityFragment extends Fragment implements OcTranspo
                         TextView time_type = (TextView) v.findViewById(R.id.time_type);
                         Stop stop = trip.getStop();
                         stop_code.setText(stop.getCode());
-                        stop_name.setText(stop.getName());
+                        stop_name.setText(stop.getName(mContext));
                         Route route = trip.getRoute();
                         route.applyToTextView(route_name);
-                        String lastStopName = trip.getLastStop().getName();
-                        head_sign.setText(WordUtils.capitalizeFully(lastStopName, ' ', '1', '2', '3', '4'));
+                        boolean showHeadsigns = mSharedPreferences.getBoolean(SettingsActivityFragment.PREF_SHOW_HEADSIGNS, false);
+                        if (showHeadsigns) {
+                            head_sign.setText(trip.getHeadSign());
+                        } else {
+                            String lastStopName = trip.getLastStop().getName(mContext);
+                            head_sign.setText(lastStopName);
+                        }
                         arrival_time_scheduled.setText(mTimeFormatter.print(trip.getArrivalTime()));
                         ArrivalEstimate ae = trip.getEstimatedArrival();
                         DateTime estimatedArrival = ae.getTime();
@@ -221,7 +231,7 @@ public class ViewFavouriteActivityFragment extends Fragment implements OcTranspo
     private void refresh() {
         mForthcomingTrips = mFavourite.updateForthcomingTrips(mOcTranspo, mForthcomingTrips);
         mLastRefresh = new DateTime();
-        mOcTranspo.getLiveDataForTrips(getActivity(), mForthcomingTrips, this);
+        mOcTranspo.getLiveDataForTrips(mContext, mForthcomingTrips, this);
         mTripAdapter.notifyDataSetChanged();
         mHandler.postDelayed(new Runnable() {
             @Override
@@ -242,7 +252,9 @@ public class ViewFavouriteActivityFragment extends Fragment implements OcTranspo
         mTripAdapter.notifyDataSetChanged();
     }
 
+    private Context mContext;
     private OcTranspoDataAccess mOcTranspo;
+    private SharedPreferences mSharedPreferences;
     private Handler mHandler;
     private Favourite mFavourite;
     private ArrayList<ForthcomingTrip> mForthcomingTrips;

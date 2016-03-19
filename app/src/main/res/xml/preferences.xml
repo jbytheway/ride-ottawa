@@ -14,4 +14,16 @@
         android:entryValues="@array/pref_sort_stop_by_values"
         android:defaultValue="@string/pref_default_sort_stops_by" />
 
+    <SwitchPreference
+        android:key="pref_show_headsigns"
+        android:title="@string/pref_title_show_headsigns"
+        android:summary="@string/pref_description_show_headsigns"
+        android:defaultValue="false" />
+
+    <SwitchPreference
+        android:key="pref_title_case_stops"
+        android:title="@string/pref_title_title_case_stops"
+        android:summary="@string/pref_description_title_case_stops"
+        android:defaultValue="false" />
+
 </PreferenceScreen>

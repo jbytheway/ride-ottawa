@@ -18,6 +18,7 @@ import android.widget.EditText;
 import android.widget.FilterQueryProvider;
 import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
+import android.widget.TextView;
 
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.PendingResult;
@@ -29,6 +30,9 @@ import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.LocationSettingsRequest;
 import com.google.android.gms.location.LocationSettingsResult;
 import com.google.android.gms.location.LocationSettingsStatusCodes;
+
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.text.WordUtils;
 
 import io.github.jbytheway.rideottawa.RideOttawaApplication;
 import io.github.jbytheway.rideottawa.OcTranspoDataAccess;
@@ -70,8 +74,10 @@ public class SelectStopActivity extends AppCompatActivity implements GoogleApiCl
 
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         final String orderBy = sharedPreferences.getString(SettingsActivityFragment.PREF_SORT_STOPS, "stop_name");
+        final boolean titleCaseStops = sharedPreferences.getBoolean(SettingsActivityFragment.PREF_TITLE_CASE_STOPS, false);
 
         Cursor cursor = mOcTranspo.getAllStops(orderBy, mLastLocation);
+        final int nameColumnIndex = cursor.getColumnIndex("stop_name");
 
         mAdapter = new SimpleCursorAdapter(this,
                 R.layout.select_stop_list_item, cursor,
@@ -80,6 +86,21 @@ public class SelectStopActivity extends AppCompatActivity implements GoogleApiCl
             @Override
             public Cursor runQuery(CharSequence constraint) {
                 return mOcTranspo.getAllStopsMatching(constraint.toString(), orderBy, mLastLocation);
+            }
+        });
+        mAdapter.setViewBinder(new SimpleCursorAdapter.ViewBinder() {
+            @Override
+            public boolean setViewValue(View view, Cursor cursor, int columnIndex) {
+                if (columnIndex == nameColumnIndex) {
+                    TextView textView = (TextView) view;
+                    String stopName = cursor.getString(nameColumnIndex);
+                    if (titleCaseStops) {
+                        stopName = WordUtils.capitalizeFully(stopName);
+                    }
+                    textView.setText(stopName);
+                    return true;
+                }
+                return false;
             }
         });
 
