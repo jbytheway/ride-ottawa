@@ -2,6 +2,7 @@
 <resources>
     <color name="colorPrimary">#F44336</color>
     <color name="colorPrimaryDark">#D32F2F</color>
+    <color name="colorMildAccent">#707070</color>
     <color name="colorAccent">#9E9E9E</color>
 
     <color name="time_gps">@android:color/holo_green_light</color>

@@ -20,35 +20,32 @@
             android:id="@+id/textView" />
     </LinearLayout>
 
-    <RelativeLayout
+    <LinearLayout
+        android:orientation="horizontal"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="match_parent"
+        style="?android:attr/buttonBarStyle">
 
         <Button
-            style="?android:attr/buttonStyleSmall"
+            style="?android:attr/buttonBarButtonStyle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/choose_routes"
             android:id="@+id/choose_routes_button" />
 
         <Button
-            style="?android:attr/buttonStyleSmall"
+            style="?android:attr/buttonBarButtonStyle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/add_destination"
-            android:id="@+id/add_destination_button"
-            android:layout_alignParentTop="true"
-            android:layout_toEndOf="@+id/choose_routes_button" />
+            android:id="@+id/add_destination_button" />
 
         <Button
-            style="?android:attr/buttonStyleSmall"
+            style="?android:attr/buttonBarButtonStyle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/action_delete"
-            android:id="@+id/delete_button"
-            android:layout_alignParentTop="true"
-            android:layout_toEndOf="@+id/add_destination_button" />
-
-    </RelativeLayout>
+            android:id="@+id/delete_button" />
+    </LinearLayout>
 
 </LinearLayout>

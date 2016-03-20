@@ -13,23 +13,32 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/route_list"
-        android:layout_above="@+id/save"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentEnd="true" />
+        android:layout_above="@+id/button_bar"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentTop="false" />
 
-    <Button
-        android:layout_width="wrap_content"
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/save"
-        android:id="@+id/save"
         android:layout_alignParentBottom="true"
-        android:layout_alignParentStart="true" />
+        style="?android:attr/buttonBarStyle"
+        android:id="@+id/button_bar"
+        android:elevation="@dimen/button_bar_elevation">
 
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/select_all"
-        android:id="@+id/select_all"
-        android:layout_toEndOf="@+id/save"
-        android:layout_alignBottom="@+id/save" />
+        <Button
+            style="?android:attr/buttonBarButtonStyle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/save"
+            android:id="@+id/save" />
+
+        <Button
+            style="?android:attr/buttonBarButtonStyle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/select_all"
+            android:id="@+id/select_all" />
+    </LinearLayout>
+
 </RelativeLayout>
