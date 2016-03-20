@@ -30,6 +30,7 @@
     <string name="select_all">Select all</string>
     <string name="no_routes_available">This stop has no routes.</string>
     <string name="filter_hint">Type here to filter stops</string>
+    <string name="location_permission_denied_response">To avoid location permission requests, change your settings.</string>
     <string name="title_activity_select_stop">Select Stop</string>
     <string name="title_activity_select_routes">Select Routes</string>
     <string name="title_activity_view_favourite">View Favourite</string>

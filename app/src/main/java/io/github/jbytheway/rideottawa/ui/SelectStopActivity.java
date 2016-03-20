@@ -1,13 +1,18 @@
 package io.github.jbytheway.rideottawa.ui;
 
+import android.Manifest;
+import android.app.Activity;
 import android.content.Intent;
 import android.content.IntentSender;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.location.Location;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -19,6 +24,7 @@ import android.widget.FilterQueryProvider;
 import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.PendingResult;
@@ -44,6 +50,7 @@ public class SelectStopActivity extends AppCompatActivity implements GoogleApiCl
     private static final String TAG = "SelectStopActivity";
 
     private static final int REQUEST_CHECK_SETTINGS = 1;
+    private static final int REQUEST_PERMISSION_LOCATION = 2;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -154,6 +161,37 @@ public class SelectStopActivity extends AppCompatActivity implements GoogleApiCl
     @Override
     public void onConnected(Bundle bundle) {
         Log.d(TAG, "Connected to Google play");
+
+        // The first thing we do is check whether we have the permission to get this location info
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) ==
+                PackageManager.PERMISSION_GRANTED) {
+            // Have the permission, go ahead and use it
+            getLocation();
+        } else {
+            // Request the permission
+            ActivityCompat.requestPermissions(
+                    this,
+                    new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+                    REQUEST_PERMISSION_LOCATION);
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        switch (requestCode) {
+            case REQUEST_PERMISSION_LOCATION:
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    getLocation();
+                } else {
+                    Toast.makeText(this, R.string.location_permission_denied_response, Toast.LENGTH_LONG).show();
+                }
+                break;
+            default:
+                throw new AssertionError("Unexpected request code "+requestCode);
+        }
+    }
+
+    private void getLocation() {
         try {
             mLastLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleClient);
         } catch (SecurityException e) {
