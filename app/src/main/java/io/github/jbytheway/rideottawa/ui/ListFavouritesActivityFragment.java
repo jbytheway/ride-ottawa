@@ -6,8 +6,10 @@ import android.app.Dialog;
 import android.app.DialogFragment;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.net.Uri;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
+import android.text.method.LinkMovementMethod;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -25,6 +27,7 @@ import org.joda.time.format.DateTimeFormatter;
 
 import java.util.List;
 
+import io.github.jbytheway.rideottawa.BuildConfig;
 import io.github.jbytheway.rideottawa.Favourite;
 import io.github.jbytheway.rideottawa.OcTranspoDataAccess;
 import io.github.jbytheway.rideottawa.RideOttawaApplication;
@@ -148,6 +151,10 @@ public class ListFavouritesActivityFragment extends Fragment {
                 databaseCheckDialog.setArguments(args);
                 databaseCheckDialog.show(getActivity().getFragmentManager(), "DatabaseCheckDialog");
                 return true;
+            case R.id.menu_about:
+                AboutDialog aboutDialog = new AboutDialog();
+                aboutDialog.show(getActivity().getFragmentManager(), "AboutDialog");
+                return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
@@ -205,6 +212,44 @@ public class ListFavouritesActivityFragment extends Fragment {
         private String mLastUpdateCheck;
         private String mDatabaseEndDate;
         private DatabaseCheckListener mListener;
+    }
+
+    public static class AboutDialog extends DialogFragment {
+        public AboutDialog() {
+            // Default constructor required for DialogFragments
+            // Real construction happens in onAttach
+        }
+
+        @Override
+        public void onAttach(Activity activity) {
+            super.onAttach(activity);
+            Bundle args = getArguments();
+        }
+
+        @Override
+        public Dialog onCreateDialog(Bundle savedInstance) {
+            AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+            String version = BuildConfig.VERSION_NAME;
+            final String sourceUrl = getString(R.string.source_url);
+            String message = getString(R.string.about_dialog_message, version, sourceUrl);
+            builder
+                    .setMessage(message)
+                    .setNegativeButton(R.string.close_dialog, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            // Nothing
+                        }
+                    })
+                    .setPositiveButton(R.string.go_to_source, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(sourceUrl));
+                            startActivity(intent);
+                        }
+                    });
+            Dialog d = builder.create();
+            return d;
+        }
     }
 
     @Override
