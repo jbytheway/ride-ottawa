@@ -123,14 +123,18 @@ public class ViewFavouriteActivityFragment extends Fragment implements OcTranspo
                         ArrivalEstimate ae = trip.getEstimatedArrival();
                         DateTime estimatedArrival = ae.getTime();
                         DateTime now = mOcTranspo.getNow();
-                        long minutesAway;
+                        // Using Duration.getStandardMinutes rounds towards zero, where we want to
+                        // round to nearest.  So we get the duration in seconds and do the rounding
+                        // ourselves.
+                        long secondsAway;
                         if (now.isAfter(estimatedArrival)) {
                             Interval intervalToArrival = new Interval(estimatedArrival, now);
-                            minutesAway = -intervalToArrival.toDuration().getStandardMinutes();
+                            secondsAway = -intervalToArrival.toDuration().getStandardSeconds();
                         } else {
                             Interval intervalToArrival = new Interval(now, estimatedArrival);
-                            minutesAway = intervalToArrival.toDuration().getStandardMinutes();
+                            secondsAway = intervalToArrival.toDuration().getStandardSeconds();
                         }
+                        long minutesAway = (Math.round((double) secondsAway)/60);
                         minutes_away.setText(getString(R.string.minutes_format, minutesAway));
 
                         if (ae.getType() == ArrivalEstimate.Type.Schedule) {
