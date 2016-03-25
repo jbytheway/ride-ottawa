@@ -247,8 +247,7 @@ public class ListFavouritesActivityFragment extends Fragment {
                             startActivity(intent);
                         }
                     });
-            Dialog d = builder.create();
-            return d;
+            return builder.create();
         }
     }
 
