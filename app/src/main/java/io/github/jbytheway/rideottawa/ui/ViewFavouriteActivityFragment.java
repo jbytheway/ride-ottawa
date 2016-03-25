@@ -7,6 +7,8 @@ import android.os.Bundle;
 import android.app.Fragment;
 import android.os.Handler;
 import android.preference.PreferenceManager;
+import android.support.v7.app.ActionBar;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -213,7 +215,15 @@ public class ViewFavouriteActivityFragment extends Fragment implements OcTranspo
     }
 
     private void populateFromFavourite() {
-        mName.setText(mFavourite.Name);
+        AppCompatActivity activity = (AppCompatActivity) getActivity();
+        ActionBar actionBar = activity.getSupportActionBar();
+        if (actionBar == null) {
+            mName.setText(mFavourite.Name);
+            mName.setVisibility(View.VISIBLE);
+        } else {
+            actionBar.setTitle(mFavourite.Name);
+            mName.setVisibility(View.GONE);
+        }
         refresh();
     }
 
