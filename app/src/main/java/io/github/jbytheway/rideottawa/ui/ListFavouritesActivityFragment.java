@@ -4,9 +4,12 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.DialogFragment;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.Uri;
+import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
 import android.text.method.LinkMovementMethod;
@@ -59,9 +62,11 @@ public class ListFavouritesActivityFragment extends Fragment {
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_list_favourites, container, false);
         mFavouriteList = (ListView) view.findViewById(R.id.favourite_list_view);
+        final SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
+        final Context context = getActivity();
 
         mAdapter = new IndirectArrayAdapter<>(
-            getActivity(),
+            context,
             R.layout.favourite_list_item,
             new IndirectArrayAdapter.ListGenerator<Favourite>() {
                 @Override
@@ -74,6 +79,12 @@ public class ListFavouritesActivityFragment extends Fragment {
                 public void applyView(View v, Favourite f) {
                     TextView name = (TextView) v.findViewById(R.id.name);
                     name.setText(f.Name);
+                    boolean smallFavourites = sharedPreferences.getBoolean("pref_small_favourites", false);
+                    if (smallFavourites) {
+                        name.setTextAppearance(context, android.R.style.TextAppearance_DeviceDefault_Medium);
+                    } else {
+                        name.setTextAppearance(context, android.R.style.TextAppearance_DeviceDefault_Large);
+                    }
                 }
             }
         );

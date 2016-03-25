@@ -26,4 +26,10 @@
         android:summary="@string/pref_description_title_case_stops"
         android:defaultValue="false" />
 
+    <CheckBoxPreference
+        android:key="pref_small_favourites"
+        android:title="@string/pref_title_small_favourites"
+        android:summary="@string/pref_description_small_favourites"
+        android:defaultValue="false" />
+
 </PreferenceScreen>
