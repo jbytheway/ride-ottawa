@@ -21,10 +21,14 @@ public class Stop {
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
         boolean titleCase = preferences.getBoolean(SettingsActivityFragment.PREF_TITLE_CASE_STOPS, false);
         if (titleCase) {
-            return WordUtils.capitalizeFully(mName, ' ', '1', '2', '3', '4');
+            return titleCaseOf(mName);
         } else {
             return mName;
         }
+    }
+
+    public static String titleCaseOf(String stopName) {
+        return WordUtils.capitalizeFully(stopName, ' ', '1', '2', '3', '4', '.');
     }
 
     private final String mId;

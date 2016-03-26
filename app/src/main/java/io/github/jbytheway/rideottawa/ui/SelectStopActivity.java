@@ -102,7 +102,7 @@ public class SelectStopActivity extends AppCompatActivity implements GoogleApiCl
                     TextView textView = (TextView) view;
                     String stopName = cursor.getString(nameColumnIndex);
                     if (titleCaseStops) {
-                        stopName = WordUtils.capitalizeFully(stopName);
+                        stopName = Stop.titleCaseOf(stopName);
                     }
                     textView.setText(stopName);
                     return true;
