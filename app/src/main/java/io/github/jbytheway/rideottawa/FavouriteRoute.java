@@ -60,9 +60,16 @@ public class FavouriteRoute extends SugarRecord implements Comparable<FavouriteR
 
     @Override
     public int compareTo(@NonNull FavouriteRoute another) {
-        int stringCompare = RouteName.compareTo(another.RouteName);
-        if (stringCompare != 0) {
-            return stringCompare;
+        int routeCompare;
+        try {
+            int myRoute = Integer.parseInt(RouteName);
+            int otherRoute = Integer.parseInt(another.RouteName);
+            routeCompare = Integer.compare(myRoute, otherRoute);
+        } catch (NumberFormatException e) {
+            routeCompare = RouteName.compareTo(another.RouteName);
+        }
+        if (routeCompare != 0) {
+            return routeCompare;
         }
         return Integer.compare(Direction, another.Direction);
     }
