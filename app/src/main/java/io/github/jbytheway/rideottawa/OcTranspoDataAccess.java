@@ -8,6 +8,9 @@ import android.location.Location;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
+import com.orm.dsl.NotNull;
+
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
@@ -67,12 +70,15 @@ public class OcTranspoDataAccess {
         mHelper.deleteDatabase();
     }
 
-    private static final String[] STOP_COLUMNS = new String[]{"_id", "stop_id", "stop_code", "stop_name"};
+    private static final String[] ROUTE_COLUMNS = new String[]{"route_short_name", "directed_routes.direction_id", "route_modal_headsign"};
+
+    private static final String[] STOP_COLUMNS = new String[]{"stops._id", "stops.stop_id", "stops.stop_code", "stops.stop_name"};
 
     public Route getRoute(String routeName, int directionId) {
         SQLiteDatabase database = mHelper.getReadableDatabase();
+        String cols = StringUtils.join(ROUTE_COLUMNS, ", ");
         Cursor c = database.rawQuery(
-                "select distinct route_short_name, direction_id, route_modal_headsign " +
+                "select distinct " + cols + " " +
                 "from routes " +
                 "join directed_routes on routes.route_id = directed_routes.route_id " +
                 "where routes.route_short_name = ? and directed_routes.direction_id = ?",
@@ -86,19 +92,41 @@ public class OcTranspoDataAccess {
 
     public Cursor getRoutesForStopById(String stopId) {
         SQLiteDatabase database = mHelper.getReadableDatabase();
+        String cols = StringUtils.join(ROUTE_COLUMNS, ", ");
         return database.rawQuery(
-                "select distinct route_short_name, directed_routes.direction_id, route_modal_headsign from stops " +
-                "join stop_times on stops._id = stop_times.stop_id " +
-                "join trips on trips.trip_id = stop_times.trip_id " +
-                "join routes on trips.route_id = routes.route_id " +
-                "join directed_routes on trips.route_id = directed_routes.route_id " +
-                "where stops.stop_id = ? and directed_routes.direction_id = trips.direction_id " +
-                "order by CAST(routes.route_short_name AS INTEGER)", new String[]{stopId});
+                "select distinct " + cols + " from stops " +
+                        "join stop_times on stops._id = stop_times.stop_id " +
+                        "join trips on trips.trip_id = stop_times.trip_id " +
+                        "join routes on trips.route_id = routes.route_id " +
+                        "join directed_routes on trips.route_id = directed_routes.route_id " +
+                        "where stops.stop_id = ? and directed_routes.direction_id = trips.direction_id " +
+                        "order by CAST(routes.route_short_name AS INTEGER)", new String[]{stopId});
+    }
+
+    public Cursor getRoutesBetweenStops(@NotNull String fromStopId, @NotNull String toStopId) {
+        Log.d(TAG, "Fetching routes from "+fromStopId+" to "+toStopId);
+        SQLiteDatabase database = mHelper.getReadableDatabase();
+        String cols = StringUtils.join(ROUTE_COLUMNS, ", ");
+        String[] args = new String[]{fromStopId, toStopId};
+        return database.rawQuery(
+                "select distinct " + cols + " " +
+                        "from stops as dest_stop " +
+                        "join stop_times as dest_stop_time on dest_stop_time.stop_id = dest_stop._id " +
+                        "join trips on dest_stop_time.trip_id = trips.trip_id " +
+                        "join stop_times as start_stop_time on start_stop_time.trip_id = trips.trip_id " +
+                        "join stops as start_stop on start_stop_time.stop_id = start_stop._id " +
+                        "join routes on trips.route_id = routes.route_id " +
+                        "join directed_routes on trips.route_id = directed_routes.route_id " +
+                        "where start_stop.stop_id = ? " +
+                        "and dest_stop.stop_id = ? " +
+                        "and start_stop_time.stop_sequence < dest_stop_time.stop_sequence " +
+                        "and directed_routes.direction_id = trips.direction_id " +
+                        "order by CAST(routes.route_short_name AS INTEGER)",
+                args
+        );
     }
 
     /*
-    private static final String[] ROUTE_COLUMNS = new String[]{"route_short_name", "direction_id"};
-
     Cursor getRoutesByIds(Collection<String> routeIds) {
         String[] routeIdArray = routeIds.toArray(new String[routeIds.size()]);
 rm         return getRoutesByIds(routeIdArray);
@@ -139,30 +167,55 @@ rm         return getRoutesByIds(routeIdArray);
         return result;
     }
 
-    public Cursor getAllStops(String orderBy, Location location) {
-        return getAllStopsMatching("", orderBy, location);
-    }
-
-    public Cursor getAllStopsMatching(String constraint, String orderBy, Location location) {
+    public Cursor getAllStopsMatchingReachableFrom(@Nullable String constraint, @Nullable String fromStopId, String orderBy, Location location) {
         String cols = StringUtils.join(STOP_COLUMNS, ", ");
+        if (constraint == null) {
+            constraint = "";
+        }
         String namePattern = "%"+constraint+"%";
         String codePattern = constraint+"%";
-        String[] args = new String[]{namePattern, codePattern};
+        ArrayList<String> args = new ArrayList<>();
+        args.add(namePattern);
+        args.add(codePattern);
 
         if (orderBy.equals("proximity")) {
             // We need to sort by distance.  This means we need our current location
             if (location == null) {
-                orderBy = "stop_name";
+                orderBy = "stops.stop_name";
             } else {
-                orderBy = "(stop_lat-?)*(stop_lat-?)+(stop_lon-?)*(stop_lon-?)";
+                orderBy = "(stops.stop_lat-?)*(stops.stop_lat-?)+(stops.stop_lon-?)*(stops.stop_lon-?)";
                 String lat = ""+location.getLatitude();
                 String lon = ""+location.getLongitude();
-                args = new String[]{namePattern, codePattern, lat, lat, lon, lon};
+                args.add(lat);
+                args.add(lat);
+                args.add(lon);
+                args.add(lon);
             }
+        } else {
+            orderBy = "stops." + orderBy;
         }
 
         SQLiteDatabase database = mHelper.getReadableDatabase();
-        return database.rawQuery("select " + cols + " from stops where (stop_name like ? or stop_code like ?) order by "+orderBy, args);
+        String whereClause = "(stops.stop_name like ? or stops.stop_code like ?) order by " + orderBy;
+        if (fromStopId == null) {
+            return database.rawQuery("select " + cols + " from stops where " + whereClause, args.toArray(new String[0]));
+        } else {
+            args.add(0, fromStopId);
+            // This big messy query is aboput finding those stops reachable on any route from
+            // fromStopId
+            return database.rawQuery(
+                    "select distinct " + cols + " " +
+                    "from stops " +
+                    "join stop_times as dest_stop_time on dest_stop_time.stop_id = stops._id " +
+                    "join trips on dest_stop_time.trip_id = trips.trip_id " +
+                    "join stop_times as start_stop_time on start_stop_time.trip_id = trips.trip_id " +
+                    "join stops as start_stop on start_stop_time.stop_id = start_stop._id " +
+                    "where start_stop.stop_id = ? " +
+                    "and start_stop_time.stop_sequence < dest_stop_time.stop_sequence " +
+                    "and " + whereClause,
+                    args.toArray(new String[0])
+            );
+        }
     }
 
     public Stop getStop(String stopId) {

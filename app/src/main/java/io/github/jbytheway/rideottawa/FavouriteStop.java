@@ -49,15 +49,16 @@ public class FavouriteStop extends SugarRecord {
         return all;
     }
 
-    public void addRoute(Route r) {
-        addRoute(r.getName(), r.getDirection());
+    public void addRoute(Route r, String destination) {
+        addRoute(r.getName(), r.getDirection(), destination);
     }
 
-    public void addRoute(String routeName, int direction) {
+    public void addRoute(String routeName, int direction, String destination) {
         FavouriteRoute route = new FavouriteRoute();
         route.Stop = this;
         route.RouteName = routeName;
         route.Direction = direction;
+        route.Destination = destination;
         mPendingRoutes.add(route);
     }
 
@@ -80,7 +81,30 @@ public class FavouriteStop extends SugarRecord {
 
         // At this point everything left in desiredRoutes is a thing we need to add
         for (Route newRoute : desiredRoutes) {
-            addRoute(newRoute);
+            addRoute(newRoute, null);
+        }
+    }
+
+    public void includeRoutes(List<Route> routes, String destStopId, OcTranspoDataAccess ocTranspo) {
+        HashSet<Route> newRoutes = new HashSet<>(routes);
+
+        // First add destination to routes we already have
+        for (FavouriteRoute favRoute : getRoutes()) {
+            Route rawRoute = favRoute.asRoute(ocTranspo);
+            if (newRoutes.contains(rawRoute)) {
+                if (favRoute.Destination == null) {
+                    favRoute.Destination = destStopId;
+                    if (favRoute.getId() != null) {
+                        favRoute.saveRecursively();
+                    }
+                }
+                newRoutes.remove(rawRoute);
+            }
+        }
+
+        // At this point everything left in newRoutes is a thing we need to add
+        for (Route newRoute : newRoutes) {
+            addRoute(newRoute, destStopId);
         }
     }
 

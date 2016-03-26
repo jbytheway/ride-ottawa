@@ -46,7 +46,9 @@ import io.github.jbytheway.rideottawa.R;
 import io.github.jbytheway.rideottawa.Stop;
 
 public class SelectStopActivity extends AppCompatActivity implements GoogleApiClient.ConnectionCallbacks, LocationListener {
+    public static final String FROM_STOP_ID = "from_stop_id";
     public static final String SELECTED_STOP = "selected_stop";
+
     private static final String TAG = "SelectStopActivity";
 
     private static final int REQUEST_CHECK_SETTINGS = 1;
@@ -83,7 +85,9 @@ public class SelectStopActivity extends AppCompatActivity implements GoogleApiCl
         final String orderBy = sharedPreferences.getString(SettingsActivityFragment.PREF_SORT_STOPS, "stop_name");
         final boolean titleCaseStops = sharedPreferences.getBoolean(SettingsActivityFragment.PREF_TITLE_CASE_STOPS, false);
 
-        Cursor cursor = mOcTranspo.getAllStops(orderBy, mLastLocation);
+        Intent intent = getIntent();
+        mFromStopId = intent.getStringExtra(FROM_STOP_ID);
+        Cursor cursor = makeCursor(null, mFromStopId, orderBy);
         final int nameColumnIndex = cursor.getColumnIndex("stop_name");
 
         mAdapter = new SimpleCursorAdapter(this,
@@ -92,7 +96,7 @@ public class SelectStopActivity extends AppCompatActivity implements GoogleApiCl
         mAdapter.setFilterQueryProvider(new FilterQueryProvider() {
             @Override
             public Cursor runQuery(CharSequence constraint) {
-                return mOcTranspo.getAllStopsMatching(constraint.toString(), orderBy, mLastLocation);
+                return makeCursor(constraint.toString(), mFromStopId, orderBy);
             }
         });
         mAdapter.setViewBinder(new SimpleCursorAdapter.ViewBinder() {
@@ -120,6 +124,9 @@ public class SelectStopActivity extends AppCompatActivity implements GoogleApiCl
                 Stop stop = mOcTranspo.getStop(id);
                 String stopId = stop.getId();
                 result.putExtra(SELECTED_STOP, stopId);
+                if (mFromStopId != null) {
+                    result.putExtra(FROM_STOP_ID, mFromStopId);
+                }
                 setResult(RESULT_OK, result);
                 finish();
             }
@@ -150,6 +157,10 @@ public class SelectStopActivity extends AppCompatActivity implements GoogleApiCl
 
     private void triggerListUpdate() {
         mAdapter.getFilter().filter(mStopFilter.getText());
+    }
+
+    private Cursor makeCursor(String constraint, String fromStopId, String orderBy) {
+        return mOcTranspo.getAllStopsMatchingReachableFrom(constraint, fromStopId, orderBy, mLastLocation);
     }
 
     @Override
@@ -275,6 +286,7 @@ public class SelectStopActivity extends AppCompatActivity implements GoogleApiCl
     }
 
     private OcTranspoDataAccess mOcTranspo;
+    private String mFromStopId;
     private GoogleApiClient mGoogleClient;
     private SimpleCursorAdapter mAdapter;
     private EditText mStopFilter;

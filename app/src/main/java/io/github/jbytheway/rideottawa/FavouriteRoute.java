@@ -69,5 +69,6 @@ public class FavouriteRoute extends SugarRecord implements Comparable<FavouriteR
 
     public String RouteName;
     public int Direction;
+    public String Destination;
     public FavouriteStop Stop;
 }

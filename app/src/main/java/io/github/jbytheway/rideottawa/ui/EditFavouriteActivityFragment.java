@@ -2,6 +2,7 @@ package io.github.jbytheway.rideottawa.ui;
 
 import android.app.Activity;
 import android.app.Fragment;
+import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
@@ -36,7 +37,8 @@ public class EditFavouriteActivityFragment extends Fragment {
     private static final String TAG = "EditFavouriteFragment";
 
     private static final int REQUEST_NEW_STOP = 1;
-    private static final int REQUEST_ROUTES = 2;
+    private static final int REQUEST_DESTINATION = 2;
+    private static final int REQUEST_ROUTES = 3;
 
     public EditFavouriteActivityFragment() {
     }
@@ -59,6 +61,7 @@ public class EditFavouriteActivityFragment extends Fragment {
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_edit_favourite, container, false);
         ListView stopList = (ListView) view.findViewById(R.id.stop_list);
+        final Context context = getActivity();
 
         mStopAdapter = new IndirectArrayAdapter<>(
                 getActivity(),
@@ -80,13 +83,21 @@ public class EditFavouriteActivityFragment extends Fragment {
                         TextView stop_name = (TextView) v.findViewById(R.id.stop_name);
                         final Stop stop = mOcTranspo.getStop(favouriteStop.StopId);
                         stop_code.setText(stop.getCode());
-                        stop_name.setText(stop.getName(getActivity()));
+                        stop_name.setText(stop.getName(context));
 
                         Button chooseRoutesButton = (Button) v.findViewById(R.id.choose_routes_button);
                         chooseRoutesButton.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
                                 selectRoutesForStop(favouriteStop);
+                            }
+                        });
+
+                        Button addDestinationButton = (Button) v.findViewById(R.id.add_destination_button);
+                        addDestinationButton.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                addDestinationForStop(favouriteStop);
                             }
                         });
 
@@ -106,8 +117,15 @@ public class EditFavouriteActivityFragment extends Fragment {
                             View routeView = inflater.inflate(R.layout.edit_stop_route_list_item, routeList, false);
                             TextView routeName = (TextView) routeView.findViewById(R.id.route_name);
                             route.asRoute(mOcTranspo).applyToTextView(routeName);
-                            TextView destination = (TextView) routeView.findViewById(R.id.destination);
-                            destination.setText(""); // TODO: destination in FavouriteRoute
+                            TextView destinationView = (TextView) routeView.findViewById(R.id.destination);
+                            String destinationStopId = route.Destination;
+                            if (destinationStopId == null) {
+                                destinationView.setVisibility(View.GONE);
+                            } else {
+                                Stop destination = mOcTranspo.getStop(route.Destination);
+                                destinationView.setText(destination.getName(context));
+                                destinationView.setVisibility(View.VISIBLE);
+                            }
                             routeList.addView(routeView);
                         }
                     }
@@ -189,6 +207,12 @@ public class EditFavouriteActivityFragment extends Fragment {
         startActivityForResult(intent, REQUEST_ROUTES);
     }
 
+    private void addDestinationForStop(FavouriteStop favouriteStop) {
+        Intent intent = new Intent(getActivity(), SelectStopActivity.class);
+        intent.putExtra(SelectStopActivity.FROM_STOP_ID, favouriteStop.StopId);
+        startActivityForResult(intent, REQUEST_DESTINATION);
+    }
+
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         switch (requestCode) {
@@ -201,7 +225,7 @@ public class EditFavouriteActivityFragment extends Fragment {
                     FavouriteStop stop = mFavourite.getStop(stopId);
                     if (c.getCount() == 1) {
                         List<Route> routes = mOcTranspo.routeCursorToList(c);
-                        stop.addRoute(routes.get(0));
+                        stop.addRoute(routes.get(0), null);
                     } else if (c.getCount() > 1) {
                         // Assume that the user wants to select routes for this stop, so do that
                         selectRoutesForStop(stop);
@@ -219,6 +243,26 @@ public class EditFavouriteActivityFragment extends Fragment {
                     FavouriteStop stop = mFavourite.getStop(stopId);
                     ArrayList<Route> selectedRoutes = data.getParcelableArrayListExtra(SelectRoutesActivity.SELECTED_ROUTES);
                     stop.updateRoutes(selectedRoutes, mOcTranspo);
+                    if (stop.getId() != null) {
+                        stop.saveRecursively();
+                    }
+                    mStopAdapter.notifyDataSetChanged();
+                }
+                break;
+            case REQUEST_DESTINATION:
+                if (resultCode == Activity.RESULT_OK) {
+                    String fromStopId = data.getStringExtra(SelectStopActivity.FROM_STOP_ID);
+                    String destStopId = data.getStringExtra(SelectStopActivity.SELECTED_STOP);
+                    if (fromStopId == null) {
+                        throw new AssertionError("Missing FROM_STOP_ID");
+                    }
+                    if (destStopId == null) {
+                        throw new AssertionError("Missing SELECTED_STOP");
+                    }
+                    Cursor c = mOcTranspo.getRoutesBetweenStops(fromStopId, destStopId);
+                    List<Route> newRoutes = mOcTranspo.routeCursorToList(c);
+                    FavouriteStop stop = mFavourite.getStop(fromStopId);
+                    stop.includeRoutes(newRoutes, destStopId, mOcTranspo);
                     if (stop.getId() != null) {
                         stop.saveRecursively();
                     }
