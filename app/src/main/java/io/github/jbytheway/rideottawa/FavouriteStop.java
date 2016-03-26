@@ -37,6 +37,10 @@ public class FavouriteStop extends SugarRecord {
         delete();
     }
 
+    public Stop asStop(OcTranspoDataAccess ocTranspo) {
+        return ocTranspo.getStop(StopId);
+    }
+
     public List<FavouriteRoute> getRoutes() {
         ArrayList<FavouriteRoute> all = new ArrayList<>();
         Long id = getId();

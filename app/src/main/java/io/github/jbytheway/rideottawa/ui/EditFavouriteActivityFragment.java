@@ -149,7 +149,21 @@ public class EditFavouriteActivityFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 updateFavourite();
-                mFavourite.saveRecursively();
+                List<FavouriteStop> stops = mFavourite.getStops();
+                boolean hasStops = !stops.isEmpty();
+                boolean hasName = !mFavourite.Name.isEmpty();
+
+                // Only keep it at all if it has at least something
+                if (hasName || hasStops) {
+                    if (!hasName) {
+                        // If it has no name, concoct one
+                        FavouriteStop firstStop = stops.get(0);
+                        mFavourite.Name = firstStop.asStop(mOcTranspo).getName(context);
+                    }
+                    mFavourite.saveRecursively();
+                } else {
+                    Toast.makeText(context, R.string.not_saving_empty_favourite, Toast.LENGTH_LONG).show();
+                }
                 getActivity().finish();
             }
         });
