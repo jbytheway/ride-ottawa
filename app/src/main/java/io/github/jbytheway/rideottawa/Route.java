@@ -28,7 +28,7 @@ public class Route implements Parcelable {
         view.setTextColor(getColour());
     }
 
-    public int getColour() {
+    private int getColour() {
         final double INT_RANGE = Math.pow(2, 32);
         int hash = mName.hashCode() * 1284865837;
         double hue = hash * 360.0 / INT_RANGE;

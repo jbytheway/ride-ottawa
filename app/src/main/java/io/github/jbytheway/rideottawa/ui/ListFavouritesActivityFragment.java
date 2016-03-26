@@ -12,7 +12,6 @@ import android.net.Uri;
 import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
-import android.text.method.LinkMovementMethod;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -24,7 +23,6 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import org.apache.commons.collections4.IteratorUtils;
-import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 
@@ -81,8 +79,10 @@ public class ListFavouritesActivityFragment extends Fragment {
                     name.setText(f.Name);
                     boolean smallFavourites = sharedPreferences.getBoolean("pref_small_favourites", false);
                     if (smallFavourites) {
+                        //noinspection deprecation
                         name.setTextAppearance(context, android.R.style.TextAppearance_DeviceDefault_Medium);
                     } else {
+                        //noinspection deprecation
                         name.setTextAppearance(context, android.R.style.TextAppearance_DeviceDefault_Large);
                     }
                 }
@@ -234,7 +234,7 @@ public class ListFavouritesActivityFragment extends Fragment {
         @Override
         public void onAttach(Activity activity) {
             super.onAttach(activity);
-            Bundle args = getArguments();
+            //Bundle args = getArguments();
         }
 
         @Override

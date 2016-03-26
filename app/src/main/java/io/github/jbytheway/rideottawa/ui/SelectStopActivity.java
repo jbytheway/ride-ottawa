@@ -1,7 +1,6 @@
 package io.github.jbytheway.rideottawa.ui;
 
 import android.Manifest;
-import android.app.Activity;
 import android.content.Intent;
 import android.content.IntentSender;
 import android.content.SharedPreferences;
@@ -88,8 +87,10 @@ public class SelectStopActivity extends AppCompatActivity implements GoogleApiCl
         Intent intent = getIntent();
         mFromStopId = intent.getStringExtra(FROM_STOP_ID);
         if (mFromStopId == null) {
+            //noinspection ConstantConditions
             getSupportActionBar().setTitle(R.string.title_activity_select_stop);
         } else {
+            //noinspection ConstantConditions
             getSupportActionBar().setTitle(R.string.title_activity_select_destination);
         }
         Cursor cursor = makeCursor(null, mFromStopId, orderBy);

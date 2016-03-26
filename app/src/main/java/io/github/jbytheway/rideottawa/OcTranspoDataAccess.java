@@ -198,7 +198,7 @@ rm         return getRoutesByIds(routeIdArray);
         SQLiteDatabase database = mHelper.getReadableDatabase();
         String whereClause = "(stops.stop_name like ? or stops.stop_code like ?) order by " + orderBy;
         if (fromStopId == null) {
-            return database.rawQuery("select " + cols + " from stops where " + whereClause, args.toArray(new String[0]));
+            return database.rawQuery("select " + cols + " from stops where " + whereClause, args.toArray(new String[args.size()]));
         } else {
             args.add(0, fromStopId);
             // This big messy query is aboput finding those stops reachable on any route from
@@ -213,7 +213,7 @@ rm         return getRoutesByIds(routeIdArray);
                     "where start_stop.stop_id = ? " +
                     "and start_stop_time.stop_sequence < dest_stop_time.stop_sequence " +
                     "and " + whereClause,
-                    args.toArray(new String[0])
+                    args.toArray(new String[args.size()])
             );
         }
     }
