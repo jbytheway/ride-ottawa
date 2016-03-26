@@ -209,6 +209,7 @@ public class EditFavouriteActivityFragment extends Fragment {
                         // Strange case; there are no routes for this stop.
                         Toast.makeText(getActivity(), getString(R.string.no_routes_available), Toast.LENGTH_LONG).show();
                     }
+                    c.close();
                     mStopAdapter.notifyDataSetChanged();
                 }
                 break;
