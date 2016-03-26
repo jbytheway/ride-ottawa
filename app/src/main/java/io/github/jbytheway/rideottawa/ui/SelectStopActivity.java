@@ -76,10 +76,6 @@ public class SelectStopActivity extends AppCompatActivity implements GoogleApiCl
 
         ListView stopList = (ListView) findViewById(R.id.stop_list);
 
-        // For the cursor adapter, specify which columns go into which views
-        String[] fromColumns = {"stop_code", "stop_name"};
-        int[] toViews = {R.id.stop_code, R.id.stop_name};
-
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         final String orderBy = sharedPreferences.getString(SettingsActivityFragment.PREF_SORT_STOPS, "stop_name");
         final boolean titleCaseStops = sharedPreferences.getBoolean(SettingsActivityFragment.PREF_TITLE_CASE_STOPS, false);
@@ -93,6 +89,11 @@ public class SelectStopActivity extends AppCompatActivity implements GoogleApiCl
             //noinspection ConstantConditions
             getSupportActionBar().setTitle(R.string.title_activity_select_destination);
         }
+
+        // For the cursor adapter, specify which columns go into which views
+        String[] fromColumns = {"stop_code", "stop_name"};
+        int[] toViews = {R.id.stop_code, R.id.stop_name};
+
         Cursor cursor = makeCursor(null, mFromStopId, orderBy);
         final int nameColumnIndex = cursor.getColumnIndex("stop_name");
 
