@@ -226,10 +226,7 @@ public class EditFavouriteActivityFragment extends Fragment {
                     if (c.getCount() == 1) {
                         List<Route> routes = mOcTranspo.routeCursorToList(c);
                         stop.addRoute(routes.get(0), null);
-                    } else if (c.getCount() > 1) {
-                        // Assume that the user wants to select routes for this stop, so do that
-                        selectRoutesForStop(stop);
-                    } else {
+                    } else if (c.getCount() == 0) {
                         // Strange case; there are no routes for this stop.
                         Toast.makeText(getActivity(), getString(R.string.no_routes_available), Toast.LENGTH_LONG).show();
                     }
