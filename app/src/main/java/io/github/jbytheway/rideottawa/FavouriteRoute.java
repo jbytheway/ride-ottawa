@@ -31,7 +31,7 @@ public class FavouriteRoute extends SugarRecord implements Comparable<FavouriteR
     }
 
     public ArrayList<ForthcomingTrip> updateForthcomingTrips(OcTranspoDataAccess ocTranspo, ArrayList<ForthcomingTrip> oldTrips) {
-        Cursor c = ocTranspo.getForthcomingTrips(Stop.StopId, RouteName, Direction);
+        Cursor c = ocTranspo.getForthcomingTrips(Stop.StopId, RouteName, Direction, Destination);
         List<ForthcomingTrip> newTrips = ocTranspo.stopTimeCursorToList(c);
 
         // We want to keep the old trips where they match the new ones, but add also the new ones

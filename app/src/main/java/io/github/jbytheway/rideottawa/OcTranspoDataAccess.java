@@ -79,10 +79,10 @@ public class OcTranspoDataAccess {
         String cols = StringUtils.join(ROUTE_COLUMNS, ", ");
         Cursor c = database.rawQuery(
                 "select distinct " + cols + " " +
-                "from routes " +
-                "join directed_routes on routes.route_id = directed_routes.route_id " +
-                "where routes.route_short_name = ? and directed_routes.direction_id = ?",
-                new String[]{routeName, ""+directionId});
+                        "from routes " +
+                        "join directed_routes on routes.route_id = directed_routes.route_id " +
+                        "where routes.route_short_name = ? and directed_routes.direction_id = ?",
+                new String[]{routeName, "" + directionId});
         if (c.getCount() != 1) {
             throw new AssertionError("Requested invalid Route " + routeName + ", " + directionId);
         }
@@ -104,7 +104,7 @@ public class OcTranspoDataAccess {
     }
 
     public Cursor getRoutesBetweenStops(@NotNull String fromStopId, @NotNull String toStopId) {
-        Log.d(TAG, "Fetching routes from "+fromStopId+" to "+toStopId);
+        Log.d(TAG, "Fetching routes from " + fromStopId + " to " + toStopId);
         SQLiteDatabase database = mHelper.getReadableDatabase();
         String cols = StringUtils.join(ROUTE_COLUMNS, ", ");
         String[] args = new String[]{fromStopId, toStopId};
@@ -256,7 +256,7 @@ rm         return getRoutesByIds(routeIdArray);
         return now.withZone(mOttawaTimeZone);
     }
 
-    public Cursor getForthcomingTrips(String stopId, String routeName, int direction) {
+    public Cursor getForthcomingTrips(String stopId, String routeName, int direction, String destinationStopId) {
         DateTime now = getNow();
 
         // Next we need to figure out the midnight that started this day in Ottawa
@@ -270,36 +270,51 @@ rm         return getRoutesByIds(routeIdArray);
         // Format the date in ISO format (which is what the db uses)
         String today = mIsoDateFormatter.print(now);
 
+        String[] args = new String[]{stopId, routeName, "" + direction, today, "" + minTime};
+        String extraJoin = "";
+        String extraWhere = "";
+
+        if (destinationStopId != null) {
+            //Log.d(TAG, "destinationStopId = "+destinationStopId);
+            extraJoin = "join stop_times as dest_stop_time on dest_stop_time.trip_id = trips.trip_id " +
+                        "join stops as dest_stop on dest_stop._id = dest_stop_time.stop_id ";
+            extraWhere = "and dest_stop.stop_id = ? ";
+            args = ArrayUtils.add(args, destinationStopId);
+        }
+
         // Now we can finally make a query
         SQLiteDatabase database = mHelper.getReadableDatabase();
-        return database.rawQuery(
+        String query =
                 "select stops.stop_id, stops.stop_code, stops.stop_name, " +
-                        "route_short_name, trips.direction_id, " +
-                        "trips.trip_id, trip_headsign, date, stop_times.arrival_time, " +
-                        "stop_times_start.arrival_time as start_arrival_time, " +
-                        "last_stop.stop_id as last_stop_id, " +
-                        "last_stop.stop_code as last_stop_code, " +
-                        "last_stop.stop_name as last_stop_name, " +
-                        "route_modal_headsign from stop_times " +
-                        "join trips on stop_times.trip_id = trips.trip_id " +
-                        "join days on days.service_id = trips.service_id " +
-                        "join routes on trips.route_id = routes.route_id " +
-                        "join directed_routes on trips.route_id = directed_routes.route_id " +
-                        "join stops on stop_times.stop_id = stops._id " +
-                        "join stop_times as stop_times_start on stop_times_start.trip_id = trips.trip_id " +
-                        "join stop_times as last_stop_time on last_stop_time.trip_id = trips.trip_id " +
-                        "join stops as last_stop on last_stop._id = last_stop_time.stop_id " +
-                        "where stops.stop_id = ? " +
-                        "and routes.route_short_name = ? " +
-                        "and trips.direction_id = ? " +
-                        "and directed_routes.direction_id = trips.direction_id " +
-                        "and days.date = ? " +
-                        "and stop_times.arrival_time >= ? " +
-                        "and stop_times_start.stop_sequence = 1 " +
-                        "and last_stop_time.stop_sequence = trips.last_stop_sequence " +
-                        "order by stop_times.arrival_time " +
-                        "limit 10",
-                new String[]{stopId, routeName, "" + direction, today, ""+minTime});
+                "route_short_name, trips.direction_id, " +
+                "trips.trip_id, trip_headsign, date, stop_times.arrival_time, " +
+                "stop_times_start.arrival_time as start_arrival_time, " +
+                "last_stop.stop_id as last_stop_id, " +
+                "last_stop.stop_code as last_stop_code, " +
+                "last_stop.stop_name as last_stop_name, " +
+                "route_modal_headsign from stop_times " +
+                "join trips on stop_times.trip_id = trips.trip_id " +
+                "join days on days.service_id = trips.service_id " +
+                "join routes on trips.route_id = routes.route_id " +
+                "join directed_routes on trips.route_id = directed_routes.route_id " +
+                "join stops on stop_times.stop_id = stops._id " +
+                "join stop_times as stop_times_start on stop_times_start.trip_id = trips.trip_id " +
+                "join stop_times as last_stop_time on last_stop_time.trip_id = trips.trip_id " +
+                "join stops as last_stop on last_stop._id = last_stop_time.stop_id " +
+                extraJoin +
+                "where stops.stop_id = ? " +
+                "and routes.route_short_name = ? " +
+                "and trips.direction_id = ? " +
+                "and directed_routes.direction_id = trips.direction_id " +
+                "and days.date = ? " +
+                "and stop_times.arrival_time >= ? " +
+                "and stop_times_start.stop_sequence = 1 " +
+                "and last_stop_time.stop_sequence = trips.last_stop_sequence " +
+                extraWhere +
+                "order by stop_times.arrival_time " +
+                "limit 10";
+        //Log.d(TAG, "Query = " + query + ", stops.stop_id = " + stopId);
+        return database.rawQuery(query, args);
 
         // FIXME: also fetch trips with times which derive from the previous day (i.e. which started yesterday)
         // and the next day
