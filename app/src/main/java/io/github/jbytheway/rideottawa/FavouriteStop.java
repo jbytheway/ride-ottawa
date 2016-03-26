@@ -1,5 +1,7 @@
 package io.github.jbytheway.rideottawa;
 
+import android.util.Log;
+
 import com.orm.SugarRecord;
 import com.orm.dsl.Ignore;
 
@@ -10,6 +12,8 @@ import java.util.HashSet;
 import java.util.List;
 
 public class FavouriteStop extends SugarRecord {
+    private static final String TAG = "FavouriteStop";
+
     @SuppressWarnings("unused")
     public FavouriteStop() {
         // Required for Sugar
