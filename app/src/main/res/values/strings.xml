@@ -33,6 +33,7 @@
     <string name="filter_hint">Type here to filter stops</string>
     <string name="location_permission_denied_response">To avoid location permission requests, change your settings.</string>
     <string name="title_activity_select_stop">Select Stop</string>
+    <string name="title_activity_select_destination">Select Destination</string>
     <string name="title_activity_select_routes">Select Routes</string>
     <string name="title_activity_view_favourite">View Favourite</string>
     <string name="minutes_format">%1$dm</string>

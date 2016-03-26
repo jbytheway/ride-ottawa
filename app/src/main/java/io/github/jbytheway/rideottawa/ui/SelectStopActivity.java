@@ -14,6 +14,7 @@ import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
@@ -36,9 +37,6 @@ import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.LocationSettingsRequest;
 import com.google.android.gms.location.LocationSettingsResult;
 import com.google.android.gms.location.LocationSettingsStatusCodes;
-
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.text.WordUtils;
 
 import io.github.jbytheway.rideottawa.RideOttawaApplication;
 import io.github.jbytheway.rideottawa.OcTranspoDataAccess;
@@ -74,6 +72,8 @@ public class SelectStopActivity extends AppCompatActivity implements GoogleApiCl
         }
 
         setContentView(R.layout.activity_select_stop);
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
 
         ListView stopList = (ListView) findViewById(R.id.stop_list);
 
@@ -87,6 +87,11 @@ public class SelectStopActivity extends AppCompatActivity implements GoogleApiCl
 
         Intent intent = getIntent();
         mFromStopId = intent.getStringExtra(FROM_STOP_ID);
+        if (mFromStopId == null) {
+            getSupportActionBar().setTitle(R.string.title_activity_select_stop);
+        } else {
+            getSupportActionBar().setTitle(R.string.title_activity_select_destination);
+        }
         Cursor cursor = makeCursor(null, mFromStopId, orderBy);
         final int nameColumnIndex = cursor.getColumnIndex("stop_name");
 
