@@ -5,6 +5,13 @@
     android:layout_height="match_parent"
     tools:context=".ui.ViewFavouriteActivityFragment">
 
+    <ProgressBar
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        style="@android:style/Widget.ProgressBar.Large"
+        android:layout_gravity="center"
+        android:id="@+id/progress" />
+
     <ListView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

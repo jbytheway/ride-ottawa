@@ -18,6 +18,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -76,7 +77,7 @@ public class ViewFavouriteActivityFragment extends Fragment implements OcTranspo
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_view_favourite, container, false);
 
-        ListView tripList = (ListView) view.findViewById(R.id.trip_list);
+        mTripList = (ListView) view.findViewById(R.id.trip_list);
 
         mTripAdapter = new IndirectArrayAdapter<>(
                 getActivity(),
@@ -190,7 +191,12 @@ public class ViewFavouriteActivityFragment extends Fragment implements OcTranspo
                 }
         );
 
-        tripList.setAdapter(mTripAdapter);
+        mTripList.setAdapter(mTripAdapter);
+
+        // mTripList starts invisible; it will reappear when the first set of Favourites have been loaded
+        mTripList.setVisibility(View.GONE);
+
+        mProgressIndicator = (ProgressBar) view.findViewById(R.id.progress);
 
         return view;
     }
@@ -271,6 +277,10 @@ public class ViewFavouriteActivityFragment extends Fragment implements OcTranspo
             mOcTranspo.getLiveDataForTrips(mContext, mForthcomingTrips, ViewFavouriteActivityFragment.this);
             mTripAdapter.notifyDataSetChanged();
             mRefresingNow = false;
+            // The following only matters the first time; we remove the progress indicator and
+            // replace it with the actual trip list
+            mTripList.setVisibility(View.VISIBLE);
+            mProgressIndicator.setVisibility(View.GONE);
         }
     }
 
@@ -314,6 +324,8 @@ public class ViewFavouriteActivityFragment extends Fragment implements OcTranspo
     private volatile ArrayList<ForthcomingTrip> mForthcomingTrips;
     private DateTime mLastRefresh;
     private boolean mRefresingNow;
+    private ProgressBar mProgressIndicator;
+    private ListView mTripList;
     private IndirectArrayAdapter<ForthcomingTrip> mTripAdapter;
     private final DateTimeFormatter mTimeFormatter;
 
