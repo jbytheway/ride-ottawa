@@ -76,8 +76,6 @@ public class ViewFavouriteActivityFragment extends Fragment implements OcTranspo
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_view_favourite, container, false);
 
-        mName = (TextView) view.findViewById(R.id.name);
-
         ListView tripList = (ListView) view.findViewById(R.id.trip_list);
 
         mTripAdapter = new IndirectArrayAdapter<>(
@@ -232,12 +230,8 @@ public class ViewFavouriteActivityFragment extends Fragment implements OcTranspo
     private void populateFromFavourite() {
         AppCompatActivity activity = (AppCompatActivity) getActivity();
         ActionBar actionBar = activity.getSupportActionBar();
-        if (actionBar == null) {
-            mName.setText(mFavourite.Name);
-            mName.setVisibility(View.VISIBLE);
-        } else {
+        if (actionBar != null) {
             actionBar.setTitle(mFavourite.Name);
-            mName.setVisibility(View.GONE);
         }
         refresh();
     }
@@ -321,7 +315,6 @@ public class ViewFavouriteActivityFragment extends Fragment implements OcTranspo
     private DateTime mLastRefresh;
     private boolean mRefresingNow;
     private IndirectArrayAdapter<ForthcomingTrip> mTripAdapter;
-    private TextView mName;
     private final DateTimeFormatter mTimeFormatter;
 
 }
