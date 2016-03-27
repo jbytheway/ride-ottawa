@@ -42,6 +42,8 @@ public class ForthcomingTrip {
 
     public TripUid getTripUid() { return new TripUid(getTripId(), mMidnight); }
 
+    public boolean isWaitingForLiveData() { return mWaitingForLiveData; }
+
     public ArrivalEstimate getEstimatedArrival() {
         if (mEstimatedArrival != null) {
             ArrivalEstimate.Type type;
@@ -58,9 +60,14 @@ public class ForthcomingTrip {
         return new ArrivalEstimate(getArrivalTime(), ArrivalEstimate.Type.Schedule);
     }
 
+    public void notifyLiveUpdateRequested() {
+        mWaitingForLiveData = true;
+    }
+
     public void notifyLiveResponseReceived() {
         // This is called before the below (provideLiveData) is called
         // For trips where no GPS data is available, only this is called and provideLiveData is not
+        mWaitingForLiveData = false;
         mNoGpsOnLastData = true;
     }
 
@@ -78,6 +85,7 @@ public class ForthcomingTrip {
     private final DateTime mMidnight; // the origin from which times are measured
     private final int mTime;
     private final int mStartTime;
+    private boolean mWaitingForLiveData;
     private boolean mNoGpsOnLastData;
     private DateTime mEstimatedArrival;
     private Double mEstimateAge;

@@ -40,6 +40,7 @@
     <string name="scheduled_abbrev">Sched</string>
     <string name="gps_abbrev">GPS</string>
     <string name="gps_old_abbrev">GPS?</string>
+    <string name="waiting_for_data_abbrev">&#8230;</string>
     <string name="skipping_refresh_too_soon">Refreshed too recently.</string>
     <string name="example_stop_code">8888</string>
     <string name="example_route_name">999</string>

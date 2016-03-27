@@ -182,6 +182,11 @@ public class ViewFavouriteActivityFragment extends Fragment implements OcTranspo
                             default:
                                 throw new AssertionError("Unexpected estimate type "+ae.getType());
                         }
+
+                        // Override the above text if we are waiting for data
+                        if (trip.isWaitingForLiveData()) {
+                            time_type.setText(R.string.waiting_for_data_abbrev);
+                        }
                     }
                 }
         );
@@ -250,6 +255,9 @@ public class ViewFavouriteActivityFragment extends Fragment implements OcTranspo
     private void refresh() {
         mForthcomingTrips = mFavourite.updateForthcomingTrips(mOcTranspo, mForthcomingTrips);
         mLastRefresh = new DateTime();
+        for (ForthcomingTrip trip : mForthcomingTrips) {
+            trip.notifyLiveUpdateRequested();
+        }
         mOcTranspo.getLiveDataForTrips(mContext, mForthcomingTrips, this);
         mTripAdapter.notifyDataSetChanged();
         mHandler.postDelayed(new Runnable() {
