@@ -97,6 +97,7 @@ public class OcTranspoApi {
                         ProcessJsonResponse(context, result.getResult(), query, trips);
                     } catch (JSONException jsonException) {
                         Log.e(TAG, "JSON error with API result", jsonException);
+                        Log.e(TAG, "JSON was: "+result.getResult());
                         listener.onApiFail(jsonException);
                         return;
                     }

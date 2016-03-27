@@ -4,6 +4,7 @@ import com.orm.SugarRecord;
 import com.orm.dsl.Ignore;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 
@@ -12,6 +13,13 @@ public class Favourite extends SugarRecord {
     public Favourite() {
         // Required for Sugar
         mPendingStops = new ArrayList<>();
+    }
+
+    public static class CompareNames implements Comparator<Favourite> {
+        @Override
+        public int compare(Favourite lhs, Favourite rhs) {
+            return lhs.Name.compareTo(rhs.Name);
+        }
     }
 
     public String Name;

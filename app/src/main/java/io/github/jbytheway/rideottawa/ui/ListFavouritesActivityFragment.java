@@ -26,6 +26,7 @@ import org.apache.commons.collections4.IteratorUtils;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 
+import java.util.Collections;
 import java.util.List;
 
 import io.github.jbytheway.rideottawa.BuildConfig;
@@ -69,7 +70,9 @@ public class ListFavouritesActivityFragment extends Fragment {
             new IndirectArrayAdapter.ListGenerator<Favourite>() {
                 @Override
                 public List<Favourite> makeList() {
-                    return IteratorUtils.toList(Favourite.findAll(Favourite.class));
+                    List<Favourite> favourites = IteratorUtils.toList(Favourite.findAll(Favourite.class));
+                    Collections.sort(favourites, new Favourite.CompareNames());
+                    return favourites;
                 }
             },
             new IndirectArrayAdapter.ViewGenerator<Favourite>() {
