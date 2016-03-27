@@ -28,12 +28,12 @@ public class Route implements Parcelable {
         view.setTextColor(getColour());
     }
 
-    private int getColour() {
+    public static int getColourOf(String name, int direction) {
         final double INT_RANGE = Math.pow(2, 32);
-        int hash = mName.hashCode() * 1284865837;
+        int hash = name.hashCode() * 1284865837;
         double hue = hash * 360.0 / INT_RANGE;
         // Make colours for opposite direction complementary
-        if (mDirection == 1) {
+        if (direction == 1) {
             hue += 180;
         }
         // Make sure hue is in valid range
@@ -45,6 +45,10 @@ public class Route implements Parcelable {
         float saturation = 1;
         float lightness = 0.7f;
         return ColorUtils.HSLToColor(new float[]{(float) hue, saturation, lightness});
+    }
+
+    private int getColour() {
+        return getColourOf(mName, mDirection);
     }
 
     @Override
