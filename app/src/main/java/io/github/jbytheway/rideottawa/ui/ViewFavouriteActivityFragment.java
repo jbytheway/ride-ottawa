@@ -3,6 +3,7 @@ package io.github.jbytheway.rideottawa.ui;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.app.Fragment;
 import android.os.Handler;
@@ -253,14 +254,45 @@ public class ViewFavouriteActivityFragment extends Fragment implements OcTranspo
         }
     }
 
-    private void refresh() {
-        mForthcomingTrips = mFavourite.updateForthcomingTrips(mOcTranspo, mForthcomingTrips);
-        mLastRefresh = new DateTime();
-        for (ForthcomingTrip trip : mForthcomingTrips) {
-            trip.notifyLiveUpdateRequested();
+    private class RefreshTask extends AsyncTask<Void, Void, Void> {
+        @Override
+        protected Void doInBackground(Void... _) {
+            // NOTE: Assigning to mForthcomingTrips on another thread.
+            // In an effort to make this reasonable, I made mForthcomingTrips volatile.
+            // I think that's the correct Java approach.
+
+            // Note that we are assigning an entirely new array; the old one may still be
+            // referenced in e.g. the API calling code, but that's fine.
+            mForthcomingTrips = mFavourite.updateForthcomingTrips(mOcTranspo, mForthcomingTrips);
+            return null;
         }
-        mOcTranspo.getLiveDataForTrips(mContext, mForthcomingTrips, this);
-        mTripAdapter.notifyDataSetChanged();
+
+        @Override
+        protected void onPostExecute(Void _) {
+            // Everything else gets run on the UI thread so we can safely mess with all fields
+            for (ForthcomingTrip trip : mForthcomingTrips) {
+                trip.notifyLiveUpdateRequested();
+            }
+            mLastRefresh = new DateTime();
+            mOcTranspo.getLiveDataForTrips(mContext, mForthcomingTrips, ViewFavouriteActivityFragment.this);
+            mTripAdapter.notifyDataSetChanged();
+            mRefresingNow = false;
+        }
+    }
+
+    private void refresh() {
+        // The process of updating the Forthcoming trips can take a while (maybe half
+        // a second or more depending on how many routes are involved.
+        // Therefore we want to do it on a background thread.
+
+        // First we check if we're already refreshing (very unlikely, because we force a fairly
+        // long delay between refreshes)
+        if (!mRefresingNow) {
+            mRefresingNow = true;
+            new RefreshTask().execute();
+        }
+
+        // Whether we actually refreshed or not, trigger another refresh
         mHandler.postDelayed(new Runnable() {
             @Override
             public void run() {
@@ -285,8 +317,9 @@ public class ViewFavouriteActivityFragment extends Fragment implements OcTranspo
     private SharedPreferences mSharedPreferences;
     private Handler mHandler;
     private Favourite mFavourite;
-    private ArrayList<ForthcomingTrip> mForthcomingTrips;
+    private volatile ArrayList<ForthcomingTrip> mForthcomingTrips;
     private DateTime mLastRefresh;
+    private boolean mRefresingNow;
     private IndirectArrayAdapter<ForthcomingTrip> mTripAdapter;
     private TextView mName;
     private final DateTimeFormatter mTimeFormatter;
