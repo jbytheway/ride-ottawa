@@ -46,6 +46,7 @@ public class ViewFavouriteActivityFragment extends Fragment implements OcTranspo
     private static final String TAG = "ViewFavouriteFragment";
     private static final int AUTO_REFRESH_SECONDS = 30;
     private static final int MINIMUM_REFRESH_SECONDS = 15;
+    private static final int MAX_FORTHCOMING_TRIPS = 50;
 
     public ViewFavouriteActivityFragment() {
         // Required empty public constructor
@@ -255,9 +256,16 @@ public class ViewFavouriteActivityFragment extends Fragment implements OcTranspo
             // In an effort to make this reasonable, I made mForthcomingTrips volatile.
             // I think that's the correct Java approach.
 
+            ArrayList<ForthcomingTrip> newTrips = mFavourite.updateForthcomingTrips(mOcTranspo, mForthcomingTrips);
+            // Truncate the list if it's absurdly large
+            Collections.sort(newTrips, new ForthcomingTrip.CompareEstimatedArrivals());
+            if (newTrips.size() > MAX_FORTHCOMING_TRIPS) {
+                newTrips.subList(MAX_FORTHCOMING_TRIPS, newTrips.size()).clear();
+            }
+
             // Note that we are assigning an entirely new array; the old one may still be
             // referenced in e.g. the API calling code, but that's fine.
-            mForthcomingTrips = mFavourite.updateForthcomingTrips(mOcTranspo, mForthcomingTrips);
+            mForthcomingTrips = newTrips;
             return null;
         }
 
