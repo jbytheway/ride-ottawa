@@ -154,10 +154,16 @@ public class ViewFavouriteActivityFragment extends Fragment implements OcTranspo
                                 arrival_time_estimated.setTextColor(colour);
                                 break;
                             }
-                            case GpsOld: {
+                            case GpsOld: case NoLongerGps: {
                                 time_type.setText(getString(R.string.gps_old_abbrev));
-                                //noinspection deprecation
-                                int colour = getResources().getColor(R.color.time_gps_old);
+                                int colour;
+                                if (minutesAway < 0) {
+                                    //noinspection deprecation
+                                    colour = getResources().getColor(R.color.time_past);
+                                } else {
+                                    //noinspection deprecation
+                                    colour = getResources().getColor(R.color.time_gps_old);
+                                }
                                 minutes_away.setTextColor(colour);
                                 arrival_time_estimated.setTextColor(colour);
                                 break;

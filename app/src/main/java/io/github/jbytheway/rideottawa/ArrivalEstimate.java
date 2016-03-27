@@ -6,9 +6,10 @@ import org.joda.time.DateTime;
 
 public class ArrivalEstimate implements java.lang.Comparable<ArrivalEstimate> {
     public enum Type {
-        Schedule,
-        Gps,
-        GpsOld,
+        Schedule, // No GPS data received
+        Gps, // GPS data received
+        GpsOld, // We received GPS data, but it's suspiciously outdated
+        NoLongerGps, // We once received GPS data, but last time we checked we didn't
     }
 
     ArrivalEstimate(DateTime time, Type type) {

@@ -43,6 +43,15 @@ public class OcTranspoApi {
         mProcessingDateTimeFormat = DateTimeFormat.forPattern("yyyyMMddHHmmss");
     }
 
+    /**
+     * Query the OCTranspo API for live data for a collection of ForthcomingTrips.
+     *
+     * @param context Standard Android context object.
+     * @param query The Query we are making (A stop code and route number)
+     * @param trips The trips about which we want data.  Every trip in this collection *must* match
+     *              the query.
+     * @param listener The object which will receive callbacks about the results we find.
+     */
     public void queryTimes(final Context context, final TimeQuery query, final Collection<ForthcomingTrip> trips, final Listener listener) {
         // curl -d "appID=${appId}&apiKey=${apiKey}&stopNo=${stopCode}&routeNo=${routeName}&format=json" https://api.octranspo1.com/v1.2/GetNextTripsForStop
         final String stopCode = query.StopCode;
@@ -102,6 +111,11 @@ public class OcTranspoApi {
         final String stopCode = query.StopCode;
         final String routeName = query.Route.getName();
         Log.d(TAG, "Response for stop "+stopCode+", route "+routeName+" has "+routeDirections.length()+" entries");
+
+        // Before we start messing with the actual JSON, we inform each trip that they have received a response
+        for (ForthcomingTrip trip : trips) {
+            trip.notifyLiveResponseReceived();
+        }
 
         String apiDirection = null;
 

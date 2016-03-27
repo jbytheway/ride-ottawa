@@ -45,7 +45,9 @@ public class ForthcomingTrip {
     public ArrivalEstimate getEstimatedArrival() {
         if (mEstimatedArrival != null) {
             ArrivalEstimate.Type type;
-            if (mEstimateAge != null && mEstimateAge > 1) {
+            if (mNoGpsOnLastData) {
+                type = ArrivalEstimate.Type.NoLongerGps;
+            } else if (mEstimateAge != null && mEstimateAge > 1) {
                 type = ArrivalEstimate.Type.GpsOld;
             } else {
                 type = ArrivalEstimate.Type.Gps;
@@ -56,9 +58,16 @@ public class ForthcomingTrip {
         return new ArrivalEstimate(getArrivalTime(), ArrivalEstimate.Type.Schedule);
     }
 
+    public void notifyLiveResponseReceived() {
+        // This is called before the below (provideLiveData) is called
+        // For trips where no GPS data is available, only this is called and provideLiveData is not
+        mNoGpsOnLastData = true;
+    }
+
     public void provideLiveData(DateTime processingTime, int minutesAway, double estimateAge) {
         mEstimatedArrival = processingTime.plusMinutes(minutesAway);
         mEstimateAge = estimateAge;
+        mNoGpsOnLastData = false;
     }
 
     private final Stop mStop;
@@ -69,6 +78,7 @@ public class ForthcomingTrip {
     private final DateTime mMidnight; // the origin from which times are measured
     private final int mTime;
     private final int mStartTime;
+    private boolean mNoGpsOnLastData;
     private DateTime mEstimatedArrival;
     private Double mEstimateAge;
 }
