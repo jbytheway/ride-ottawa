@@ -225,8 +225,11 @@ public class OcTranspoApi {
     }
 
     private JSONArray GetArrayOrObject(JSONObject o, String member) throws JSONException {
-        // There are cases where the API can return either an array or single object
-        // Convert the latter to an array of length 1 for consistency.
+        // There are cases where the API can return either an array or single object or nothing
+        // Convert the latter to arrays of length 1 or 0 for consistency.
+        if (!o.has(member)) {
+            return new JSONArray(new Object[]{});
+        }
         Object m = o.get(member);
         if (m.getClass() == JSONArray.class) {
             return (JSONArray) m;
