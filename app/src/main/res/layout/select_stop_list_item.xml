@@ -21,4 +21,13 @@
         android:layout_alignParentTop="true"
         android:layout_toEndOf="@+id/stop_code"
         android:layout_marginStart="10dp" />
+
+    <GridLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/routes"
+        android:layout_below="@+id/stop_code"
+        android:columnCount="3"
+        android:orientation="horizontal"></GridLayout>
+
 </RelativeLayout>

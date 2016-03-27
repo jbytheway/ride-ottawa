@@ -1,12 +1,15 @@
 package io.github.jbytheway.rideottawa.ui;
 
 import android.Manifest;
+import android.content.Context;
 import android.content.Intent;
 import android.content.IntentSender;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
+import android.graphics.Point;
 import android.location.Location;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
@@ -17,12 +20,13 @@ import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
+import android.view.Display;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.EditText;
-import android.widget.FilterQueryProvider;
+import android.widget.GridLayout;
 import android.widget.ListView;
-import android.widget.SimpleCursorAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -37,10 +41,15 @@ import com.google.android.gms.location.LocationSettingsRequest;
 import com.google.android.gms.location.LocationSettingsResult;
 import com.google.android.gms.location.LocationSettingsStatusCodes;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import io.github.jbytheway.rideottawa.RideOttawaApplication;
 import io.github.jbytheway.rideottawa.OcTranspoDataAccess;
 import io.github.jbytheway.rideottawa.R;
+import io.github.jbytheway.rideottawa.Route;
 import io.github.jbytheway.rideottawa.Stop;
+import io.github.jbytheway.rideottawa.utils.IndirectArrayAdapter;
 
 public class SelectStopActivity extends AppCompatActivity implements GoogleApiClient.ConnectionCallbacks, LocationListener {
     public static final String FROM_STOP_ID = "from_stop_id";
@@ -70,15 +79,32 @@ public class SelectStopActivity extends AppCompatActivity implements GoogleApiCl
                     .build();
         }
 
+        mStopList = new ArrayList<>();
+
         setContentView(R.layout.activity_select_stop);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+        mStopFilter = (EditText) findViewById(R.id.stop_filter);
+        mStopFilter.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                triggerListUpdate();
+            }
+        });
+
         ListView stopList = (ListView) findViewById(R.id.stop_list);
 
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
-        final String orderBy = sharedPreferences.getString(SettingsActivityFragment.PREF_SORT_STOPS, "stop_name");
-        final boolean titleCaseStops = sharedPreferences.getBoolean(SettingsActivityFragment.PREF_TITLE_CASE_STOPS, false);
+        mOrderBy = sharedPreferences.getString(SettingsActivityFragment.PREF_SORT_STOPS, "stop_name");
 
         Intent intent = getIntent();
         mFromStopId = intent.getStringExtra(FROM_STOP_ID);
@@ -90,37 +116,63 @@ public class SelectStopActivity extends AppCompatActivity implements GoogleApiCl
             getSupportActionBar().setTitle(R.string.title_activity_select_destination);
         }
 
-        // For the cursor adapter, specify which columns go into which views
-        String[] fromColumns = {"stop_code", "stop_name"};
-        int[] toViews = {R.id.stop_code, R.id.stop_name};
+        final LayoutInflater inflater = getLayoutInflater();
+        final int routeNameWidthPixels = getResources().getDimensionPixelSize(R.dimen.route_name_width);
+        Display display = getWindowManager().getDefaultDisplay();
+        Point size = new Point();
+        display.getSize(size);
+        int screenWidth = size.x;
+        final int numColumns = Math.max((int) Math.floor(screenWidth / routeNameWidthPixels) - 1, 1);
+        Log.d(TAG, "Setting " + numColumns + " columns (" + screenWidth + " / " + routeNameWidthPixels + ")");
 
-        Cursor cursor = makeCursor(null, mFromStopId, orderBy);
-        final int nameColumnIndex = cursor.getColumnIndex("stop_name");
-
-        mAdapter = new SimpleCursorAdapter(this,
-                R.layout.select_stop_list_item, cursor,
-                fromColumns, toViews, 0);
-        mAdapter.setFilterQueryProvider(new FilterQueryProvider() {
-            @Override
-            public Cursor runQuery(CharSequence constraint) {
-                return makeCursor(constraint.toString(), mFromStopId, orderBy);
-            }
-        });
-        mAdapter.setViewBinder(new SimpleCursorAdapter.ViewBinder() {
-            @Override
-            public boolean setViewValue(View view, Cursor cursor, int columnIndex) {
-                if (columnIndex == nameColumnIndex) {
-                    TextView textView = (TextView) view;
-                    String stopName = cursor.getString(nameColumnIndex);
-                    if (titleCaseStops) {
-                        stopName = Stop.titleCaseOf(stopName);
+        mAdapter = new IndirectArrayAdapter<>(
+                this,
+                R.layout.select_stop_list_item,
+                new IndirectArrayAdapter.ListGenerator<Stop>() {
+                    @Override
+                    public List<Stop> makeList() {
+                        return mStopList;
                     }
-                    textView.setText(stopName);
-                    return true;
+                },
+                new IndirectArrayAdapter.ViewGenerator<Stop>() {
+                    @Override
+                    public void applyView(View v, final Stop stop) {
+                        Log.d(TAG, "applyView start");
+                        Context context = SelectStopActivity.this;
+                        TextView stopCodeView = (TextView) v.findViewById(R.id.stop_code);
+                        stopCodeView.setText(stop.getCode());
+                        TextView stopNameView = (TextView) v.findViewById(R.id.stop_name);
+                        stopNameView.setText(stop.getName(context));
+                        GridLayout routesView = (GridLayout) v.findViewById(R.id.routes);
+                        routesView.removeAllViews();
+                        routesView.setColumnCount(numColumns);
+
+                        Log.d(TAG, "applyView 1");
+                        Cursor c = mOcTranspo.getRoutesForStopById(stop.getId());
+                        Log.d(TAG, "applyView 2");
+                        //List<Route> routes = mOcTranspo.routeCursorToList(c);
+                        if (c.moveToFirst()) {
+                            int name_column = c.getColumnIndex("route_short_name");
+                            int direction_column = c.getColumnIndex("direction_id");
+
+                            while (true) {
+                                String name = c.getString(name_column);
+                                int direction = c.getInt(direction_column);
+                                TextView routeView = (TextView) inflater.inflate(R.layout.route_name_only, routesView, false);
+                                routeView.setText(name);
+                                routeView.setTextColor(Route.getColourOf(name, direction));
+                                routesView.addView(routeView);
+
+                                if (!c.moveToNext()) {
+                                    break;
+                                }
+                            }
+                        }
+                        c.close();
+                        Log.d(TAG, "applyView end");
+                    }
                 }
-                return false;
-            }
-        });
+        );
 
         stopList.setAdapter(mAdapter);
 
@@ -139,21 +191,7 @@ public class SelectStopActivity extends AppCompatActivity implements GoogleApiCl
             }
         });
 
-        mStopFilter = (EditText) findViewById(R.id.stop_filter);
-        mStopFilter.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-            }
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-            }
-
-            @Override
-            public void afterTextChanged(Editable s) {
-                triggerListUpdate();
-            }
-        });
+        triggerListUpdate();
     }
 
     @Override
@@ -162,12 +200,28 @@ public class SelectStopActivity extends AppCompatActivity implements GoogleApiCl
         super.onStart();
     }
 
-    private void triggerListUpdate() {
-        mAdapter.getFilter().filter(mStopFilter.getText());
+    private class UpdateListTask extends AsyncTask<String, Void, Void> {
+        @Override
+        protected Void doInBackground(String... params) {
+            // NOTE: Assigning to mStopList on another thread.
+            // In an effort to make this reasonable, I made mForthcomingTrips volatile.
+            // I think that's the correct Java approach.
+            String filter = params[0];
+
+            Cursor c = mOcTranspo.getAllStopsMatchingReachableFrom(filter, mFromStopId, mOrderBy, mLastLocation);
+            mStopList = mOcTranspo.stopCursorToList(c);
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void _) {
+            mAdapter.notifyDataSetChanged();
+        }
     }
 
-    private Cursor makeCursor(String constraint, String fromStopId, String orderBy) {
-        return mOcTranspo.getAllStopsMatchingReachableFrom(constraint, fromStopId, orderBy, mLastLocation);
+    private void triggerListUpdate() {
+        String filter = mStopFilter.getText().toString();
+        new UpdateListTask().execute(filter);
     }
 
     @Override
@@ -295,8 +349,10 @@ public class SelectStopActivity extends AppCompatActivity implements GoogleApiCl
     private OcTranspoDataAccess mOcTranspo;
     private String mFromStopId;
     private GoogleApiClient mGoogleClient;
-    private SimpleCursorAdapter mAdapter;
+    private volatile List<Stop> mStopList;
+    private IndirectArrayAdapter<Stop> mAdapter;
+    private String mOrderBy;
     private EditText mStopFilter;
-    private Location mLastLocation;
+    private volatile Location mLastLocation;
     private LocationRequest mLocationRequest;
 }
