@@ -244,6 +244,7 @@ public class ViewFavouriteActivityFragment extends Fragment implements OcTranspo
     private void refreshIfLateEnough(boolean showMessage) {
         DateTime now = new DateTime();
         if (now.minusSeconds(MINIMUM_REFRESH_SECONDS).isBefore(mLastRefresh)) {
+            // Too soon; we won't refresh yet
             if (showMessage) {
                 Toast.makeText(getActivity(), getString(R.string.skipping_refresh_too_soon), Toast.LENGTH_LONG).show();
             }
