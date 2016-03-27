@@ -251,6 +251,28 @@ rm         return getRoutesByIds(routeIdArray);
         return new Stop(stopId, stopCode, stopName);
     }
 
+    public List<Stop> stopCursorToList(Cursor c) {
+        ArrayList<Stop> result = new ArrayList<>();
+        if (c.moveToFirst()) {
+            int stopIdColumn = c.getColumnIndex("stop_id");
+            int stopCodeColumn = c.getColumnIndex("stop_code");
+            int stopNameColumn = c.getColumnIndex("stop_name");
+
+            while (true) {
+                String stopId = c.getString(stopIdColumn);
+                String stopCode = c.getString(stopCodeColumn);
+                String stopName = c.getString(stopNameColumn);
+                result.add(new Stop(stopId, stopCode, stopName));
+
+                if (!c.moveToNext()) {
+                    break;
+                }
+            }
+        }
+        c.close();
+        return result;
+    }
+
     public DateTime getNow() {
         // Get the current instant in the Ottawa time zone
         DateTime now = new DateTime();
