@@ -29,7 +29,6 @@ import org.joda.time.format.DateTimeFormatter;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 
 import io.github.jbytheway.rideottawa.ArrivalEstimate;
@@ -85,12 +84,7 @@ public class ViewFavouriteActivityFragment extends Fragment implements OcTranspo
                 new IndirectArrayAdapter.ListGenerator<ForthcomingTrip>() {
                     @Override
                     public List<ForthcomingTrip> makeList() {
-                        Collections.sort(mForthcomingTrips, new Comparator<ForthcomingTrip>() {
-                            @Override
-                            public int compare(ForthcomingTrip lhs, ForthcomingTrip rhs) {
-                                return lhs.getEstimatedArrival().compareTo(rhs.getEstimatedArrival());
-                            }
-                        });
+                        Collections.sort(mForthcomingTrips, new ForthcomingTrip.CompareEstimatedArrivals());
                         return mForthcomingTrips;
                     }
                 },

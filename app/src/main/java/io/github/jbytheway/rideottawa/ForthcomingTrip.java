@@ -2,6 +2,8 @@ package io.github.jbytheway.rideottawa;
 
 import org.joda.time.DateTime;
 
+import java.util.Comparator;
+
 public class ForthcomingTrip {
     public ForthcomingTrip(Stop stop, Route route, String headSign, Stop lastStop, int tripId, DateTime midnight, int time, int startTime) {
         mStop = stop;
@@ -12,6 +14,13 @@ public class ForthcomingTrip {
         mMidnight = midnight;
         mTime = time;
         mStartTime = startTime;
+    }
+
+    public static class CompareEstimatedArrivals implements Comparator<ForthcomingTrip> {
+        @Override
+        public int compare(ForthcomingTrip lhs, ForthcomingTrip rhs) {
+            return lhs.getEstimatedArrival().compareTo(rhs.getEstimatedArrival());
+        }
     }
 
     public Stop getStop() {
