@@ -169,14 +169,15 @@ rm         return getRoutesByIds(routeIdArray);
 
     public Cursor getAllStopsMatchingReachableFrom(@Nullable String constraint, @Nullable String fromStopId, String orderBy, Location location) {
         String cols = StringUtils.join(STOP_COLUMNS, ", ");
-        if (constraint == null) {
-            constraint = "";
-        }
-        String namePattern = "%"+constraint+"%";
-        String codePattern = constraint+"%";
+        String whereClause = "";
         ArrayList<String> args = new ArrayList<>();
-        args.add(namePattern);
-        args.add(codePattern);
+        if (constraint != null) {
+            whereClause += " and (stops.stop_name like ? or stops.stop_code like ?)";
+            String namePattern = "%"+constraint+"%";
+            String codePattern = constraint+"%";
+            args.add(namePattern);
+            args.add(codePattern);
+        }
 
         if (orderBy.equals("proximity")) {
             // We need to sort by distance.  This means we need our current location
@@ -196,12 +197,12 @@ rm         return getRoutesByIds(routeIdArray);
         }
 
         SQLiteDatabase database = mHelper.getReadableDatabase();
-        String whereClause = "(stops.stop_name like ? or stops.stop_code like ?) order by " + orderBy;
+        whereClause += " order by " + orderBy;
         if (fromStopId == null) {
-            return database.rawQuery("select " + cols + " from stops where " + whereClause, args.toArray(new String[args.size()]));
+            return database.rawQuery("select " + cols + " from stops where 1=1 " + whereClause, args.toArray(new String[args.size()]));
         } else {
             args.add(0, fromStopId);
-            // This big messy query is aboput finding those stops reachable on any route from
+            // This big messy query is about finding those stops reachable on any route from
             // fromStopId
             return database.rawQuery(
                     "select distinct " + cols + " " +
@@ -212,7 +213,7 @@ rm         return getRoutesByIds(routeIdArray);
                     "join stops as start_stop on start_stop_time.stop_id = start_stop._id " +
                     "where start_stop.stop_id = ? " +
                     "and start_stop_time.stop_sequence < dest_stop_time.stop_sequence " +
-                    "and " + whereClause,
+                    whereClause,
                     args.toArray(new String[args.size()])
             );
         }
