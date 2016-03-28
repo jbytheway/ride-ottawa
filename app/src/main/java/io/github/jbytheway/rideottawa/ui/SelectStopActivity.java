@@ -137,7 +137,6 @@ public class SelectStopActivity extends AppCompatActivity implements GoogleApiCl
                 new IndirectArrayAdapter.ViewGenerator<Stop>() {
                     @Override
                     public void applyView(View v, final Stop stop) {
-                        Log.d(TAG, "applyView start");
                         Context context = SelectStopActivity.this;
                         TextView stopCodeView = (TextView) v.findViewById(R.id.stop_code);
                         stopCodeView.setText(stop.getCode());
@@ -147,29 +146,13 @@ public class SelectStopActivity extends AppCompatActivity implements GoogleApiCl
                         routesView.removeAllViews();
                         routesView.setColumnCount(numColumns);
 
-                        Log.d(TAG, "applyView 1");
                         Cursor c = mOcTranspo.getRoutesForStopById(stop.getId());
-                        Log.d(TAG, "applyView 2");
-                        //List<Route> routes = mOcTranspo.routeCursorToList(c);
-                        if (c.moveToFirst()) {
-                            int name_column = c.getColumnIndex("route_short_name");
-                            int direction_column = c.getColumnIndex("direction_id");
-
-                            while (true) {
-                                String name = c.getString(name_column);
-                                int direction = c.getInt(direction_column);
-                                TextView routeView = (TextView) inflater.inflate(R.layout.route_name_only, routesView, false);
-                                routeView.setText(name);
-                                routeView.setTextColor(Route.getColourOf(name, direction));
-                                routesView.addView(routeView);
-
-                                if (!c.moveToNext()) {
-                                    break;
-                                }
-                            }
+                        List<Route> routes = mOcTranspo.routeCursorToList(c);
+                        for (Route route : routes) {
+                            TextView routeView = (TextView) inflater.inflate(R.layout.route_name_only, routesView, false);
+                            route.applyToTextView(routeView);
+                            routesView.addView(routeView);
                         }
-                        c.close();
-                        Log.d(TAG, "applyView end");
                     }
                 }
         );

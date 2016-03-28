@@ -95,12 +95,12 @@ public class OcTranspoDataAccess {
         String cols = StringUtils.join(ROUTE_COLUMNS, ", ");
         return database.rawQuery(
                 "select distinct " + cols + " from stops " +
-                        "join stop_times on stops._id = stop_times.stop_id " +
-                        "join trips on trips.trip_id = stop_times.trip_id " +
-                        "join routes on trips.route_id = routes.route_id " +
-                        "join directed_routes on trips.route_id = directed_routes.route_id " +
-                        "where stops.stop_id = ? and directed_routes.direction_id = trips.direction_id " +
-                        "order by CAST(routes.route_short_name AS INTEGER)", new String[]{stopId});
+                        "join routes_at_stops on routes_at_stops.stop_id = stops._id " +
+                        "join directed_routes on directed_routes._id = routes_at_stops.directed_route_id " +
+                        "join routes on routes.route_id = directed_routes.route_id " +
+                        "where stops.stop_id = ? " +
+                        "order by CAST(routes.route_short_name AS INTEGER)",
+                new String[]{stopId});
     }
 
     public Cursor getRoutesBetweenStops(@NotNull String fromStopId, @NotNull String toStopId) {
