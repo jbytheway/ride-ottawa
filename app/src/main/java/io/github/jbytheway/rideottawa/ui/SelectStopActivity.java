@@ -163,7 +163,10 @@ public class SelectStopActivity extends AppCompatActivity implements GoogleApiCl
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Intent result = new Intent();
-                Stop stop = mOcTranspo.getStop(id);
+                // FIXME: There is a race condition here; we might end up with a stop from a different
+                // list than the one the user tapped, but I don't think it's possible to know for
+                // sure given the structure of this code...
+                Stop stop = mStopList.get(position);
                 String stopId = stop.getId();
                 result.putExtra(SELECTED_STOP, stopId);
                 if (mFromStopId != null) {
