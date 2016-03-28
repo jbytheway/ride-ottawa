@@ -152,10 +152,28 @@ public class OcTranspoDataAccess {
 
     public Cursor getAllStopsMatchingReachableFrom(@Nullable String constraint, @Nullable String fromStopId, String orderBy, Location location) {
         String cols = StringUtils.join(STOP_COLUMNS, ", ");
-        String whereClause = "";
+        String query;
         ArrayList<String> args = new ArrayList<>();
+
+        if (fromStopId == null) {
+            query = "select " + cols + " from stops where 1=1 ";
+        } else {
+            // This big messy query is about finding those stops reachable on any route from
+            // fromStopId
+            query = "select distinct " + cols + " " +
+                    "from stops as start_stop " +
+                    "join stop_times as start_stop_time on start_stop_time.stop_id = start_stop._id " +
+                    "join trips on start_stop_time.trip_id = trips.trip_id " +
+                    "join stop_times as dest_stop_time on dest_stop_time.trip_id = trips.trip_id " +
+                    "join stops on dest_stop_time.stop_id = stops._id " +
+                    "where start_stop.stop_id = ? " +
+                    "and start_stop_time.stop_sequence < dest_stop_time.stop_sequence " +
+                    "and trips.is_representative ";
+            args.add(0, fromStopId);
+        }
+
         if (constraint != null) {
-            whereClause += " and (stops.stop_name like ? or stops.stop_code like ?)";
+            query += " and (stops.stop_name like ? or stops.stop_code like ?)";
             String namePattern = "%"+constraint+"%";
             String codePattern = constraint+"%";
             args.add(namePattern);
@@ -180,26 +198,8 @@ public class OcTranspoDataAccess {
         }
 
         SQLiteDatabase database = mHelper.getReadableDatabase();
-        whereClause += " order by " + orderBy;
-        if (fromStopId == null) {
-            return database.rawQuery("select " + cols + " from stops where 1=1 " + whereClause, args.toArray(new String[args.size()]));
-        } else {
-            args.add(0, fromStopId);
-            // This big messy query is about finding those stops reachable on any route from
-            // fromStopId
-            return database.rawQuery(
-                    "select distinct " + cols + " " +
-                    "from stops " +
-                    "join stop_times as dest_stop_time on dest_stop_time.stop_id = stops._id " +
-                    "join trips on dest_stop_time.trip_id = trips.trip_id " +
-                    "join stop_times as start_stop_time on start_stop_time.trip_id = trips.trip_id " +
-                    "join stops as start_stop on start_stop_time.stop_id = start_stop._id " +
-                    "where start_stop.stop_id = ? " +
-                    "and start_stop_time.stop_sequence < dest_stop_time.stop_sequence " +
-                    whereClause,
-                    args.toArray(new String[args.size()])
-            );
-        }
+        query += " order by " + orderBy;
+        return database.rawQuery(query, args.toArray(new String[args.size()]));
     }
 
     public Stop getStop(String stopId) {
