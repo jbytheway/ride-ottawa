@@ -200,7 +200,7 @@ public class SelectStopActivity extends AppCompatActivity implements GoogleApiCl
         }
 
         @Override
-        protected void onPostExecute(Void _) {
+        protected void onPostExecute(Void ignore) {
             mAdapter.notifyDataSetChanged();
         }
     }

@@ -22,10 +22,12 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import org.apache.commons.collections4.IteratorUtils;
+import com.google.common.collect.Iterators;
+
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -70,7 +72,8 @@ public class ListFavouritesActivityFragment extends Fragment {
             new IndirectArrayAdapter.ListGenerator<Favourite>() {
                 @Override
                 public List<Favourite> makeList() {
-                    List<Favourite> favourites = IteratorUtils.toList(Favourite.findAll(Favourite.class));
+                    List<Favourite> favourites = new ArrayList<>();
+                    Iterators.addAll(favourites, Favourite.findAll(Favourite.class));
                     Collections.sort(favourites, new Favourite.CompareNames());
                     return favourites;
                 }

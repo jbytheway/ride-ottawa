@@ -8,14 +8,15 @@ import android.net.ConnectivityManager;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
+import com.google.common.io.ByteStreams;
+import com.google.common.io.CharStreams;
+import com.google.common.io.Files;
 import com.koushikdutta.async.future.FutureCallback;
 import com.koushikdutta.ion.HeadersCallback;
 import com.koushikdutta.ion.HeadersResponse;
 import com.koushikdutta.ion.Ion;
 import com.koushikdutta.ion.Response;
 
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.IOUtils;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 
@@ -24,6 +25,8 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.Future;
 import java.util.zip.GZIPInputStream;
@@ -190,7 +193,7 @@ public abstract class DownloadableDatabase extends SQLiteOpenHelper {
 
             FileOutputStream fout = new FileOutputStream(tmpFile);
 
-            IOUtils.copy(zin, fout);
+            ByteStreams.copy(zin, fout);
             Log.d(TAG, "Decompression done");
             if (!tmpFile.renameTo(new File(getPath()))) {
                 throw new IOException("Failed to rename "+tmpFile+" to "+getPath());
@@ -241,13 +244,18 @@ public abstract class DownloadableDatabase extends SQLiteOpenHelper {
             return "";
         }
         InputStream is = new FileInputStream(etagFile);
-        return IOUtils.toString(is);
+        InputStreamReader isr = new InputStreamReader(is, "ASCII");
+        String result = CharStreams.toString(isr);
+        isr.close();
+        return result;
     }
 
     private void setEtag(String etag) {
         try {
             FileOutputStream os = new FileOutputStream(getEtagPath());
-            IOUtils.write(etag, os);
+            OutputStreamWriter osr = new OutputStreamWriter(os, "ASCII");
+            osr.write(etag);
+            osr.close();
         } catch (IOException e) {
             Log.e(TAG, "Failed to update etag", e);
             // Not really anything we can do to recover from this; just have to live with downloading the file again next time
@@ -257,7 +265,7 @@ public abstract class DownloadableDatabase extends SQLiteOpenHelper {
     private void touchEtag() {
         // Update the last-modified date on the ETag so we know when we last checked for updates
         try {
-            FileUtils.touch(new File(getEtagPath()));
+            Files.touch(new File(getEtagPath()));
         } catch (IOException e) {
             Log.e(TAG, "Error touching etag", e);
             // Otherwise, ignore error

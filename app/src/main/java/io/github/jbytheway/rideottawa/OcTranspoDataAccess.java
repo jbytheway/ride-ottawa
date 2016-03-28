@@ -8,10 +8,10 @@ import android.location.Location;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
+import com.google.common.base.Joiner;
+import com.google.common.collect.Lists;
 import com.orm.dsl.NotNull;
 
-import org.apache.commons.lang3.ArrayUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.joda.time.Duration;
@@ -24,6 +24,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import io.github.jbytheway.rideottawa.utils.DownloadableDatabase;
 
@@ -76,7 +77,7 @@ public class OcTranspoDataAccess {
 
     public Route getRoute(String routeName, int directionId) {
         SQLiteDatabase database = mHelper.getReadableDatabase();
-        String cols = StringUtils.join(ROUTE_COLUMNS, ", ");
+        String cols = Joiner.on(", ").join(ROUTE_COLUMNS);
         Cursor c = database.rawQuery(
                 "select distinct " + cols + " " +
                         "from routes " +
@@ -92,7 +93,7 @@ public class OcTranspoDataAccess {
 
     public Cursor getRoutesForStopById(String stopId) {
         SQLiteDatabase database = mHelper.getReadableDatabase();
-        String cols = StringUtils.join(ROUTE_COLUMNS, ", ");
+        String cols = Joiner.on(", ").join(ROUTE_COLUMNS);
         return database.rawQuery(
                 "select distinct " + cols + " from stops " +
                         "join routes_at_stops on routes_at_stops.stop_id = stops._id " +
@@ -106,7 +107,7 @@ public class OcTranspoDataAccess {
     public Cursor getRoutesBetweenStops(@NotNull String fromStopId, @NotNull String toStopId) {
         Log.d(TAG, "Fetching routes from " + fromStopId + " to " + toStopId);
         SQLiteDatabase database = mHelper.getReadableDatabase();
-        String cols = StringUtils.join(ROUTE_COLUMNS, ", ");
+        String cols = Joiner.on(", ").join(ROUTE_COLUMNS);
         String[] args = new String[]{fromStopId, toStopId};
         return database.rawQuery(
                 "select distinct " + cols + " " +
@@ -152,7 +153,7 @@ public class OcTranspoDataAccess {
     }
 
     public Cursor getAllStopsMatchingReachableFrom(@Nullable String constraint, @Nullable String fromStopId, String orderBy, Location location) {
-        String cols = StringUtils.join(STOP_COLUMNS, ", ");
+        String cols = Joiner.on(", ").join(STOP_COLUMNS);
         String query;
         ArrayList<String> args = new ArrayList<>();
 
@@ -277,7 +278,7 @@ public class OcTranspoDataAccess {
         // Format the date in ISO format (which is what the db uses)
         String today = mIsoDateFormatter.print(now);
 
-        String[] args = new String[]{stopId, routeName, "" + direction, today, "" + minTime};
+        ArrayList<String> args = Lists.newArrayList(stopId, routeName, "" + direction, today, "" + minTime);
         String extraJoin = "";
         String extraWhere = "";
 
@@ -286,7 +287,7 @@ public class OcTranspoDataAccess {
             extraJoin = "join stop_times as dest_stop_time on dest_stop_time.trip_id = trips.trip_id " +
                         "join stops as dest_stop on dest_stop._id = dest_stop_time.stop_id ";
             extraWhere = "and dest_stop.stop_id = ? ";
-            args = ArrayUtils.add(args, destinationStopId);
+            args.add(destinationStopId);
         }
 
         // Now we can finally make a query
@@ -321,7 +322,7 @@ public class OcTranspoDataAccess {
                 "order by stop_times.arrival_time " +
                 "limit 10";
         //Log.d(TAG, "Query = " + query + ", stops.stop_id = " + stopId);
-        return database.rawQuery(query, args);
+        return database.rawQuery(query, args.toArray(new String[args.size()]));
 
         // FIXME: also fetch trips with times which derive from the previous day (i.e. which started yesterday)
         // and the next day

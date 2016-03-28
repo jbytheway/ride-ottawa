@@ -251,7 +251,7 @@ public class ViewFavouriteActivityFragment extends Fragment implements OcTranspo
 
     private class RefreshTask extends AsyncTask<Void, Void, Void> {
         @Override
-        protected Void doInBackground(Void... _) {
+        protected Void doInBackground(Void... ignore) {
             // NOTE: Assigning to mForthcomingTrips on another thread.
             // In an effort to make this reasonable, I made mForthcomingTrips volatile.
             // I think that's the correct Java approach.
@@ -270,7 +270,7 @@ public class ViewFavouriteActivityFragment extends Fragment implements OcTranspo
         }
 
         @Override
-        protected void onPostExecute(Void _) {
+        protected void onPostExecute(Void ignore) {
             // Everything else gets run on the UI thread so we can safely mess with all fields
             for (ForthcomingTrip trip : mForthcomingTrips) {
                 trip.notifyLiveUpdateRequested();
