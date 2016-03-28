@@ -120,6 +120,7 @@ public class OcTranspoDataAccess {
                         "where start_stop.stop_id = ? " +
                         "and dest_stop.stop_id = ? " +
                         "and start_stop_time.stop_sequence < dest_stop_time.stop_sequence " +
+                        "and trips.is_representative " +
                         "and directed_routes.direction_id = trips.direction_id " +
                         "order by CAST(routes.route_short_name AS INTEGER)",
                 args
