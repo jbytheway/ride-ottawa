@@ -126,23 +126,6 @@ public class OcTranspoDataAccess {
         );
     }
 
-    /*
-    Cursor getRoutesByIds(Collection<String> routeIds) {
-        String[] routeIdArray = routeIds.toArray(new String[routeIds.size()]);
-rm         return getRoutesByIds(routeIdArray);
-    }
-
-    Cursor getRoutesByIds(String[] routeIds) {
-        String queryList;
-        if (routeIds.length == 0) {
-            queryList = "";
-        } else {
-            queryList = "?" + StringUtils.repeat(",?", routeIds.length - 1);
-        }
-        return mDatabase.query("routes", ROUTE_COLUMNS, "route_id in ("+queryList+")", routeIds, null, null, null);
-    }
-    */
-
     public List<Route> routeCursorToList(Cursor c) {
         ArrayList<Route> result = new ArrayList<>();
         if (c.moveToFirst()) {
