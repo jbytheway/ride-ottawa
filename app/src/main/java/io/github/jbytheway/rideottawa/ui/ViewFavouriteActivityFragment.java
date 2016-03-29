@@ -23,6 +23,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 import org.joda.time.Interval;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
@@ -51,6 +52,7 @@ public class ViewFavouriteActivityFragment extends Fragment implements OcTranspo
     public ViewFavouriteActivityFragment() {
         // Required empty public constructor
         mTimeFormatter = DateTimeFormat.forPattern("HH:mm");
+        mOttawaTimeZone = DateTimeZone.forID("America/Toronto");
     }
 
     @Override
@@ -116,7 +118,7 @@ public class ViewFavouriteActivityFragment extends Fragment implements OcTranspo
                         arrival_time_scheduled.setText(mTimeFormatter.print(trip.getArrivalTime()));
                         ArrivalEstimate ae = trip.getEstimatedArrival();
                         DateTime estimatedArrival = ae.getTime();
-                        DateTime now = mOcTranspo.getNow();
+                        DateTime now = mOcTranspo.getNow().withZone(mOttawaTimeZone);
                         // Using Duration.getStandardMinutes rounds towards zero, where we want to
                         // round to nearest.  So we get the duration in seconds and do the rounding
                         // ourselves.
@@ -318,6 +320,7 @@ public class ViewFavouriteActivityFragment extends Fragment implements OcTranspo
         mTripAdapter.notifyDataSetChanged();
     }
 
+    private final DateTimeZone mOttawaTimeZone;
     private Context mContext;
     private OcTranspoDataAccess mOcTranspo;
     private SharedPreferences mSharedPreferences;

@@ -9,6 +9,7 @@ import com.koushikdutta.ion.Ion;
 import com.koushikdutta.ion.Response;
 
 import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 import org.json.JSONArray;
@@ -39,6 +40,7 @@ public class OcTranspoApi {
         // defining them as string resources with the names used here.
         mAppId = context.getString(R.string.app_id);
         mApiKey = context.getString(R.string.api_key);
+        mOttawaTimeZone = DateTimeZone.forID("America/Toronto");
         mStartTimeFormat = DateTimeFormat.forPattern("HH:mm");
         mProcessingDateTimeFormat = DateTimeFormat.forPattern("yyyyMMddHHmmss");
     }
@@ -147,7 +149,9 @@ public class OcTranspoApi {
             }
 
             // We want to process the provided trips in this direction
-            DateTime processingTime = mProcessingDateTimeFormat.parseDateTime(routeDirection.getString("RequestProcessingTime"));
+            String processingTimeString = routeDirection.getString("RequestProcessingTime");
+            DateTime processingTime = mProcessingDateTimeFormat.parseDateTime(processingTimeString);
+            processingTime = processingTime.withZoneRetainFields(mOttawaTimeZone);
 
             JSONArray liveTrips = GetArrayOrObject(routeDirection.getJSONObject("Trips"), "Trip");
             for (int j = 0; j < liveTrips.length(); ++j) {
@@ -265,6 +269,7 @@ public class OcTranspoApi {
 
     private final String mAppId;
     private final String mApiKey;
+    private final DateTimeZone mOttawaTimeZone;
     private final DateTimeFormatter mProcessingDateTimeFormat;
     private final DateTimeFormatter mStartTimeFormat;
     // Mapping from database directions to cardinal directions
