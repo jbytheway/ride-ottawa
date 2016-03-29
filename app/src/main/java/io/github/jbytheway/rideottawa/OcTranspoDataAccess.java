@@ -296,7 +296,7 @@ public class OcTranspoDataAccess {
                 "select stops.stop_id, stops.stop_code, stops.stop_name, " +
                 "route_short_name, trips.direction_id, " +
                 "trips.trip_id, trip_headsign, date, stop_times.arrival_time, " +
-                "stop_times_start.arrival_time as start_arrival_time, " +
+                "start_stop_time.arrival_time as start_arrival_time, " +
                 "last_stop.stop_id as last_stop_id, " +
                 "last_stop.stop_code as last_stop_code, " +
                 "last_stop.stop_name as last_stop_name, " +
@@ -306,7 +306,7 @@ public class OcTranspoDataAccess {
                 "join routes on trips.route_id = routes.route_id " +
                 "join directed_routes on trips.route_id = directed_routes.route_id " +
                 "join stops on stop_times.stop_id = stops._id " +
-                "join stop_times as stop_times_start on stop_times_start.trip_id = trips.trip_id " +
+                "join stop_times as start_stop_time on start_stop_time.trip_id = trips.trip_id " +
                 "join stop_times as last_stop_time on last_stop_time.trip_id = trips.trip_id " +
                 "join stops as last_stop on last_stop._id = last_stop_time.stop_id " +
                 extraJoin +
@@ -316,7 +316,7 @@ public class OcTranspoDataAccess {
                 "and directed_routes.direction_id = trips.direction_id " +
                 "and days.date = ? " +
                 "and stop_times.arrival_time >= ? " +
-                "and stop_times_start.stop_sequence = 1 " +
+                "and start_stop_time.stop_sequence = 1 " +
                 "and last_stop_time.stop_sequence = trips.last_stop_sequence " +
                 extraWhere +
                 "order by stop_times.arrival_time " +
