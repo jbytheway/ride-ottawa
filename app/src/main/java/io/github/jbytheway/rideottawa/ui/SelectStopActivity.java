@@ -186,28 +186,35 @@ public class SelectStopActivity extends AppCompatActivity implements GoogleApiCl
         super.onStart();
     }
 
-    private class UpdateListTask extends AsyncTask<String, Void, Void> {
-        @Override
-        protected Void doInBackground(String... params) {
-            // NOTE: Assigning to mStopList on another thread.
-            // In an effort to make this reasonable, I made mForthcomingTrips volatile.
-            // I think that's the correct Java approach.
-            String filter = params[0];
+    private static class UpdateArgs {
+        UpdateArgs(String filter, Location lastLocation) {
+            Filter = filter;
+            LastLocation = lastLocation;
+        }
 
-            Cursor c = mOcTranspo.getAllStopsMatchingReachableFrom(filter, mFromStopId, mOrderBy, mLastLocation);
-            mStopList = mOcTranspo.stopCursorToList(c);
-            return null;
+        String Filter;
+        Location LastLocation;
+    }
+
+    private class UpdateListTask extends AsyncTask<UpdateArgs, Void, List<Stop>> {
+        @Override
+        protected List<Stop> doInBackground(UpdateArgs... params) {
+            UpdateArgs args = params[0];
+
+            Cursor c = mOcTranspo.getAllStopsMatchingReachableFrom(args.Filter, mFromStopId, mOrderBy, args.LastLocation);
+            return mOcTranspo.stopCursorToList(c);
         }
 
         @Override
-        protected void onPostExecute(Void ignore) {
+        protected void onPostExecute(List<Stop> newList) {
+            mStopList = newList;
             mAdapter.notifyDataSetChanged();
         }
     }
 
     private void triggerListUpdate() {
         String filter = mStopFilter.getText().toString();
-        new UpdateListTask().execute(filter);
+        new UpdateListTask().execute(new UpdateArgs(filter, mLastLocation));
     }
 
     @Override
@@ -335,10 +342,10 @@ public class SelectStopActivity extends AppCompatActivity implements GoogleApiCl
     private OcTranspoDataAccess mOcTranspo;
     private String mFromStopId;
     private GoogleApiClient mGoogleClient;
-    private volatile List<Stop> mStopList;
+    private List<Stop> mStopList;
     private IndirectArrayAdapter<Stop> mAdapter;
     private String mOrderBy;
     private EditText mStopFilter;
-    private volatile Location mLastLocation;
+    private Location mLastLocation;
     private LocationRequest mLocationRequest;
 }

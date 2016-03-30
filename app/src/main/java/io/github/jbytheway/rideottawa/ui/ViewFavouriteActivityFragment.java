@@ -251,13 +251,9 @@ public class ViewFavouriteActivityFragment extends Fragment implements OcTranspo
         }
     }
 
-    private class RefreshTask extends AsyncTask<Void, Void, Void> {
+    private class RefreshTask extends AsyncTask<Void, Void, ArrayList<ForthcomingTrip>> {
         @Override
-        protected Void doInBackground(Void... ignore) {
-            // NOTE: Assigning to mForthcomingTrips on another thread.
-            // In an effort to make this reasonable, I made mForthcomingTrips volatile.
-            // I think that's the correct Java approach.
-
+        protected ArrayList<ForthcomingTrip> doInBackground(Void... ignore) {
             ArrayList<ForthcomingTrip> newTrips = mFavourite.updateForthcomingTrips(mOcTranspo, mForthcomingTrips);
             // Truncate the list if it's absurdly large
             Collections.sort(newTrips, new ForthcomingTrip.CompareEstimatedArrivals());
@@ -265,15 +261,14 @@ public class ViewFavouriteActivityFragment extends Fragment implements OcTranspo
                 newTrips.subList(MAX_FORTHCOMING_TRIPS, newTrips.size()).clear();
             }
 
-            // Note that we are assigning an entirely new array; the old one may still be
-            // referenced in e.g. the API calling code, but that's fine.
-            mForthcomingTrips = newTrips;
-            return null;
+            return newTrips;
         }
 
         @Override
-        protected void onPostExecute(Void ignore) {
-            // Everything else gets run on the UI thread so we can safely mess with all fields
+        protected void onPostExecute(ArrayList<ForthcomingTrip> newTrips) {
+            // Note that we are assigning an entirely new array; the old one may still be
+            // referenced in e.g. the API calling code, but that's fine.
+            mForthcomingTrips = newTrips;
             for (ForthcomingTrip trip : mForthcomingTrips) {
                 trip.notifyLiveUpdateRequested();
             }
@@ -326,7 +321,7 @@ public class ViewFavouriteActivityFragment extends Fragment implements OcTranspo
     private SharedPreferences mSharedPreferences;
     private Handler mHandler;
     private Favourite mFavourite;
-    private volatile ArrayList<ForthcomingTrip> mForthcomingTrips;
+    private ArrayList<ForthcomingTrip> mForthcomingTrips;
     private DateTime mLastRefresh;
     private boolean mRefresingNow;
     private ProgressBar mProgressIndicator;
