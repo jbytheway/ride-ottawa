@@ -275,7 +275,7 @@ public class ViewFavouriteActivityFragment extends Fragment implements OcTranspo
             mLastRefresh = new DateTime();
             mOcTranspo.getLiveDataForTrips(mContext, mForthcomingTrips, ViewFavouriteActivityFragment.this);
             mTripAdapter.notifyDataSetChanged();
-            mRefresingNow = false;
+            mRefreshingNow = false;
             // The following only matters the first time; we remove the progress indicator and
             // replace it with the actual trip list
             mTripList.setVisibility(View.VISIBLE);
@@ -290,8 +290,8 @@ public class ViewFavouriteActivityFragment extends Fragment implements OcTranspo
 
         // First we check if we're already refreshing (very unlikely, because we force a fairly
         // long delay between refreshes)
-        if (!mRefresingNow) {
-            mRefresingNow = true;
+        if (!mRefreshingNow) {
+            mRefreshingNow = true;
             new RefreshTask().execute();
         }
 
@@ -323,7 +323,7 @@ public class ViewFavouriteActivityFragment extends Fragment implements OcTranspo
     private Favourite mFavourite;
     private ArrayList<ForthcomingTrip> mForthcomingTrips;
     private DateTime mLastRefresh;
-    private boolean mRefresingNow;
+    private boolean mRefreshingNow;
     private ProgressBar mProgressIndicator;
     private ListView mTripList;
     private IndirectArrayAdapter<ForthcomingTrip> mTripAdapter;
