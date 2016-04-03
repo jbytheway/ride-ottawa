@@ -15,7 +15,7 @@
     <string name="force_database_update">Force update check</string>
     <string name="close_app">Close</string>
     <string name="close_dialog">Close</string>
-    <string name="try_again_without_wifi">Download regardless (25MB)</string>
+    <string name="try_again_without_wifi">Download regardless (27MB)</string>
     <string name="action_settings">Settings</string>
     <string name="action_database">Database&#8230;</string>
     <string name="action_about">About</string>
