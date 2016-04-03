@@ -31,6 +31,16 @@ public class Stop {
         return WordUtils.capitalizeFully(stopName, ' ', '1', '2', '3', '4', '.', '/');
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (o instanceof Stop) {
+            Stop other = (Stop) o;
+            return mId.equals(other.mId);
+        }
+
+        return false;
+    }
+
     private final String mId;
     private final String mCode;
     private final String mName;
