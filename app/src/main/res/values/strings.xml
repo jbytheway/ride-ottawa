@@ -38,6 +38,7 @@
     <string name="title_activity_view_favourite">View Favourite</string>
     <string name="minutes_format">%1$dm</string>
     <string name="scheduled_abbrev">Sched</string>
+    <string name="last_stop_abbrev">Last</string>
     <string name="gps_abbrev">GPS</string>
     <string name="gps_old_abbrev">GPS?</string>
     <string name="waiting_for_data_abbrev">&#8230;</string>

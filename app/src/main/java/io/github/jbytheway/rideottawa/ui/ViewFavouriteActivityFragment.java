@@ -8,6 +8,8 @@ import android.os.Bundle;
 import android.app.Fragment;
 import android.os.Handler;
 import android.preference.PreferenceManager;
+import android.support.annotation.ColorRes;
+import android.support.annotation.StringRes;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -142,43 +144,53 @@ public class ViewFavouriteActivityFragment extends Fragment implements OcTranspo
                             arrival_time_estimated.setText(mTimeFormatter.print(estimatedArrival));
                         }
 
+                        @ColorRes int arrivalTimeColour;
+                        @StringRes int timeTypeString;
+                        int estimationVisibility;
+
                         switch (ae.getType()) {
                             case Gps: {
-                                time_type.setText(getString(R.string.gps_abbrev));
-                                //noinspection deprecation
-                                int colour = getResources().getColor(R.color.time_gps);
-                                minutes_away.setTextColor(colour);
-                                arrival_time_estimated.setTextColor(colour);
+                                timeTypeString = R.string.gps_abbrev;
+                                arrivalTimeColour = R.color.time_gps;
+                                estimationVisibility = View.VISIBLE;
                                 break;
                             }
                             case GpsOld: case NoLongerGps: {
-                                time_type.setText(getString(R.string.gps_old_abbrev));
-                                int colour;
-                                if (minutesAway < 0) {
-                                    //noinspection deprecation
-                                    colour = getResources().getColor(R.color.time_past);
-                                } else {
-                                    //noinspection deprecation
-                                    colour = getResources().getColor(R.color.time_gps_old);
-                                }
-                                minutes_away.setTextColor(colour);
-                                arrival_time_estimated.setTextColor(colour);
+                                timeTypeString = R.string.gps_old_abbrev;
+                                arrivalTimeColour = R.color.time_gps_old;
+                                estimationVisibility = View.VISIBLE;
                                 break;
                             }
                             case Schedule: {
-                                time_type.setText(getString(R.string.scheduled_abbrev));
-                                if (minutesAway < 0) {
-                                    //noinspection deprecation
-                                    minutes_away.setTextColor(getResources().getColor(R.color.time_past));
-                                } else {
-                                    //noinspection deprecation
-                                    minutes_away.setTextColor(getResources().getColor(R.color.time_scheduled));
-                                }
+                                timeTypeString = R.string.scheduled_abbrev;
+                                arrivalTimeColour = R.color.time_scheduled;
+                                estimationVisibility = View.INVISIBLE;
+                                break;
+                            }
+                            case LastStop: {
+                                timeTypeString = R.string.last_stop_abbrev;
+                                arrivalTimeColour = R.color.time_scheduled;
+                                estimationVisibility = View.INVISIBLE;
                                 break;
                             }
                             default:
                                 throw new AssertionError("Unexpected estimate type "+ae.getType());
                         }
+
+                        time_type.setText(getString(timeTypeString));
+
+                        if (minutesAway < 0) {
+                            arrivalTimeColour = R.color.time_past;
+                        }
+
+                        //noinspection deprecation
+                        int colour = getResources().getColor(arrivalTimeColour);
+                        minutes_away.setTextColor(colour);
+                        arrival_time_estimated.setTextColor(colour);
+
+                        // Set visibility
+                        arrival_time_estimated.setVisibility(estimationVisibility);
+                        label_time_estimated.setVisibility(estimationVisibility);
 
                         // Override the above text if we are waiting for data
                         if (trip.isWaitingForLiveData()) {

@@ -7,6 +7,7 @@ import org.joda.time.DateTime;
 public class ArrivalEstimate implements java.lang.Comparable<ArrivalEstimate> {
     public enum Type {
         Schedule, // No GPS data received
+        LastStop, // Last stop, so we cannot expect any GPS data to be received
         Gps, // GPS data received
         GpsOld, // We received GPS data, but it's suspiciously outdated
         NoLongerGps, // We once received GPS data, but last time we checked we didn't

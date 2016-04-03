@@ -66,7 +66,15 @@ public class ForthcomingTrip {
             return new ArrivalEstimate(mEstimatedArrival, type);
         }
 
-        return new ArrivalEstimate(getArrivalTime(), ArrivalEstimate.Type.Schedule);
+        // Now we are in the non-GPS case
+        ArrivalEstimate.Type type;
+
+        if (mStop.equals(mLastStop)) {
+            type = ArrivalEstimate.Type.LastStop;
+        } else {
+            type = ArrivalEstimate.Type.Schedule;
+        }
+        return new ArrivalEstimate(getArrivalTime(), type);
     }
 
     public void notifyLiveUpdateRequested() {
