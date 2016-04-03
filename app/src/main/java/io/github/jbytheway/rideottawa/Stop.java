@@ -28,7 +28,7 @@ public class Stop {
     }
 
     public static String titleCaseOf(String stopName) {
-        return WordUtils.capitalizeFully(stopName, ' ', '1', '2', '3', '4', '.');
+        return WordUtils.capitalizeFully(stopName, ' ', '1', '2', '3', '4', '.', '/');
     }
 
     private final String mId;
