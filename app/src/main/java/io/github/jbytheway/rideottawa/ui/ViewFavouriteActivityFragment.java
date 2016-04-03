@@ -203,8 +203,15 @@ public class ViewFavouriteActivityFragment extends Fragment implements OcTranspo
         if (favouriteId == -1) {
             Log.e(TAG, "Missing FAVOURITE_ID in ViewFavourite Intent");
         } else {
-            mFavourite = Favourite.findById(Favourite.class, favouriteId);
-            populateFromFavourite();
+            // Because of setRetainInstance we will sometimes be called when the appropriate Favourite
+            // is already populated, in which case we do nothing
+            if (mFavourite == null || mFavourite.getId() != favouriteId) {
+                mFavourite = Favourite.findById(Favourite.class, favouriteId);
+                populateFromFavourite();
+            } else {
+                mTripList.setVisibility(View.VISIBLE);
+                mProgressIndicator.setVisibility(View.GONE);
+            }
         }
     }
 
