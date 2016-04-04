@@ -76,7 +76,7 @@
     </string>
 
     <string name="pref_title_small_favourites">Use small font for favourite list</string>
-    <string name="pref_description_small_favourites">Use s smaller font for the main list of
+    <string name="pref_description_small_favourites">Use a smaller font for the main list of
         favourites.  This allows you to see more at once, but might make them harder to
         accurately tap.
     </string>
