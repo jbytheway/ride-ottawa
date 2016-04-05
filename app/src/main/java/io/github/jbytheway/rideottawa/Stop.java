@@ -28,7 +28,8 @@ public class Stop {
     }
 
     public static String titleCaseOf(String stopName) {
-        return WordUtils.capitalizeFully(stopName, ' ', '1', '2', '3', '4', '.', '/');
+        // FIXME: This incorrectly capitalizes the 'd' in Place d'Orleans
+        return WordUtils.capitalizeFully(stopName, ' ', '1', '2', '3', '4', '.', '/', '\'');
     }
 
     @Override
