@@ -40,9 +40,17 @@ import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.LocationSettingsRequest;
 import com.google.android.gms.location.LocationSettingsResult;
 import com.google.android.gms.location.LocationSettingsStatusCodes;
+import com.google.common.base.Function;
+import com.google.common.base.Joiner;
+import com.google.common.base.Strings;
+import com.google.common.collect.Lists;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import io.github.jbytheway.rideottawa.RideOttawaApplication;
 import io.github.jbytheway.rideottawa.OcTranspoDataAccess;
@@ -148,11 +156,47 @@ public class SelectStopActivity extends AppCompatActivity implements GoogleApiCl
 
                         Cursor c = mOcTranspo.getRoutesForStopById(stop.getId());
                         List<Route> routes = mOcTranspo.routeCursorToList(c);
+                        HashMap<String, Integer> headsignMap = new HashMap<>();
                         for (Route route : routes) {
                             TextView routeView = (TextView) inflater.inflate(R.layout.route_name_only, routesView, false);
                             route.applyToTextView(routeView);
                             routesView.addView(routeView);
+
+                            String headsign = route.getModalHeadSign();
+                            Integer count = headsignMap.get(headsign);
+                            if (count == null) {
+                                count = 0;
+                            }
+                            ++count;
+                            headsignMap.put(headsign, count);
                         }
+
+                        // Find the most popular headsigns
+                        ArrayList<Map.Entry<String, Integer>> countedHeadsigns = new ArrayList<>(headsignMap.entrySet());
+                        Collections.sort(countedHeadsigns, new Comparator<Map.Entry<String, Integer>>() {
+                            @Override
+                            public int compare(Map.Entry<String, Integer> lhs, Map.Entry<String, Integer> rhs) {
+                                int integerCompare = Integer.compare(lhs.getValue(), rhs.getValue());
+                                if (integerCompare != 0) {
+                                    return -integerCompare;
+                                }
+                                return lhs.getKey().compareTo(rhs.getKey());
+                            }
+                        });
+                        if (countedHeadsigns.size() > 4) {
+                            countedHeadsigns.subList(4, countedHeadsigns.size()).clear();
+                        }
+                        List<String> headsigns = Lists.transform(
+                                countedHeadsigns,
+                                new Function<Map.Entry<String,Integer>, String>() {
+                                @Override
+                                public String apply(Map.Entry<String, Integer> input) {
+                                    return input.getKey();
+                                }
+                            });
+                        String mostPopularHeadsigns = Joiner.on(", ").join(headsigns);
+                        TextView headsignView = (TextView) v.findViewById(R.id.head_sign);
+                        headsignView.setText(getString(R.string.to_destination, mostPopularHeadsigns));
                     }
                 }
         );
