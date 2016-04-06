@@ -16,8 +16,7 @@
             android:textAppearance="?android:attr/textAppearanceMedium"
             android:text="@string/example_stop_code"
             android:id="@+id/stop_code"
-            android:textAlignment="textEnd"
-            android:layout_marginStart="5dp" />
+            android:textAlignment="textEnd" />
 
         <TextView
             android:layout_width="0dp"
@@ -25,27 +24,34 @@
             android:textAppearance="?android:attr/textAppearanceMedium"
             android:text="Medium Text"
             android:id="@+id/stop_name"
-            android:layout_marginStart="10dp"
+            android:layout_marginStart="10sp"
             android:layout_weight="2"
-            android:textColor="@color/abc_primary_text_material_dark" />
+            android:textColor="@android:color/white" />
 
     </LinearLayout>
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceSmall"
-        android:text="@string/example_head_sign"
-        android:id="@+id/head_sign"
-        android:layout_marginStart="10dp"
-        android:ellipsize="end"
-        android:maxLines="1" />
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/route_info">
 
-    <GridLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/routes"
-        android:columnCount="3"
-        android:orientation="horizontal"/>
+        <GridLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/routes"
+            android:columnCount="3"
+            android:orientation="horizontal"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="5sp"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:text="@string/example_head_sign"
+            android:id="@+id/head_sign"
+            android:ellipsize="end"
+            android:maxLines="1" />
+    </LinearLayout>
 
 </LinearLayout>

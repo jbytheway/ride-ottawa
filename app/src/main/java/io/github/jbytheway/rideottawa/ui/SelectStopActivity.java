@@ -26,6 +26,7 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.GridLayout;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -171,6 +172,13 @@ public class SelectStopActivity extends AppCompatActivity implements GoogleApiCl
                             headsignMap.put(headsign, count);
                         }
 
+                        LinearLayout routeInfo = (LinearLayout) v.findViewById(R.id.route_info);
+                        if (routes.size() > 3) {
+                            routeInfo.setOrientation(LinearLayout.VERTICAL);
+                        } else {
+                            routeInfo.setOrientation(LinearLayout.HORIZONTAL);
+                        }
+
                         // Find the most popular headsigns
                         ArrayList<Map.Entry<String, Integer>> countedHeadsigns = new ArrayList<>(headsignMap.entrySet());
                         Collections.sort(countedHeadsigns, new Comparator<Map.Entry<String, Integer>>() {
@@ -183,17 +191,20 @@ public class SelectStopActivity extends AppCompatActivity implements GoogleApiCl
                                 return lhs.getKey().compareTo(rhs.getKey());
                             }
                         });
-                        if (countedHeadsigns.size() > 4) {
-                            countedHeadsigns.subList(4, countedHeadsigns.size()).clear();
-                        }
-                        List<String> headsigns = Lists.transform(
+                        ArrayList<String> headsigns = new ArrayList<>(Lists.transform(
                                 countedHeadsigns,
                                 new Function<Map.Entry<String,Integer>, String>() {
                                 @Override
                                 public String apply(Map.Entry<String, Integer> input) {
                                     return input.getKey();
                                 }
-                            });
+                            }));
+
+                        final int maxHeadsigns = 4;
+                        if (headsigns.size() > maxHeadsigns) {
+                            headsigns.subList(maxHeadsigns, headsigns.size()).clear();
+                            headsigns.add(getString(R.string.ellipsis));
+                        }
                         String mostPopularHeadsigns = Joiner.on(", ").join(headsigns);
                         TextView headsignView = (TextView) v.findViewById(R.id.head_sign);
                         headsignView.setText(getString(R.string.to_destination, mostPopularHeadsigns));

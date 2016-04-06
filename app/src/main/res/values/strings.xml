@@ -37,6 +37,7 @@
     <string name="title_activity_select_routes">Select Routes</string>
     <string name="title_activity_view_favourite">View Favourite</string>
     <string name="to_destination">to %1$s</string>
+    <string name="ellipsis">&#8230;</string>
     <string name="minutes_format">%1$dm</string>
     <string name="scheduled_abbrev">Sched</string>
     <string name="last_stop_abbrev">Last</string>
