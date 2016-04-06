@@ -62,6 +62,9 @@ public class ListFavouritesActivityFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_list_favourites, container, false);
+
+        mNoFavouritesHint = (TextView) view.findViewById(R.id.no_favourites_hint);
+
         mFavouriteList = (ListView) view.findViewById(R.id.favourite_list_view);
         final SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
         final Context context = getActivity();
@@ -272,6 +275,14 @@ public class ListFavouritesActivityFragment extends Fragment {
     public void onResume() {
         super.onResume();
         mAdapter.notifyDataSetChanged();
+
+        long numFavourites = Favourite.count(Favourite.class);
+
+        if (numFavourites == 0) {
+            mNoFavouritesHint.setVisibility(View.VISIBLE);
+        } else {
+            mNoFavouritesHint.setVisibility(View.GONE);
+        }
     }
 
     @Override
@@ -282,6 +293,7 @@ public class ListFavouritesActivityFragment extends Fragment {
     }
 
     private OcTranspoDataAccess mOcTranspo;
+    private TextView mNoFavouritesHint;
     private ListFavouritesActivity mActivity;
     private ListView mFavouriteList;
     private IndirectArrayAdapter<Favourite> mAdapter;

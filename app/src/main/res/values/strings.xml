@@ -84,6 +84,7 @@
     </string>
 
 
+    <!-- Strings related to Documentation -->
     <string name="about_dialog_message">Ride Ottawa version %1$s
 
     \n\nThis program is free software: you can redistribute it and/or modify
@@ -95,4 +96,7 @@
     pull requests are welcome.</string>
     <string name="go_to_source">Go to source</string>
     <string name="source_url">https://github.com/jbytheway/ride-ottawa</string>
+
+    <string name="no_favourites_hint">You currently have no favourites.\nTap the \'+\' button
+    below to create one.</string>
 </resources>
