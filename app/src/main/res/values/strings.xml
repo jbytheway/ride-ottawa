@@ -99,4 +99,6 @@
 
     <string name="no_favourites_hint">You currently have no favourites.\nTap the \'+\' button
     below to create one.</string>
+
+    <string name="edit_favourite_hint">Tap a favourite to use it.\nLong tap to edit.</string>
 </resources>

@@ -64,6 +64,7 @@ public class ListFavouritesActivityFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_list_favourites, container, false);
 
         mNoFavouritesHint = (TextView) view.findViewById(R.id.no_favourites_hint);
+        mEditFavouriteHint = (TextView) view.findViewById(R.id.edit_favourite_hint);
 
         mFavouriteList = (ListView) view.findViewById(R.id.favourite_list_view);
         final SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
@@ -280,8 +281,13 @@ public class ListFavouritesActivityFragment extends Fragment {
 
         if (numFavourites == 0) {
             mNoFavouritesHint.setVisibility(View.VISIBLE);
+            mEditFavouriteHint.setVisibility(View.GONE);
+        } else if (numFavourites < 4) {
+            mNoFavouritesHint.setVisibility(View.GONE);
+            mEditFavouriteHint.setVisibility(View.VISIBLE);
         } else {
             mNoFavouritesHint.setVisibility(View.GONE);
+            mEditFavouriteHint.setVisibility(View.GONE);
         }
     }
 
@@ -294,6 +300,7 @@ public class ListFavouritesActivityFragment extends Fragment {
 
     private OcTranspoDataAccess mOcTranspo;
     private TextView mNoFavouritesHint;
+    private TextView mEditFavouriteHint;
     private ListFavouritesActivity mActivity;
     private ListView mFavouriteList;
     private IndirectArrayAdapter<Favourite> mAdapter;
