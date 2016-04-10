@@ -30,6 +30,7 @@
     <string name="add_destination">Add destination</string>
     <string name="select_all">Select all</string>
     <string name="no_routes_available">This stop has no routes.</string>
+    <string name="duplicate_stop_message">This favourite already contains that stop.</string>
     <string name="not_saving_empty_favourite">Not saving a Favourite with neither name nor stops.</string>
     <string name="filter_hint">Type here to filter stops</string>
     <string name="location_permission_denied_response">To avoid location permission requests, change your settings.</string>

@@ -238,19 +238,24 @@ public class EditFavouriteActivityFragment extends Fragment {
             case REQUEST_NEW_STOP:
                 if (resultCode == Activity.RESULT_OK) {
                     String stopId = data.getStringExtra(SelectStopActivity.SELECTED_STOP);
-                    mFavourite.addStop(stopId);
-                    // In the event that this stop has but a single Route, we wish to add it forthwith.
-                    Cursor c = mOcTranspo.getRoutesForStopById(stopId);
-                    FavouriteStop stop = mFavourite.getStop(stopId);
-                    if (c.getCount() == 1) {
-                        List<Route> routes = mOcTranspo.routeCursorToList(c);
-                        stop.addRoute(routes.get(0), null);
-                    } else if (c.getCount() == 0) {
-                        // Strange case; there are no routes for this stop.
-                        Toast.makeText(getActivity(), getString(R.string.no_routes_available), Toast.LENGTH_LONG).show();
+                    // First check if we already have this stop, and if so, pass
+                    if (mFavourite.hasStop(stopId)) {
+                        Toast.makeText(getActivity(), R.string.duplicate_stop_message, Toast.LENGTH_LONG).show();
+                    } else {
+                        mFavourite.addStop(stopId);
+                        // In the event that this stop has but a single Route, we wish to add it forthwith.
+                        Cursor c = mOcTranspo.getRoutesForStopById(stopId);
+                        FavouriteStop stop = mFavourite.getStop(stopId);
+                        if (c.getCount() == 1) {
+                            List<Route> routes = mOcTranspo.routeCursorToList(c);
+                            stop.addRoute(routes.get(0), null);
+                        } else if (c.getCount() == 0) {
+                            // Strange case; there are no routes for this stop.
+                            Toast.makeText(getActivity(), getString(R.string.no_routes_available), Toast.LENGTH_LONG).show();
+                        }
+                        c.close();
+                        mStopAdapter.notifyDataSetChanged();
                     }
-                    c.close();
-                    mStopAdapter.notifyDataSetChanged();
                 }
                 break;
             case REQUEST_ROUTES:

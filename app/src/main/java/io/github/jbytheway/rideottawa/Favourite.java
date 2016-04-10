@@ -54,6 +54,26 @@ public class Favourite extends SugarRecord {
         return all;
     }
 
+    public boolean hasStop(String stopId) {
+        Long id = getId();
+        if (id != null) {
+            long numHits = FavouriteStop.count(FavouriteStop.class, "favourite = ? and stop_id = ?", new String[]{ id.toString(), stopId});
+            if (numHits > 0) {
+                return true;
+            }
+            // else zero results, in which case fall through to checking pending
+        }
+
+        // DB failed, check pending
+        for (FavouriteStop stop : mPendingStops) {
+            if (stop.StopId.equals(stopId)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     public FavouriteStop getStop(String stopId) {
         // First look in DB
         Long id = getId();
