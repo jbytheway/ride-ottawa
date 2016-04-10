@@ -150,23 +150,7 @@ public class EditFavouriteActivityFragment extends Fragment {
         saveButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                updateFavourite();
-                List<FavouriteStop> stops = mFavourite.getStops();
-                boolean hasStops = !stops.isEmpty();
-                boolean hasName = !mFavourite.Name.isEmpty();
-
-                // Only keep it at all if it has at least something
-                if (hasName || hasStops) {
-                    if (!hasName) {
-                        // If it has no name, concoct one
-                        FavouriteStop firstStop = stops.get(0);
-                        mFavourite.Name = firstStop.asStop(mOcTranspo).getName(context);
-                    }
-                    mFavourite.saveRecursively();
-                } else {
-                    Toast.makeText(context, R.string.not_saving_empty_favourite, Toast.LENGTH_LONG).show();
-                }
-                getActivity().finish();
+                saveAndClose();
             }
         });
 
@@ -304,6 +288,31 @@ public class EditFavouriteActivityFragment extends Fragment {
             default:
                 throw new AssertionError("Unexpected request code");
         }
+    }
+
+    public void onBackPressed() {
+        saveAndClose();
+    }
+
+    private void saveAndClose() {
+        updateFavourite();
+        List<FavouriteStop> stops = mFavourite.getStops();
+        boolean hasStops = !stops.isEmpty();
+        boolean hasName = !mFavourite.Name.isEmpty();
+        Context context = getActivity();
+
+        // Only keep it at all if it has at least something
+        if (hasName || hasStops) {
+            if (!hasName) {
+                // If it has no name, concoct one
+                FavouriteStop firstStop = stops.get(0);
+                mFavourite.Name = firstStop.asStop(mOcTranspo).getName(context);
+            }
+            mFavourite.saveRecursively();
+        } else {
+            Toast.makeText(context, R.string.not_saving_empty_favourite, Toast.LENGTH_LONG).show();
+        }
+        getActivity().finish();
     }
 
     @Override
