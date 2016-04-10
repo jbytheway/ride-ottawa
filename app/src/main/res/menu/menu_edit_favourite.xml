@@ -6,6 +6,6 @@
         android:id="@+id/edit_menu_delete"
         android:orderInCategory="100"
         android:title="@string/action_delete"
-        android:icon="@android:drawable/ic_menu_delete"
+        android:icon="@drawable/ic_menu_delete"
         app:showAsAction="ifRoom"/>
 </menu>
