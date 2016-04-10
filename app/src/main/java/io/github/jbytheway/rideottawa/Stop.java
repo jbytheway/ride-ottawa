@@ -42,6 +42,11 @@ public class Stop {
         return false;
     }
 
+    @Override
+    public int hashCode() {
+        return mId.hashCode();
+    }
+
     private final String mId;
     private final String mCode;
     private final String mName;
