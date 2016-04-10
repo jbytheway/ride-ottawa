@@ -1,6 +1,11 @@
 package io.github.jbytheway.rideottawa.ui;
 
+import android.app.Activity;
+import android.app.AlertDialog;
+import android.app.Dialog;
+import android.app.DialogFragment;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
@@ -241,6 +246,9 @@ public class ViewFavouriteActivityFragment extends Fragment implements OcTranspo
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
+            case R.id.menu_help:
+                helpDialog();
+                return true;
             case R.id.menu_refresh:
                 refreshIfLateEnough(true);
                 return true;
@@ -332,6 +340,40 @@ public class ViewFavouriteActivityFragment extends Fragment implements OcTranspo
 
     public void onTripData() {
         mTripAdapter.notifyDataSetChanged();
+    }
+
+    public static class HelpDialog extends DialogFragment {
+        public HelpDialog() {
+            // Default constructor required for DialogFragments
+            // Real construction happens in onAttach
+        }
+
+        @Override
+        public void onAttach(Activity activity) {
+            super.onAttach(activity);
+            //Bundle args = getArguments();
+        }
+
+        @Override
+        public Dialog onCreateDialog(Bundle savedInstance) {
+            AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+            builder
+                    .setMessage(R.string.view_favourite_help)
+                    .setNegativeButton(R.string.close_dialog, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            dismiss();
+                        }
+                    });
+            return builder.create();
+        }
+    }
+
+    private void helpDialog() {
+        HelpDialog errorDialog = new HelpDialog();
+        Bundle args = new Bundle();
+        errorDialog.setArguments(args);
+        errorDialog.show(getFragmentManager(), "HelpDialog");
     }
 
     private final DateTimeZone mOttawaTimeZone;

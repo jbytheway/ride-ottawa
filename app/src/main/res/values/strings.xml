@@ -20,6 +20,7 @@
     <string name="action_database">Database&#8230;</string>
     <string name="action_about">About</string>
     <string name="action_delete">Delete</string>
+    <string name="action_help">Help</string>
     <string name="action_refresh">Refresh</string>
     <string name="title_activity_edit_favourite">Edit Favourite</string>
     <string name="name_label">Name:</string>
@@ -104,4 +105,14 @@
 
     <string name="edit_favourite_hint">Add stops with the button above.\nFor each, either add
         individual routes, or all routes to a destination.</string>
+
+    <string name="view_favourite_help">Here you can see forthcoming trips for this
+    favourite.  Each trip shows:\n- The stop it departs from\n- The destination\n- The scheduled
+    time of departure\n- The number of minutes until departure.\n- The estimated time of departure,
+    when GPS data is available.\n\nThe short string
+    above the number of minutes can be\n‘Sched’ if the time is taken from the schedule,\n‘Last’ if
+    this is the last stop for the route, and thus you cannot board the bus here,\n‘GPS’ if the time
+    is an estimate based a GPS reading,\n‘GPS?’ if there was a GPS reading, but it is more than
+    a minute old, which is suspicious, and might indicate that the estimate is no longer
+    good, or \n‘&#8230;’ when waiting for GPS data from the OCTranspo API.</string>
 </resources>
