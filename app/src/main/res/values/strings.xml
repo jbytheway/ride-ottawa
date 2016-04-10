@@ -94,7 +94,9 @@
     (at your option) any later version.
 
     \n\nSource is hosted at %2$s where bug reports and
-    pull requests are welcome.</string>
+    pull requests are welcome.
+
+    \n\nSome icons derived from Material icons available from design.google.com/icons</string>
     <string name="go_to_source">Go to source</string>
     <string name="source_url">https://github.com/jbytheway/ride-ottawa</string>
 
