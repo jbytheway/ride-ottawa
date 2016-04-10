@@ -66,13 +66,10 @@
     </string>
     <string name="pref_default_sort_stops_by">proximity</string>
 
-    <string name="pref_title_show_headsigns">Use headsigns as trip destinations</string>
-    <string name="pref_description_show_headsigns">By default trip destinations are given as the
-        last stop on the trip, which is accurate, but can sometimes be a long or obscure stop.
-        Selecting this option will instead display the bus headsign as the destination, which
-        is more succinct and likely to match the text on the bus.  Unfortunately, the headsign
-        can be inaccurate for buses which do not always reach the same destination.
+    <string name="pref_title_what_destination">What to display as trip destinations</string>
+    <string name="pref_description_what_destination">What should be displayed for trip destinations?
     </string>
+    <string name="pref_default_what_destination">chosen</string>
 
     <string name="pref_title_title_case_stops">Convert stop names to title case</string>
     <string name="pref_description_title_case_stops">OCTranspo provides the stop names in

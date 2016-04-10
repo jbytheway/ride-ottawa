@@ -38,10 +38,13 @@ import org.joda.time.format.DateTimeFormatter;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 
 import io.github.jbytheway.rideottawa.ArrivalEstimate;
 import io.github.jbytheway.rideottawa.Favourite;
+import io.github.jbytheway.rideottawa.FavouriteRoute;
+import io.github.jbytheway.rideottawa.FavouriteStop;
 import io.github.jbytheway.rideottawa.ForthcomingTrip;
 import io.github.jbytheway.rideottawa.OcTranspoApi;
 import io.github.jbytheway.rideottawa.utils.IndirectArrayAdapter;
@@ -128,12 +131,30 @@ public class ViewFavouriteActivityFragment extends Fragment implements OcTranspo
                         stop_name.setText(stop.getName(mContext));
                         Route route = trip.getRoute();
                         route.applyToTextView(route_name);
-                        boolean showHeadsigns = mSharedPreferences.getBoolean(SettingsActivityFragment.PREF_SHOW_HEADSIGNS, false);
-                        if (showHeadsigns) {
-                            head_sign.setText(trip.getHeadSign());
-                        } else {
-                            String lastStopName = trip.getLastStop().getName(mContext);
-                            head_sign.setText(lastStopName);
+                        String defaultWhatDestination = getString(R.string.pref_default_what_destination);
+                        String whatDestination = mSharedPreferences.getString(SettingsActivityFragment.PREF_WHAT_DESTINATION, defaultWhatDestination);
+                        switch (whatDestination) {
+                            case "headsign":
+                                head_sign.setText(trip.getHeadSign());
+                                break;
+                            case "final_stop": {
+                                String lastStopName = trip.getLastStop().getName(mContext);
+                                head_sign.setText(lastStopName);
+                                break;
+                            }
+                            case "chosen": {
+                                String destination = mChosenDestinations.get(stop).get(route);
+                                if (destination == null) {
+                                    // Fall back on trip end
+                                    String lastStopName = trip.getLastStop().getName(mContext);
+                                    head_sign.setText(lastStopName);
+                                } else {
+                                    head_sign.setText(destination);
+                                }
+                                break;
+                            }
+                            default:
+                                throw new AssertionError("Unexpected what_destination " + whatDestination);
                         }
                         arrival_time_scheduled.setText(mTimeFormatter.print(trip.getArrivalTime()));
                         ArrivalEstimate ae = trip.getEstimatedArrival();
@@ -276,6 +297,21 @@ public class ViewFavouriteActivityFragment extends Fragment implements OcTranspo
         if (actionBar != null) {
             actionBar.setTitle(mFavourite.Name);
         }
+        mChosenDestinations = new HashMap<>();
+        for (FavouriteStop stop : mFavourite.getStops()) {
+            HashMap<Route, String> destinationsByRoute = new HashMap<>();
+            for (FavouriteRoute favouriteRoute : stop.getRoutes()) {
+                String destinationId = favouriteRoute.Destination;
+                Route route = favouriteRoute.asRoute(mOcTranspo);
+                if (destinationId == null) {
+                    destinationsByRoute.put(route, null);
+                } else {
+                    Stop destination = mOcTranspo.getStop(destinationId);
+                    destinationsByRoute.put(route, destination.getName(mContext));
+                }
+            }
+            mChosenDestinations.put(stop.asStop(mOcTranspo), destinationsByRoute);
+        }
         refresh();
     }
 
@@ -399,6 +435,7 @@ public class ViewFavouriteActivityFragment extends Fragment implements OcTranspo
     private SharedPreferences mSharedPreferences;
     private Handler mHandler;
     private Favourite mFavourite;
+    private HashMap<Stop, HashMap<Route, String>> mChosenDestinations;
     private ArrayList<ForthcomingTrip> mForthcomingTrips;
     private DateTime mLastRefresh;
     private boolean mRefreshingNow;

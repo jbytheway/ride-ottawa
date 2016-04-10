@@ -10,4 +10,15 @@
         <item>stop_code</item>
         <item>proximity</item>
     </string-array>
+
+    <string-array name="pref_what_destination_entries">
+        <item>The headsign from the front of the bus (sometimes inaccurate)</item>
+        <item>The final stop of the route</item>
+        <item>The chosen destination as set by you in the favourite</item>
+    </string-array>
+    <string-array name="pref_what_destination_values">
+        <item>headsign</item>
+        <item>final_stop</item>
+        <item>chosen</item>
+    </string-array>
 </resources>

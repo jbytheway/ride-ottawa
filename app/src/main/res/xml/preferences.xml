@@ -14,11 +14,13 @@
         android:entryValues="@array/pref_sort_stop_by_values"
         android:defaultValue="@string/pref_default_sort_stops_by" />
 
-    <CheckBoxPreference
-        android:key="pref_show_headsigns"
-        android:title="@string/pref_title_show_headsigns"
-        android:summary="@string/pref_description_show_headsigns"
-        android:defaultValue="false" />
+    <ListPreference
+        android:key="pref_what_destination"
+        android:title="@string/pref_title_what_destination"
+        android:dialogTitle="@string/pref_description_what_destination"
+        android:entries="@array/pref_what_destination_entries"
+        android:entryValues="@array/pref_what_destination_values"
+        android:defaultValue="@string/pref_default_what_destination" />
 
     <CheckBoxPreference
         android:key="pref_title_case_stops"
