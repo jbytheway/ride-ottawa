@@ -18,8 +18,10 @@ public class ViewFavouriteActivity extends AppCompatActivity {
         //noinspection ConstantConditions
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-        ViewFavouriteActivityFragment fragment =
-                (ViewFavouriteActivityFragment) getFragmentManager().findFragmentById(R.id.fragment);
-        fragment.initialize(getIntent());
+        getFragment().initialize(getIntent());
+    }
+
+    public ViewFavouriteActivityFragment getFragment() {
+        return (ViewFavouriteActivityFragment) getFragmentManager().findFragmentById(R.id.fragment);
     }
 }

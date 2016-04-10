@@ -22,6 +22,8 @@
     <string name="action_delete">Delete</string>
     <string name="action_help">Help</string>
     <string name="action_refresh">Refresh</string>
+    <string name="action_set_alarm">Set alarm</string>
+    <string name="action_cancel">Cancel</string>
     <string name="title_activity_edit_favourite">Edit Favourite</string>
     <string name="name_label">Name:</string>
     <string name="save">Save</string>
@@ -47,6 +49,8 @@
     <string name="gps_old_abbrev">GPS?</string>
     <string name="waiting_for_data_abbrev">&#8230;</string>
     <string name="skipping_refresh_too_soon">Refreshed too recently.</string>
+    <string name="title_set_alarm_dialog">Set alarm for trip</string>
+    <string name="choose_minutes_warning">Minutes of warning:</string>
     <string name="example_stop_code">8888</string>
     <string name="example_route_name">999</string>
     <string name="example_arrival_time">12:00</string>

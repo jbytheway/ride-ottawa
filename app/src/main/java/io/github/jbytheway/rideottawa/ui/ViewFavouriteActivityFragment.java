@@ -14,6 +14,7 @@ import android.app.Fragment;
 import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.support.annotation.ColorRes;
+import android.support.annotation.Nullable;
 import android.support.annotation.StringRes;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBar;
@@ -25,7 +26,9 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.NumberPicker;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -59,6 +62,8 @@ public class ViewFavouriteActivityFragment extends Fragment implements OcTranspo
     private static final int AUTO_REFRESH_SECONDS = 30;
     private static final int MINIMUM_REFRESH_SECONDS = 15;
     private static final int MAX_FORTHCOMING_TRIPS = 50;
+    private static final int MAX_ALARM_MINUTES_WARNING = 60;
+    private static final int DEFAULT_ALARM_MINUTES_WARNING = 5;
 
     public ViewFavouriteActivityFragment() {
         // Required empty public constructor
@@ -241,6 +246,14 @@ public class ViewFavouriteActivityFragment extends Fragment implements OcTranspo
 
         mTripList.setAdapter(mTripAdapter);
 
+        mTripList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                ForthcomingTrip trip = mForthcomingTrips.get(position);
+                setAlarmFor(trip);
+            }
+        });
+
         return view;
     }
 
@@ -385,6 +398,74 @@ public class ViewFavouriteActivityFragment extends Fragment implements OcTranspo
         mTripAdapter.notifyDataSetChanged();
     }
 
+    public static class SetAlarmDialog extends DialogFragment {
+        public SetAlarmDialog() {
+            // Default constructor required for DialogFragments
+            // Real construction happens in onAttach
+        }
+
+        public interface AlarmDialogListener {
+            void setAlarmAt(int minutesWarning);
+        }
+
+        @Override
+        public void onAttach(Activity activity) {
+            super.onAttach(activity);
+            mListener = ((ViewFavouriteActivity) activity).getFragment().getAlarmListener();
+            Bundle args = getArguments();
+        }
+
+        @Override
+        public Dialog onCreateDialog(Bundle savedInstance) {
+            LayoutInflater inflater = getActivity().getLayoutInflater();
+            View view = inflater.inflate(R.layout.number_picker, null);
+
+            TextView caption = (TextView) view.findViewById(R.id.caption);
+            caption.setText(R.string.choose_minutes_warning);
+
+            NumberPicker numberPicker = (NumberPicker) view.findViewById(R.id.number_picker);
+            numberPicker.setMaxValue(MAX_ALARM_MINUTES_WARNING);
+            numberPicker.setValue(DEFAULT_ALARM_MINUTES_WARNING);
+
+            AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+            builder
+                    .setView(view)
+                    .setTitle(R.string.title_set_alarm_dialog)
+                    .setPositiveButton(R.string.action_set_alarm, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            NumberPicker numberPicker = (NumberPicker) getDialog().findViewById(R.id.number_picker);
+                            int minutesWarning = numberPicker.getValue();
+                            mListener.setAlarmAt(minutesWarning);
+                        }
+                    })
+                    .setNegativeButton(R.string.action_cancel, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                        }
+                    });
+            return builder.create();
+        }
+
+        private AlarmDialogListener mListener;
+    }
+
+    private void setAlarmFor(ForthcomingTrip trip) {
+        SetAlarmDialog dialog = new SetAlarmDialog();
+        Bundle args = new Bundle();
+        dialog.setArguments(args);
+        dialog.show(getFragmentManager(), "SetAlarmDialog");
+    }
+
+    private SetAlarmDialog.AlarmDialogListener getAlarmListener() {
+        return new SetAlarmDialog.AlarmDialogListener() {
+            @Override
+            public void setAlarmAt(int minutesWarning) {
+                //TODO
+            }
+        };
+    }
+
     public static class HelpDialog extends DialogFragment {
         public HelpDialog() {
             // Default constructor required for DialogFragments
@@ -413,10 +494,10 @@ public class ViewFavouriteActivityFragment extends Fragment implements OcTranspo
     }
 
     private void helpDialog() {
-        HelpDialog errorDialog = new HelpDialog();
+        HelpDialog dialog = new HelpDialog();
         Bundle args = new Bundle();
-        errorDialog.setArguments(args);
-        errorDialog.show(getFragmentManager(), "HelpDialog");
+        dialog.setArguments(args);
+        dialog.show(getFragmentManager(), "HelpDialog");
     }
 
     private final DateTimeZone mOttawaTimeZone;
