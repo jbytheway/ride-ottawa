@@ -28,8 +28,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceMedium"
-        android:text="@string/edit_favourite_hint"
-        android:id="@+id/edit_favourite_hint"
+        android:text="@string/list_favourites_hint"
+        android:id="@+id/list_favourites_hint"
         android:layout_marginStart="10sp"
         android:layout_below="@+id/favourite_list_view"
         android:layout_alignParentBottom="false" />

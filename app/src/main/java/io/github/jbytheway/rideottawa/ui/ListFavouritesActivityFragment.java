@@ -64,7 +64,7 @@ public class ListFavouritesActivityFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_list_favourites, container, false);
 
         mNoFavouritesHint = (TextView) view.findViewById(R.id.no_favourites_hint);
-        mEditFavouriteHint = (TextView) view.findViewById(R.id.edit_favourite_hint);
+        mEditFavouriteHint = (TextView) view.findViewById(R.id.list_favourites_hint);
 
         mFavouriteList = (ListView) view.findViewById(R.id.favourite_list_view);
         final SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
