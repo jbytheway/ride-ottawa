@@ -29,7 +29,7 @@ public class Stop {
 
     public static String titleCaseOf(String stopName) {
         // FIXME: This incorrectly capitalizes the 'd' in Place d'Orleans
-        return WordUtils.capitalizeFully(stopName, ' ', '1', '2', '3', '4', '.', '/', '\'');
+        return WordUtils.capitalizeFully(stopName, ' ', '1', '2', '3', '4', '.', '/', '\'', '-');
     }
 
     @Override
