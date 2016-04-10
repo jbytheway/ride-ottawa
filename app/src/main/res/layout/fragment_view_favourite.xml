@@ -12,8 +12,13 @@
         android:layout_gravity="center"
         android:id="@+id/progress" />
 
-    <ListView
-        android:layout_width="wrap_content"
+    <android.support.v4.widget.SwipeRefreshLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/trip_list" />
+        android:id="@+id/trip_list_swiper">
+        <ListView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/trip_list" />
+    </android.support.v4.widget.SwipeRefreshLayout>
 </LinearLayout>

@@ -15,6 +15,7 @@ import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.support.annotation.ColorRes;
 import android.support.annotation.StringRes;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -85,6 +86,16 @@ public class ViewFavouriteActivityFragment extends Fragment implements OcTranspo
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_view_favourite, container, false);
+
+        mSwipeRefresh = (SwipeRefreshLayout) view.findViewById(R.id.trip_list_swiper);
+        mSwipeRefresh.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                if (!refreshIfLateEnough(true)) {
+                    mSwipeRefresh.setRefreshing(false);
+                }
+            }
+        });
 
         mTripList = (ListView) view.findViewById(R.id.trip_list);
 
@@ -266,15 +277,17 @@ public class ViewFavouriteActivityFragment extends Fragment implements OcTranspo
         refresh();
     }
 
-    private void refreshIfLateEnough(boolean showMessage) {
+    private boolean refreshIfLateEnough(boolean showMessage) {
         DateTime now = new DateTime();
         if (now.minusSeconds(MINIMUM_REFRESH_SECONDS).isBefore(mLastRefresh)) {
             // Too soon; we won't refresh yet
             if (showMessage) {
                 Toast.makeText(getActivity(), getString(R.string.skipping_refresh_too_soon), Toast.LENGTH_LONG).show();
             }
+            return false;
         } else {
             refresh();
+            return true;
         }
     }
 
@@ -303,6 +316,8 @@ public class ViewFavouriteActivityFragment extends Fragment implements OcTranspo
             mOcTranspo.getLiveDataForTrips(mContext, mForthcomingTrips, ViewFavouriteActivityFragment.this);
             mTripAdapter.notifyDataSetChanged();
             mRefreshingNow = false;
+            // Turn off the refreshing indicator
+            mSwipeRefresh.setRefreshing(false);
             // The following only matters the first time; we remove the progress indicator and
             // replace it with the actual trip list
             mTripList.setVisibility(View.VISIBLE);
@@ -386,6 +401,7 @@ public class ViewFavouriteActivityFragment extends Fragment implements OcTranspo
     private DateTime mLastRefresh;
     private boolean mRefreshingNow;
     private ProgressBar mProgressIndicator;
+    private SwipeRefreshLayout mSwipeRefresh;
     private ListView mTripList;
     private IndirectArrayAdapter<ForthcomingTrip> mTripAdapter;
     private final DateTimeFormatter mTimeFormatter;
