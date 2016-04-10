@@ -31,6 +31,7 @@ import io.github.jbytheway.rideottawa.OcTranspoDataAccess;
 import io.github.jbytheway.rideottawa.R;
 import io.github.jbytheway.rideottawa.Route;
 import io.github.jbytheway.rideottawa.Stop;
+import io.github.jbytheway.rideottawa.utils.Keyboard;
 
 public class EditFavouriteActivityFragment extends Fragment {
     private static final String TAG = "EditFavouriteFragment";
@@ -228,6 +229,10 @@ public class EditFavouriteActivityFragment extends Fragment {
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        // Regardless of the reason we got back here, we really want to hide the soft keyboard,
+        // because with it open, almost nothing of this view is visible
+        Keyboard.hideKeyboard(getActivity());
+
         switch (requestCode) {
             case REQUEST_NEW_STOP:
                 if (resultCode == Activity.RESULT_OK) {
