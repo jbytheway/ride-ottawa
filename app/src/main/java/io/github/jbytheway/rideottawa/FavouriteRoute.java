@@ -6,6 +6,7 @@ import android.support.annotation.NonNull;
 import com.orm.SugarRecord;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 
@@ -30,7 +31,7 @@ public class FavouriteRoute extends SugarRecord implements Comparable<FavouriteR
         delete();
     }
 
-    public ArrayList<ForthcomingTrip> updateForthcomingTrips(OcTranspoDataAccess ocTranspo, ArrayList<ForthcomingTrip> oldTrips) {
+    public ArrayList<ForthcomingTrip> updateForthcomingTrips(OcTranspoDataAccess ocTranspo, Collection<ForthcomingTrip> oldTrips) {
         Cursor c = ocTranspo.getForthcomingTrips(Stop.StopId, RouteName, Direction, Destination);
         List<ForthcomingTrip> newTrips = ocTranspo.stopTimeCursorToList(c);
 

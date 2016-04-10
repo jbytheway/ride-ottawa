@@ -9,6 +9,7 @@ import android.support.annotation.Nullable;
 import android.util.Log;
 
 import com.google.common.base.Joiner;
+import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Lists;
 import com.orm.dsl.NotNull;
 
@@ -381,20 +382,14 @@ public class OcTranspoDataAccess {
         // Uniqify the info we need to pass to the API
         // FIXME: Do we worry about cases where we don't think there should be a bus (because the last one was too long ago)
         // but in fact there is (because the last one is very late)?  Currently such will not be caught.
-        HashMap<TimeQuery, ArrayList<ForthcomingTrip>> queries = new HashMap<>();
+        HashMultimap<TimeQuery, ForthcomingTrip> queries = HashMultimap.create();
         for (ForthcomingTrip trip : trips) {
             TimeQuery query = new TimeQuery(trip.getStop().getCode(), trip.getRoute());
-            if (queries.containsKey(query)) {
-                queries.get(query).add(trip);
-            } else {
-                ArrayList<ForthcomingTrip> theseTrips = new ArrayList<>();
-                theseTrips.add(trip);
-                queries.put(query, theseTrips);
-            }
+            queries.put(query, trip);
         }
 
         // Trigger all those queries
-        for (Map.Entry<TimeQuery, ArrayList<ForthcomingTrip>> entry : queries.entrySet()) {
+        for (Map.Entry<TimeQuery, Collection<ForthcomingTrip>> entry : queries.asMap().entrySet()) {
             mApi.queryTimes(context, entry.getKey(), entry.getValue(), apiListener);
         }
     }

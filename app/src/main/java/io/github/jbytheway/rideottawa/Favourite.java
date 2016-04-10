@@ -1,5 +1,6 @@
 package io.github.jbytheway.rideottawa;
 
+import com.google.common.collect.HashMultimap;
 import com.orm.SugarRecord;
 import com.orm.dsl.Ignore;
 
@@ -7,6 +8,7 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Set;
 
 public class Favourite extends SugarRecord {
     @SuppressWarnings("unused")
@@ -107,28 +109,17 @@ public class Favourite extends SugarRecord {
         }
 
         // First split the input trips by stop
-        HashMap<String, ArrayList<ForthcomingTrip>> tripsSplit = new HashMap<>();
+        HashMultimap<String, ForthcomingTrip> tripsSplit = HashMultimap.create();
 
         for (ForthcomingTrip trip : trips) {
             String key = trip.getStop().getId();
-            if (tripsSplit.containsKey(key)) {
-                tripsSplit.get(key).add(trip);
-            } else {
-                ArrayList<ForthcomingTrip> newList = new ArrayList<>();
-                newList.add(trip);
-                tripsSplit.put(key, newList);
-            }
+            tripsSplit.put(key, trip);
         }
 
         ArrayList<ForthcomingTrip> result = new ArrayList<>();
         for (FavouriteStop stop : getStops()) {
             String key = stop.StopId;
-            ArrayList<ForthcomingTrip> tripsForThisStop;
-            if (tripsSplit.containsKey(key)) {
-                tripsForThisStop = tripsSplit.get(key);
-            } else {
-                tripsForThisStop = new ArrayList<>();
-            }
+            Set<ForthcomingTrip> tripsForThisStop = tripsSplit.get(key);
             result.addAll(stop.updateForthcomingTrips(tripsForThisStop, ocTranspo));
         }
 

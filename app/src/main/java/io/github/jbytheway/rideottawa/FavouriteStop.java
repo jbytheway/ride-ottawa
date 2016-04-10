@@ -1,13 +1,16 @@
 package io.github.jbytheway.rideottawa;
 
+import com.google.common.collect.HashMultimap;
 import com.orm.SugarRecord;
 import com.orm.dsl.Ignore;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 public class FavouriteStop extends SugarRecord {
     @SuppressWarnings("unused")
@@ -111,34 +114,23 @@ public class FavouriteStop extends SugarRecord {
         }
     }
 
-    public List<ForthcomingTrip> updateForthcomingTrips(ArrayList<ForthcomingTrip> trips, OcTranspoDataAccess ocTranspo) {
+    public List<ForthcomingTrip> updateForthcomingTrips(Collection<ForthcomingTrip> trips, OcTranspoDataAccess ocTranspo) {
         if (!mPendingRoutes.isEmpty()) {
             throw new AssertionError("Should only be called on saved Stops");
         }
 
         // First split the input trips by route
-        HashMap<Route, ArrayList<ForthcomingTrip>> tripsSplit = new HashMap<>();
+        HashMultimap<Route, ForthcomingTrip> tripsSplit = HashMultimap.create();
 
         for (ForthcomingTrip trip : trips) {
             Route key = trip.getRoute();
-            if (tripsSplit.containsKey(key)) {
-                tripsSplit.get(key).add(trip);
-            } else {
-                ArrayList<ForthcomingTrip> newList = new ArrayList<>();
-                newList.add(trip);
-                tripsSplit.put(key, newList);
-            }
+            tripsSplit.put(key, trip);
         }
 
         ArrayList<ForthcomingTrip> result = new ArrayList<>();
         for (FavouriteRoute route : getRoutes()) {
             Route key = route.asRoute(ocTranspo);
-            ArrayList<ForthcomingTrip> tripsForThisRoute;
-            if (tripsSplit.containsKey(key)) {
-                tripsForThisRoute = tripsSplit.get(key);
-            } else {
-                tripsForThisRoute = new ArrayList<>();
-            }
+            Set<ForthcomingTrip> tripsForThisRoute = tripsSplit.get(key);
             result.addAll(route.updateForthcomingTrips(ocTranspo, tripsForThisRoute));
         }
 
