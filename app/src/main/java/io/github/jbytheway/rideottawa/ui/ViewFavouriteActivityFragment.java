@@ -241,11 +241,6 @@ public class ViewFavouriteActivityFragment extends Fragment implements OcTranspo
 
         mTripList.setAdapter(mTripAdapter);
 
-        // mTripList starts invisible; it will reappear when the first set of Favourites have been loaded
-        mTripList.setVisibility(View.GONE);
-
-        mProgressIndicator = (ProgressBar) view.findViewById(R.id.progress);
-
         return view;
     }
 
@@ -259,9 +254,6 @@ public class ViewFavouriteActivityFragment extends Fragment implements OcTranspo
             if (mFavourite == null || mFavourite.getId() != favouriteId) {
                 mFavourite = Favourite.findById(Favourite.class, favouriteId);
                 populateFromFavourite();
-            } else {
-                mTripList.setVisibility(View.VISIBLE);
-                mProgressIndicator.setVisibility(View.GONE);
             }
         }
     }
@@ -356,10 +348,6 @@ public class ViewFavouriteActivityFragment extends Fragment implements OcTranspo
             mRefreshingNow = false;
             // Turn off the refreshing indicator
             mSwipeRefresh.setRefreshing(false);
-            // The following only matters the first time; we remove the progress indicator and
-            // replace it with the actual trip list
-            mTripList.setVisibility(View.VISIBLE);
-            mProgressIndicator.setVisibility(View.GONE);
         }
     }
 
@@ -372,6 +360,8 @@ public class ViewFavouriteActivityFragment extends Fragment implements OcTranspo
         // long delay between refreshes)
         if (!mRefreshingNow) {
             mRefreshingNow = true;
+            // FIXME: The setRefreshing doesn't work for some reason the first time
+            mSwipeRefresh.setRefreshing(true);
             new RefreshTask().execute();
         }
 
@@ -439,7 +429,6 @@ public class ViewFavouriteActivityFragment extends Fragment implements OcTranspo
     private ArrayList<ForthcomingTrip> mForthcomingTrips;
     private DateTime mLastRefresh;
     private boolean mRefreshingNow;
-    private ProgressBar mProgressIndicator;
     private SwipeRefreshLayout mSwipeRefresh;
     private ListView mTripList;
     private IndirectArrayAdapter<ForthcomingTrip> mTripAdapter;
