@@ -101,4 +101,7 @@
     below to create one.</string>
 
     <string name="list_favourites_hint">Tap a favourite to use it.\nLong tap to edit.</string>
+
+    <string name="edit_favourite_hint">Add stops with the button above.\nFor each, either add
+        individual routes, or all routes to a destination.</string>
 </resources>

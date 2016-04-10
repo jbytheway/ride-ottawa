@@ -49,8 +49,8 @@
             android:orientation="horizontal"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_above="@+id/hint_area"
             android:id="@+id/button_holder"
-            android:layout_alignParentBottom="true"
             style="?android:attr/buttonBarStyle"
             android:elevation="@dimen/button_bar_elevation"
             android:background="@color/colorMildAccent">
@@ -70,6 +70,30 @@
                 android:id="@+id/add_stop"
                 style="?android:attr/buttonBarButtonStyle"
                 android:textColor="#ffffff" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:id="@+id/hint_area">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:text="@string/edit_favourite_hint"
+                android:id="@+id/hint_text"
+                android:layout_weight="1" />
+
+            <ImageButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@android:drawable/ic_menu_close_clear_cancel"
+                android:id="@+id/close_hint_button"
+                android:contentDescription="@string/close_dialog" />
+
         </LinearLayout>
 
     </RelativeLayout>

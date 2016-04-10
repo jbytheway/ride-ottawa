@@ -14,6 +14,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -169,6 +170,17 @@ public class EditFavouriteActivityFragment extends Fragment {
             }
         });
 
+        mHintArea = (LinearLayout) view.findViewById(R.id.hint_area);
+
+        ImageButton closeHintButton = (ImageButton) view.findViewById(R.id.close_hint_button);
+        closeHintButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Log.d(TAG, "Hiding hint because close button clicked");
+                hideHint();
+            }
+        });
+
         return view;
     }
 
@@ -191,6 +203,11 @@ public class EditFavouriteActivityFragment extends Fragment {
                 populateFromFavourite();
             }
         }
+    }
+
+    private void hideHint() {
+        mHintArea.getLayoutParams().height = 0;
+        mHintArea.requestLayout();
     }
 
     @Override
@@ -304,6 +321,18 @@ public class EditFavouriteActivityFragment extends Fragment {
     private void populateFromFavourite() {
         mName.setText(mFavourite.Name);
         mStopAdapter.notifyDataSetChanged();
+
+        // If there are things in the favourite already, then hide the hint
+        // (we assume the user knows what they are doing at that point)
+        List<FavouriteStop> stops = mFavourite.getStops();
+        if (!stops.isEmpty()) {
+            FavouriteStop firstStop = stops.get(0);
+            List<FavouriteRoute> routes = firstStop.getRoutes();
+            if (!routes.isEmpty()) {
+                Log.d(TAG, "Hiding hint because favourite is populated");
+                hideHint();
+            }
+        }
     }
 
     private void updateFavourite() {
@@ -314,4 +343,5 @@ public class EditFavouriteActivityFragment extends Fragment {
     private IndirectArrayAdapter<FavouriteStop> mStopAdapter;
     private Favourite mFavourite;
     private TextView mName;
+    private LinearLayout mHintArea;
 }
