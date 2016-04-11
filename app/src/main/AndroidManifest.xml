@@ -66,6 +66,9 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="io.github.jbytheway.rideottawa.ui.ListFavouritesActivity" />
         </activity>
+
+        <service android:name=".AlarmService"
+            android:exported="false"/>
     </application>
 
 </manifest>

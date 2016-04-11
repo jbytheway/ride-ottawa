@@ -13,6 +13,14 @@ public class TripUid implements Parcelable {
         mMidnight = midnight;
     }
 
+    public int getTripId() {
+        return mId;
+    }
+
+    public DateTime getMidnight() {
+        return mMidnight;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (o instanceof TripUid) {

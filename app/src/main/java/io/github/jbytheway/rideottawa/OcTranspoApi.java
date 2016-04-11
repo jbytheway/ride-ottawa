@@ -59,6 +59,7 @@ public class OcTranspoApi {
         final String stopCode = query.StopCode;
         final String routeName = query.Route.getName();
 
+        Log.d(TAG, "Submitting API query, stopCode="+stopCode+", routeName="+routeName);
         Ion
             .with(context)
             .load(NEXT_TRIPS_URL)

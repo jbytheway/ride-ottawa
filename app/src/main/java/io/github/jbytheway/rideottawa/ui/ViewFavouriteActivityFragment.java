@@ -44,12 +44,14 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 
+import io.github.jbytheway.rideottawa.AlarmService;
 import io.github.jbytheway.rideottawa.ArrivalEstimate;
 import io.github.jbytheway.rideottawa.Favourite;
 import io.github.jbytheway.rideottawa.FavouriteRoute;
 import io.github.jbytheway.rideottawa.FavouriteStop;
 import io.github.jbytheway.rideottawa.ForthcomingTrip;
 import io.github.jbytheway.rideottawa.OcTranspoApi;
+import io.github.jbytheway.rideottawa.TripUid;
 import io.github.jbytheway.rideottawa.utils.IndirectArrayAdapter;
 import io.github.jbytheway.rideottawa.RideOttawaApplication;
 import io.github.jbytheway.rideottawa.OcTranspoDataAccess;
@@ -405,7 +407,7 @@ public class ViewFavouriteActivityFragment extends Fragment implements OcTranspo
         }
 
         public interface AlarmDialogListener {
-            void setAlarmAt(int minutesWarning);
+            void setAlarmAt(long favouriteStopId, TripUid tripUid, int minutesWarning);
         }
 
         @Override
@@ -413,6 +415,8 @@ public class ViewFavouriteActivityFragment extends Fragment implements OcTranspo
             super.onAttach(activity);
             mListener = ((ViewFavouriteActivity) activity).getFragment().getAlarmListener();
             Bundle args = getArguments();
+            mFavouriteStopId = args.getLong("favourite_stop_id");
+            mTripUid = args.getParcelable("trip_uid");
         }
 
         @Override
@@ -436,7 +440,7 @@ public class ViewFavouriteActivityFragment extends Fragment implements OcTranspo
                         public void onClick(DialogInterface dialog, int which) {
                             NumberPicker numberPicker = (NumberPicker) getDialog().findViewById(R.id.number_picker);
                             int minutesWarning = numberPicker.getValue();
-                            mListener.setAlarmAt(minutesWarning);
+                            mListener.setAlarmAt(mFavouriteStopId, mTripUid, minutesWarning);
                         }
                     })
                     .setNegativeButton(R.string.action_cancel, new DialogInterface.OnClickListener() {
@@ -448,11 +452,18 @@ public class ViewFavouriteActivityFragment extends Fragment implements OcTranspo
         }
 
         private AlarmDialogListener mListener;
+        private long mFavouriteStopId;
+        private TripUid mTripUid;
     }
 
     private void setAlarmFor(ForthcomingTrip trip) {
+        // Figure out which Favourite gave rise to this trip
+        FavouriteStop favouriteStop = mFavourite.getStop(trip.getStop().getId());
+
         SetAlarmDialog dialog = new SetAlarmDialog();
         Bundle args = new Bundle();
+        args.putLong("favourite_stop_id", favouriteStop.getId());
+        args.putParcelable("trip_uid", trip.getTripUid());
         dialog.setArguments(args);
         dialog.show(getFragmentManager(), "SetAlarmDialog");
     }
@@ -460,8 +471,13 @@ public class ViewFavouriteActivityFragment extends Fragment implements OcTranspo
     private SetAlarmDialog.AlarmDialogListener getAlarmListener() {
         return new SetAlarmDialog.AlarmDialogListener() {
             @Override
-            public void setAlarmAt(int minutesWarning) {
-                //TODO
+            public void setAlarmAt(long favouriteStopId, TripUid tripUid, int minutesWarning) {
+                Intent intent = new Intent(getActivity(), AlarmService.class);
+                Log.d(TAG, "favouriteStopId = "+favouriteStopId);
+                intent.putExtra(AlarmService.FAVOURITE_STOP_ID, favouriteStopId);
+                intent.putExtra(AlarmService.TRIP_UID, tripUid);
+                intent.putExtra(AlarmService.MINUTES_WARNING, minutesWarning);
+                getActivity().startService(intent);
             }
         };
     }
