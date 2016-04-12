@@ -60,7 +60,7 @@ public class AlarmService extends IntentService {
             return;
         }
         Duration timeToWait = new Interval(now, timeForAlarm).toDuration();
-        long secondsUntilAlarm = timeToWait.getStandardSeconds();
+        long secondsUntilAlarm = timeToWait.getStandardSeconds()+1;
         // If under a minute away, wait until alarm should trigger
         // If more than 10 minutes away, wait until 10 minutes away
         // Otherwise, wait a minute
