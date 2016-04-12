@@ -36,7 +36,11 @@ public class Alarm {
         return mFavourite;
     }
 
-    DateTime getTime() {
+    DateTime getTimeOfBus() {
+        return mTimeEstimate;
+    }
+
+    DateTime getTimeOfAlarm() {
         return mTimeEstimate.minusMinutes(mMinutesWarning);
     }
 

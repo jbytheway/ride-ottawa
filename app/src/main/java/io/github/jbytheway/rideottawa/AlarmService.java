@@ -6,6 +6,8 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.TaskStackBuilder;
 import android.content.Intent;
+import android.media.RingtoneManager;
+import android.net.Uri;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 
@@ -61,7 +63,7 @@ public class AlarmService extends IntentService {
     }
 
     private void processAlarm(final Alarm alarm) {
-        DateTime timeForAlarm = alarm.getTime();
+        DateTime timeForAlarm = alarm.getTimeOfAlarm();
         DateTime now = mOcTranspo.getNow();
         Log.d(TAG, "processAlarm now="+now+", timeForAlarm="+timeForAlarm);
         if (now.isAfter(timeForAlarm)) {
@@ -96,14 +98,18 @@ public class AlarmService extends IntentService {
         stackBuilder.addNextIntent(resultIntent);
         PendingIntent resultPendingIntent = stackBuilder.getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT);
 
+        Uri sound = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM);
+
         NotificationCompat.Builder builder = new NotificationCompat.Builder(this);
         builder
                 .setSmallIcon(R.drawable.alarm_notification)
                 .setContentTitle(title)
                 .setContentText(text)
                 .setCategory(Notification.CATEGORY_ALARM)
+                .setWhen(alarm.getTimeOfBus().getMillis())
                 .setAutoCancel(true)
                 .setPriority(Notification.PRIORITY_MAX)
+                .setSound(sound)
                 .setVibrate(VIBRATION_PATTERN)
                 .setContentIntent(resultPendingIntent);
 
