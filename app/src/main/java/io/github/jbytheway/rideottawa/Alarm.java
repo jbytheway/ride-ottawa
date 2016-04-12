@@ -12,6 +12,7 @@ public class Alarm {
     private static final String TAG = "Alarm";
 
     public Alarm(FavouriteStop favouriteStop, TripUid tripUid, int minutesWarning, OnRefreshedListener listener, OcTranspoDataAccess ocTranspo) {
+        mFavourite = favouriteStop.Favourite;
         mMinutesWarning = minutesWarning;
         mOnRefreshedListener = listener;
 
@@ -29,6 +30,10 @@ public class Alarm {
 
     interface OnRefreshedListener {
         void onRefreshed(Alarm alarm);
+    }
+
+    Favourite getFavourite() {
+        return mFavourite;
     }
 
     DateTime getTime() {
@@ -58,6 +63,7 @@ public class Alarm {
         });
     }
 
+    private Favourite mFavourite;
     private int mMinutesWarning;
     private ForthcomingTrip mForthcomingTrip;
     private OnRefreshedListener mOnRefreshedListener;

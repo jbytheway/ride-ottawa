@@ -58,6 +58,9 @@
     <string name="example_minutes">999m</string>
     <string name="title_activity_settings">Settings</string>
 
+    <string name="alarm_notification_title">Your bus approaching</string>
+    <string name="alarm_notification_text">Insert details here.</string>
+
     <!-- Strings related to Settings -->
     <string name="pref_title_download_wifi_only">Download databases on WiFi only</string>
     <string name="pref_description_download_wifi_only">Will only check for or download updates to the

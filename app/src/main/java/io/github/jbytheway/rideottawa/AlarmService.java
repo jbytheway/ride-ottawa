@@ -1,8 +1,12 @@
 package io.github.jbytheway.rideottawa;
 
 import android.app.IntentService;
+import android.app.Notification;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
+import android.app.TaskStackBuilder;
 import android.content.Intent;
-import android.os.Handler;
+import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 
 import org.joda.time.DateTime;
@@ -12,11 +16,16 @@ import org.joda.time.Interval;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
+import io.github.jbytheway.rideottawa.ui.ViewFavouriteActivity;
+
 public class AlarmService extends IntentService {
     private static final String TAG = "AlarmService";
     public static final String TRIP_UID = "trip_uid";
     public static final String FAVOURITE_STOP_ID = "favourite_stop_id";
     public static final String MINUTES_WARNING = "minutes_warning";
+
+    private static final int ALARM_NOTIFICATION_ID = 1;
+    private static final long[] VIBRATION_PATTERN = new long[]{0, 300, 200, 300};
 
     public AlarmService() {
         super("AlarmService");
@@ -76,6 +85,30 @@ public class AlarmService extends IntentService {
 
     private void triggerAlarm(Alarm alarm) {
         Log.i(TAG, "ALARM ALARM");
+
+        String title = getString(R.string.alarm_notification_title);
+        String text = getString(R.string.alarm_notification_text);
+
+        Intent resultIntent = new Intent(this, ViewFavouriteActivity.class);
+        resultIntent.putExtra(ViewFavouriteActivity.FAVOURITE_ID, alarm.getFavourite().getId());
+        TaskStackBuilder stackBuilder = TaskStackBuilder.create(this);
+        stackBuilder.addParentStack(ViewFavouriteActivity.class);
+        stackBuilder.addNextIntent(resultIntent);
+        PendingIntent resultPendingIntent = stackBuilder.getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT);
+
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(this);
+        builder
+                .setSmallIcon(R.drawable.alarm_notification)
+                .setContentTitle(title)
+                .setContentText(text)
+                .setCategory(Notification.CATEGORY_ALARM)
+                .setAutoCancel(true)
+                .setPriority(Notification.PRIORITY_MAX)
+                .setVibrate(VIBRATION_PATTERN)
+                .setContentIntent(resultPendingIntent);
+
+        NotificationManager notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+        notificationManager.notify(ALARM_NOTIFICATION_ID, builder.build());
     }
 
     private OcTranspoDataAccess mOcTranspo;
