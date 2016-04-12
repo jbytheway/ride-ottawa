@@ -11,8 +11,8 @@ import java.util.ArrayList;
 public class Alarm {
     private static final String TAG = "Alarm";
 
-    public Alarm(FavouriteStop favouriteStop, TripUid tripUid, int minutesAway, OnRefreshedListener listener, OcTranspoDataAccess ocTranspo) {
-        mMinutesAway = minutesAway;
+    public Alarm(FavouriteStop favouriteStop, TripUid tripUid, int minutesWarning, OnRefreshedListener listener, OcTranspoDataAccess ocTranspo) {
+        mMinutesWarning = minutesWarning;
         mOnRefreshedListener = listener;
 
         Stop stop = favouriteStop.asStop(ocTranspo);
@@ -32,7 +32,7 @@ public class Alarm {
     }
 
     DateTime getTime() {
-        return mTimeEstimate.minusMinutes(mMinutesAway);
+        return mTimeEstimate.minusMinutes(mMinutesWarning);
     }
 
     public void refreshTimeEstimate(Context context, OcTranspoDataAccess ocTranspo) {
@@ -40,25 +40,25 @@ public class Alarm {
         forthcomingTrips.add(mForthcomingTrip);
 
         Log.d(TAG, "Alarm getting live data");
-        ocTranspo.getLiveDataForTrips(context, forthcomingTrips, new OcTranspoApi.Listener() {
+        ocTranspo.getLiveDataForTrips(context, forthcomingTrips, true, new OcTranspoApi.Listener() {
             @Override
             public void onApiFail(@Nullable Exception e) {
-                Log.d(TAG, "onApiFail");
-                // No update to time
+                Log.d(TAG, "onApiFail: exception=" + e);
+                // No update to time available
                 mOnRefreshedListener.onRefreshed(Alarm.this);
             }
 
             @Override
             public void onTripData() {
-                Log.d(TAG, "onTripData");
                 // The forthcoming trip will have been updated in place
                 mTimeEstimate = mForthcomingTrip.getEstimatedArrival().getTime();
+                Log.d(TAG, "onTripData "+mForthcomingTrip.getEstimatedArrival().getType());
                 mOnRefreshedListener.onRefreshed(Alarm.this);
             }
         });
     }
 
-    private int mMinutesAway;
+    private int mMinutesWarning;
     private ForthcomingTrip mForthcomingTrip;
     private OnRefreshedListener mOnRefreshedListener;
     private DateTime mTimeEstimate;

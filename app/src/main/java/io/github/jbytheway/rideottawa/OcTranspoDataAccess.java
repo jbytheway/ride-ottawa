@@ -288,7 +288,7 @@ public class OcTranspoDataAccess {
                 "join stop_times on stop_times.trip_id = trips.trip_id " +
                 "join routes on routes.route_id = trips.route_id " +
                 "join directed_routes on directed_routes.route_id = trips.route_id " +
-                "where stop_times.stop_sequence = trips.last_stop_sequence " +
+                "where stop_times.stop_sequence = 1 " +
                 "and directed_routes.direction_id = trips.direction_id " +
                 "and trips.trip_id = ?",
                 new String[]{"" + id});
@@ -448,7 +448,7 @@ public class OcTranspoDataAccess {
         return result;
     }
 
-    public void getLiveDataForTrips(Context context, Collection<ForthcomingTrip> trips, OcTranspoApi.Listener apiListener) {
+    public void getLiveDataForTrips(Context context, Collection<ForthcomingTrip> trips, boolean synchronously, OcTranspoApi.Listener apiListener) {
         // Uniqify the info we need to pass to the API
         // FIXME: Do we worry about cases where we don't think there should be a bus (because the last one was too long ago)
         // but in fact there is (because the last one is very late)?  Currently such will not be caught.
@@ -460,7 +460,7 @@ public class OcTranspoDataAccess {
 
         // Trigger all those queries
         for (Map.Entry<TimeQuery, Collection<ForthcomingTrip>> entry : queries.asMap().entrySet()) {
-            mApi.queryTimes(context, entry.getKey(), entry.getValue(), apiListener);
+            mApi.queryTimes(context, entry.getKey(), entry.getValue(), synchronously, apiListener);
         }
     }
 

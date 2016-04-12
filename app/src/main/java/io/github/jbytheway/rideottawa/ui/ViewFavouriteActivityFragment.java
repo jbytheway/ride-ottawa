@@ -358,7 +358,7 @@ public class ViewFavouriteActivityFragment extends Fragment implements OcTranspo
                 trip.notifyLiveUpdateRequested();
             }
             mLastRefresh = new DateTime();
-            mOcTranspo.getLiveDataForTrips(mContext, mForthcomingTrips, ViewFavouriteActivityFragment.this);
+            mOcTranspo.getLiveDataForTrips(mContext, mForthcomingTrips, false, ViewFavouriteActivityFragment.this);
             mTripAdapter.notifyDataSetChanged();
             mRefreshingNow = false;
             // Turn off the refreshing indicator

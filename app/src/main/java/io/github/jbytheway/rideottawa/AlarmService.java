@@ -9,6 +9,9 @@ import org.joda.time.DateTime;
 import org.joda.time.Duration;
 import org.joda.time.Interval;
 
+import java.util.concurrent.ScheduledThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
+
 public class AlarmService extends IntentService {
     private static final String TAG = "AlarmService";
     public static final String TRIP_UID = "trip_uid";
@@ -18,7 +21,7 @@ public class AlarmService extends IntentService {
     public AlarmService() {
         super("AlarmService");
 
-        mHandler = new Handler();
+        mExecutor = new ScheduledThreadPoolExecutor(1);
     }
 
     @Override
@@ -49,23 +52,26 @@ public class AlarmService extends IntentService {
     }
 
     private void processAlarm(final Alarm alarm) {
-        Log.d(TAG, "processAlarm");
         DateTime timeForAlarm = alarm.getTime();
         DateTime now = mOcTranspo.getNow();
+        Log.d(TAG, "processAlarm now="+now+", timeForAlarm="+timeForAlarm);
         if (now.isAfter(timeForAlarm)) {
             triggerAlarm(alarm);
             return;
         }
         Duration timeToWait = new Interval(now, timeForAlarm).toDuration();
-        long minutesUntilAlarm = timeToWait.getStandardMinutes();
-        long minutesUntilNextCheck = Math.max(minutesUntilAlarm - 10, 1);
-        Log.d(TAG, "processAlarm: minutesUntilNextCheck = "+minutesUntilNextCheck);
-        mHandler.postDelayed(new Runnable() {
+        long secondsUntilAlarm = timeToWait.getStandardSeconds();
+        // If under a minute away, wait until alarm should trigger
+        // If more than 10 minutes away, wait until 10 minutes away
+        // Otherwise, wait a minute
+        long secondsUntilNextCheck = Math.min(secondsUntilAlarm, Math.max(secondsUntilAlarm - 600, 60));
+        Log.d(TAG, "processAlarm: secondsUntilNextCheck = " + secondsUntilNextCheck);
+        mExecutor.schedule(new Runnable() {
             @Override
             public void run() {
                 alarm.refreshTimeEstimate(AlarmService.this, mOcTranspo);
             }
-        }, minutesUntilNextCheck * 60 * 1000);
+        }, secondsUntilNextCheck, TimeUnit.SECONDS);
     }
 
     private void triggerAlarm(Alarm alarm) {
@@ -73,5 +79,5 @@ public class AlarmService extends IntentService {
     }
 
     private OcTranspoDataAccess mOcTranspo;
-    private Handler mHandler;
+    private ScheduledThreadPoolExecutor mExecutor;
 }

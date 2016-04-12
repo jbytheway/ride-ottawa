@@ -1,10 +1,13 @@
 package io.github.jbytheway.rideottawa;
 
 import android.content.Context;
+import android.net.Uri;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
+import com.google.common.io.CharStreams;
 import com.koushikdutta.async.future.FutureCallback;
+import com.koushikdutta.async.http.body.UrlEncodedFormBody;
 import com.koushikdutta.ion.Ion;
 import com.koushikdutta.ion.Response;
 
@@ -16,6 +19,15 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Objects;
@@ -54,59 +66,112 @@ public class OcTranspoApi {
      *              the query.
      * @param listener The object which will receive callbacks about the results we find.
      */
-    public void queryTimes(final Context context, final TimeQuery query, final Collection<ForthcomingTrip> trips, final Listener listener) {
+    public void queryTimes(final Context context, final TimeQuery query, final Collection<ForthcomingTrip> trips, boolean synchronously, final Listener listener) {
         // curl -d "appID=${appId}&apiKey=${apiKey}&stopNo=${stopCode}&routeNo=${routeName}&format=json" https://api.octranspo1.com/v1.2/GetNextTripsForStop
         final String stopCode = query.StopCode;
         final String routeName = query.Route.getName();
 
         Log.d(TAG, "Submitting API query, stopCode="+stopCode+", routeName="+routeName);
-        Ion
-            .with(context)
-            .load(NEXT_TRIPS_URL)
-            .setBodyParameter("appID", mAppId)
-            .setBodyParameter("apiKey", mApiKey)
-            .setBodyParameter("stopNo", stopCode)
-            .setBodyParameter("routeNo", routeName)
-            .setBodyParameter("format", "json")
-            .asString()
-            .withResponse()
-            .setCallback(new FutureCallback<Response<String>>() {
-                @Override
-                public void onCompleted(Exception httpException, Response<String> result) {
-                    Integer code = null;
-                    if (result != null) {
-                        code = result.getHeaders().code();
-                    }
-                    Log.d(TAG, "Fetched API result; e=" + httpException + "; code=" + code);
-                    if (httpException != null || code == null || code != 200) {
-                        if (httpException != null && httpException.getClass() == CancellationException.class) {
-                            // We are fine; no update was necessary
-                            listener.onTripData();
-                        } else {
-                            listener.onApiFail(httpException);
-                        }
-                        return;
-                    }
 
-                    // Even when we get a response, that might be an error
-                    String response = result.getResult();
-                    if (!response.startsWith("{")) {
-                        Log.e(TAG, "Error returned: " + response);
-                        listener.onApiFail(null);
-                        return;
-                    }
+        // We generally prefer using the Ion library (asynchronously) but in some circomstances
+        // we need a synchronous version instead, so we offer these two complete implementations
+        if (synchronously) {
+            URL url;
+            try {
+                url = new URL(NEXT_TRIPS_URL);
+            } catch (MalformedURLException e) {
+                throw new AssertionError("Malformed URL "+NEXT_TRIPS_URL);
+            }
+            HttpURLConnection conn = null;
+            try {
+                conn = (HttpURLConnection) url.openConnection();
+                conn.setDoInput(true);
+                conn.setDoOutput(true);
+                conn.setRequestMethod("POST");
 
-                    try {
-                        ProcessJsonResponse(context, result.getResult(), query, trips);
-                    } catch (JSONException jsonException) {
-                        Log.e(TAG, "JSON error with API result", jsonException);
-                        Log.e(TAG, "JSON was: "+result.getResult());
-                        listener.onApiFail(jsonException);
-                        return;
-                    }
-                    listener.onTripData();
+                Uri.Builder builder = new Uri.Builder()
+                        .appendQueryParameter("appID", mAppId)
+                        .appendQueryParameter("apiKey", mApiKey)
+                        .appendQueryParameter("stopNo", stopCode)
+                        .appendQueryParameter("routeNo", routeName)
+                        .appendQueryParameter("format", "json");
+                String postContent = builder.build().getEncodedQuery();
+
+                conn.setFixedLengthStreamingMode(postContent.length());
+
+                OutputStream os = conn.getOutputStream();
+                OutputStreamWriter writer = new OutputStreamWriter(os, "UTF-8");
+                writer.write(postContent);
+                writer.close();
+
+                conn.connect();
+
+                int code = conn.getResponseCode();
+
+                InputStream is = conn.getInputStream();
+                InputStreamReader isr = new InputStreamReader(is, "UTF-8");
+                String result = CharStreams.toString(isr);
+
+                processStringResponse(context, query, trips, code, result, null, listener);
+            } catch (IOException e) {
+                listener.onApiFail(e);
+            } finally {
+                if (conn != null) {
+                    conn.disconnect();
                 }
-            });
+            }
+        } else {
+            Ion
+                    .with(context)
+                    .load(NEXT_TRIPS_URL)
+                    .setBodyParameter("appID", mAppId)
+                    .setBodyParameter("apiKey", mApiKey)
+                    .setBodyParameter("stopNo", stopCode)
+                    .setBodyParameter("routeNo", routeName)
+                    .setBodyParameter("format", "json")
+                    .asString()
+                    .withResponse()
+                    .setCallback(new FutureCallback<Response<String>>() {
+                        @Override
+                        public void onCompleted(Exception httpException, Response<String> result) {
+                            Integer code = null;
+                            if (result != null) {
+                                code = result.getHeaders().code();
+                            }
+                            Log.d(TAG, "Fetched API result; e=" + httpException + "; code=" + code);
+                            processStringResponse(context, query, trips, code, result.getResult(), httpException, listener);
+                        }
+                    });
+        }
+    }
+
+    private void processStringResponse(Context context, TimeQuery query, Collection<ForthcomingTrip> trips, Integer code, String response, Exception exception, Listener listener) {
+        if (exception != null || code == null || code != 200) {
+            if (exception != null && exception.getClass() == CancellationException.class) {
+                // We are fine; no update was necessary
+                listener.onTripData();
+            } else {
+                listener.onApiFail(exception);
+            }
+            return;
+        }
+
+        // Even when we get a response, that might be an error
+        if (!response.startsWith("{")) {
+            Log.e(TAG, "Error returned: " + response);
+            listener.onApiFail(null);
+            return;
+        }
+
+        try {
+            ProcessJsonResponse(context, response, query, trips);
+        } catch (JSONException jsonException) {
+            Log.e(TAG, "JSON error with API result", jsonException);
+            Log.e(TAG, "JSON was: " + response);
+            listener.onApiFail(jsonException);
+            return;
+        }
+        listener.onTripData();
     }
 
     private void ProcessJsonResponse(Context context, String jsonString, TimeQuery query, Collection<ForthcomingTrip> trips) throws JSONException {
