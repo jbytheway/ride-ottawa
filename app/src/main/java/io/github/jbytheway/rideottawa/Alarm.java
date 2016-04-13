@@ -16,13 +16,13 @@ public class Alarm {
         mMinutesWarning = minutesWarning;
         mOnRefreshedListener = listener;
 
-        Stop stop = favouriteStop.asStop(ocTranspo);
-        Trip trip = ocTranspo.getTrip(tripUid.getTripId());
-        int timeAtStop = ocTranspo.getTimeAtStop(trip, stop);
+        mStop = favouriteStop.asStop(ocTranspo);
+        mTrip = ocTranspo.getTrip(tripUid.getTripId());
+        int timeAtStop = ocTranspo.getTimeAtStop(mTrip, mStop);
 
         mForthcomingTrip =  new ForthcomingTrip(
-                stop, trip.getRoute(), null, null, tripUid.getTripId(),
-                tripUid.getMidnight(), timeAtStop, trip.getStartTime()
+                mStop, mTrip.getRoute(), null, null, tripUid.getTripId(),
+                tripUid.getMidnight(), timeAtStop, mTrip.getStartTime()
         );
 
         mTimeEstimate = mForthcomingTrip.getEstimatedArrival().getTime();
@@ -30,6 +30,14 @@ public class Alarm {
 
     interface OnRefreshedListener {
         void onRefreshed(Alarm alarm);
+    }
+
+    Stop getStop() {
+        return mStop;
+    }
+
+    Route getRoute() {
+        return mTrip.getRoute();
     }
 
     Favourite getFavourite() {
@@ -67,6 +75,8 @@ public class Alarm {
         });
     }
 
+    private Stop mStop;
+    private Trip mTrip;
     private Favourite mFavourite;
     private int mMinutesWarning;
     private ForthcomingTrip mForthcomingTrip;

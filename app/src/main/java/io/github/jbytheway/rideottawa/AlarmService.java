@@ -14,11 +14,14 @@ import android.util.Log;
 import org.joda.time.DateTime;
 import org.joda.time.Duration;
 import org.joda.time.Interval;
+import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
 
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 import io.github.jbytheway.rideottawa.ui.ViewFavouriteActivity;
+import io.github.jbytheway.rideottawa.utils.TimeUtils;
 
 public class AlarmService extends IntentService {
     private static final String TAG = "AlarmService";
@@ -33,6 +36,7 @@ public class AlarmService extends IntentService {
         super("AlarmService");
 
         mExecutor = new ScheduledThreadPoolExecutor(1);
+        mTimeFormatter = DateTimeFormat.forPattern("HH:mm");
     }
 
     @Override
@@ -88,8 +92,14 @@ public class AlarmService extends IntentService {
     private void triggerAlarm(Alarm alarm) {
         Log.i(TAG, "ALARM ALARM");
 
-        String title = getString(R.string.alarm_notification_title);
-        String text = getString(R.string.alarm_notification_text);
+        DateTime timeOfBus = alarm.getTimeOfBus();
+        DateTime now = mOcTranspo.getNow();
+        String routeName = alarm.getRoute().getName();
+        long minutesDifference = TimeUtils.minutesDifference(now, timeOfBus);
+        String busTimeFormatted = mTimeFormatter.print(timeOfBus);
+
+        String title = getString(R.string.alarm_notification_title, routeName, minutesDifference);
+        String text = getString(R.string.alarm_notification_text, routeName, alarm.getStop().getName(this), busTimeFormatted);
 
         Intent resultIntent = new Intent(this, ViewFavouriteActivity.class);
         resultIntent.putExtra(ViewFavouriteActivity.FAVOURITE_ID, alarm.getFavourite().getId());
@@ -119,4 +129,5 @@ public class AlarmService extends IntentService {
 
     private OcTranspoDataAccess mOcTranspo;
     private ScheduledThreadPoolExecutor mExecutor;
+    private DateTimeFormatter mTimeFormatter;
 }

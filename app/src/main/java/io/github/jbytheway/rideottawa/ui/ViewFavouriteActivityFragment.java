@@ -58,6 +58,7 @@ import io.github.jbytheway.rideottawa.OcTranspoDataAccess;
 import io.github.jbytheway.rideottawa.R;
 import io.github.jbytheway.rideottawa.Route;
 import io.github.jbytheway.rideottawa.Stop;
+import io.github.jbytheway.rideottawa.utils.TimeUtils;
 
 public class ViewFavouriteActivityFragment extends Fragment implements OcTranspoApi.Listener {
     private static final String TAG = "ViewFavouriteFragment";
@@ -167,18 +168,7 @@ public class ViewFavouriteActivityFragment extends Fragment implements OcTranspo
                         ArrivalEstimate ae = trip.getEstimatedArrival();
                         DateTime estimatedArrival = ae.getTime();
                         DateTime now = mOcTranspo.getNow().withZone(mOttawaTimeZone);
-                        // Using Duration.getStandardMinutes rounds towards zero, where we want to
-                        // round to nearest.  So we get the duration in seconds and do the rounding
-                        // ourselves.
-                        long secondsAway;
-                        if (now.isAfter(estimatedArrival)) {
-                            Interval intervalToArrival = new Interval(estimatedArrival, now);
-                            secondsAway = -intervalToArrival.toDuration().getStandardSeconds();
-                        } else {
-                            Interval intervalToArrival = new Interval(now, estimatedArrival);
-                            secondsAway = intervalToArrival.toDuration().getStandardSeconds();
-                        }
-                        long minutesAway = (Math.round((double) secondsAway)/60);
+                        long minutesAway = TimeUtils.minutesDifference(now, estimatedArrival);
                         minutes_away.setText(getString(R.string.minutes_format, minutesAway));
 
                         if (ae.getType() == ArrivalEstimate.Type.Schedule) {
