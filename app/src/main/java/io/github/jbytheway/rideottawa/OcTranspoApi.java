@@ -139,7 +139,8 @@ public class OcTranspoApi {
                                 code = result.getHeaders().code();
                             }
                             Log.d(TAG, "Fetched API result; e=" + httpException + "; code=" + code);
-                            processStringResponse(context, query, trips, code, result.getResult(), httpException, listener);
+                            String response = result == null ? null : result.getResult();
+                            processStringResponse(context, query, trips, code, response, httpException, listener);
                         }
                     });
         }
@@ -262,8 +263,10 @@ public class OcTranspoApi {
                         return;
                     }
 
+                    String response = result.getResult();
+
                     try {
-                        JSONObject json = new JSONObject(result.getResult());
+                        JSONObject json = new JSONObject(response);
                         JSONArray routes = json.getJSONObject("GetRouteSummaryForStopResult").getJSONObject("Routes").getJSONArray("Route");
 
                         String targetRouteName = key.Route.getName();
@@ -288,7 +291,7 @@ public class OcTranspoApi {
                             Log.d(TAG, "Successfully cached a direction");
                         }
                     } catch (JSONException jsonError) {
-                        Log.e(TAG, "CacheDirection JSON error", jsonError);
+                        Log.e(TAG, "CacheDirection JSON error; json was "+response, jsonError);
                     }
                 }
             });
