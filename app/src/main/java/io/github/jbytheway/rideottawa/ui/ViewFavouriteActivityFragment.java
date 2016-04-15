@@ -464,6 +464,7 @@ public class ViewFavouriteActivityFragment extends Fragment implements OcTranspo
             public void setAlarmAt(long favouriteStopId, TripUid tripUid, int minutesWarning) {
                 Intent intent = new Intent(getActivity(), AlarmService.class);
                 Log.d(TAG, "favouriteStopId = "+favouriteStopId);
+                intent.putExtra(AlarmService.ACTION, AlarmService.ACTION_NEW_ALARM);
                 intent.putExtra(AlarmService.FAVOURITE_STOP_ID, favouriteStopId);
                 intent.putExtra(AlarmService.TRIP_UID, tripUid);
                 intent.putExtra(AlarmService.MINUTES_WARNING, minutesWarning);

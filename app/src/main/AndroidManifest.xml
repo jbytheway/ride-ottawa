@@ -19,7 +19,7 @@
             android:value="io.github.jbytheway.rideottawa" />
 
         <!-- This is the Sugar ORM database version -->
-        <meta-data android:name="VERSION" android:value="2" />
+        <meta-data android:name="VERSION" android:value="3" />
 
         <activity
             android:name=".ui.ListFavouritesActivity"
@@ -70,6 +70,8 @@
 
         <service android:name=".AlarmService"
             android:exported="false"/>
+
+        <receiver android:name=".AlarmReceiver"/>
     </application>
 
 </manifest>

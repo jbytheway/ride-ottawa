@@ -12,6 +12,7 @@ public class Alarm {
     private static final String TAG = "Alarm";
 
     public Alarm(FavouriteStop favouriteStop, TripUid tripUid, int minutesWarning, OnRefreshedListener listener, OcTranspoDataAccess ocTranspo) {
+        mFavouriteStop = favouriteStop;
         mFavourite = favouriteStop.Favourite;
         mMinutesWarning = minutesWarning;
         mOnRefreshedListener = listener;
@@ -52,6 +53,10 @@ public class Alarm {
         return mTimeEstimate.minusMinutes(mMinutesWarning);
     }
 
+    PendingAlarmData makePendingAlarmData(long timeToCheck) {
+        return new PendingAlarmData(mForthcomingTrip.getTripUid(), mFavouriteStop.getId(), mMinutesWarning, timeToCheck);
+    }
+
     public void refreshTimeEstimate(Context context, OcTranspoDataAccess ocTranspo) {
         ArrayList<ForthcomingTrip> forthcomingTrips = new ArrayList<>();
         forthcomingTrips.add(mForthcomingTrip);
@@ -77,6 +82,7 @@ public class Alarm {
 
     private Stop mStop;
     private Trip mTrip;
+    private FavouriteStop mFavouriteStop;
     private Favourite mFavourite;
     private int mMinutesWarning;
     private ForthcomingTrip mForthcomingTrip;
