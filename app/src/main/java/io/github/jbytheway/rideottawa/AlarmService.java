@@ -79,6 +79,9 @@ public class AlarmService extends IntentService {
                 break;
             case ACTION_CHECK_ALARMS:
                 checkAlarms();
+                // In this case we are called from a WakefulBroadcastReceiver, so we must release
+                // the wake lock
+                AlarmReceiver.completeWakefulIntent(intent);
                 break;
             default:
                 throw new AssertionError("Unexpected ACTION "+action);
@@ -127,7 +130,7 @@ public class AlarmService extends IntentService {
         AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
         Intent intent = new Intent(this, AlarmReceiver.class);
         PendingIntent pendingIntent = PendingIntent.getBroadcast(this, AlarmReceiver.REQUEST_CHECK_ALARMS, intent, PendingIntent.FLAG_UPDATE_CURRENT);
-        alarmManager.set(AlarmManager.RTC_WAKEUP, nextTimeToCheck, pendingIntent);
+        alarmManager.setExact(AlarmManager.RTC_WAKEUP, nextTimeToCheck, pendingIntent);
     }
 
     private void checkAlarms() {
