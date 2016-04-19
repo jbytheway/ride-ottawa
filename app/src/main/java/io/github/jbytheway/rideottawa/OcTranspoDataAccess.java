@@ -67,6 +67,10 @@ public class OcTranspoDataAccess {
         }
     }
 
+    public void closeDatabase() {
+        mHelper.close();
+    }
+
     @SuppressWarnings("unused")
     public void deleteDatabase() {
         mHelper.deleteDatabase();
@@ -75,6 +79,8 @@ public class OcTranspoDataAccess {
     private static final String[] ROUTE_COLUMNS = new String[]{"route_short_name", "directed_routes.direction_id", "route_modal_headsign"};
 
     private static final String[] STOP_COLUMNS = new String[]{"stops._id", "stops.stop_id", "stops.stop_code", "stops.stop_name"};
+
+    private static final String[] TRIP_COLUMNS = new String[]{"trips.trip_id"};
 
     public Route getRoute(String routeName, int directionId) {
         SQLiteDatabase database = mHelper.getReadableDatabase();
@@ -87,6 +93,22 @@ public class OcTranspoDataAccess {
                 new String[]{routeName, "" + directionId});
         if (c.getCount() != 1) {
             throw new AssertionError("Requested invalid Route " + routeName + ", " + directionId);
+        }
+        List<Route> routes = routeCursorToList(c);
+        return routes.get(0);
+    }
+
+    public Route getRoute(int routeId, int directionId) {
+        SQLiteDatabase database = mHelper.getReadableDatabase();
+        String cols = Joiner.on(", ").join(ROUTE_COLUMNS);
+        Cursor c = database.rawQuery(
+                "select distinct " + cols + " " +
+                        "from routes " +
+                        "join directed_routes on routes.route_id = directed_routes.route_id " +
+                        "where routes.route_id = ? and directed_routes.direction_id = ?",
+                new String[]{"" + routeId, "" + directionId});
+        if (c.getCount() != 1) {
+            throw new AssertionError("Requested invalid Route " + routeId + ", " + directionId);
         }
         List<Route> routes = routeCursorToList(c);
         return routes.get(0);
@@ -226,6 +248,7 @@ public class OcTranspoDataAccess {
         if (c.getCount() != 1) {
             throw new AssertionError("Requested invalid StopId " + id);
         }
+        // FIXME duplicating stopCursorToList
         c.moveToFirst();
         int stopIdColumn = c.getColumnIndex("stop_id");
         int stopCodeColumn = c.getColumnIndex("stop_code");
@@ -257,6 +280,57 @@ public class OcTranspoDataAccess {
         }
         c.close();
         return result;
+    }
+
+    public Trip getTrip(long id) {
+        SQLiteDatabase database = mHelper.getReadableDatabase();
+        String tripCols = Joiner.on(", ").join(TRIP_COLUMNS);
+        String routeCols = Joiner.on(", ").join(ROUTE_COLUMNS);
+        Cursor c = database.rawQuery(
+                "select " + tripCols + ", " + routeCols + ", arrival_time " +
+                "from trips " +
+                "join stop_times on stop_times.trip_id = trips.trip_id " +
+                "join routes on routes.route_id = trips.route_id " +
+                "join directed_routes on directed_routes.route_id = trips.route_id " +
+                "where stop_times.stop_sequence = 1 " +
+                "and directed_routes.direction_id = trips.direction_id " +
+                "and trips.trip_id = ?",
+                new String[]{"" + id});
+        if (c.getCount() != 1) {
+            throw new AssertionError("Requested invalid TripId " + id);
+        }
+        c.moveToFirst();
+        int route_name_column = c.getColumnIndexOrThrow("route_short_name");
+        int direction_column = c.getColumnIndexOrThrow("direction_id");
+        int headsign_column = c.getColumnIndexOrThrow("route_modal_headsign");
+        int start_time_column = c.getColumnIndexOrThrow("arrival_time");
+        String routeName = c.getString(route_name_column);
+        int direction = c.getInt(direction_column);
+        String modalHeadSign = c.getString(headsign_column);
+        int startTime = c.getInt(start_time_column);
+        c.close();
+        Route route = new Route(routeName, direction, modalHeadSign);
+        return new Trip(id, route, startTime);
+    }
+
+    public int getTimeAtStop(Trip trip, Stop stop) {
+        SQLiteDatabase database = mHelper.getReadableDatabase();
+        Cursor c = database.rawQuery(
+                "select arrival_time " +
+                "from stop_times " +
+                "join stops on stops._id = stop_times.stop_id " +
+                "where stop_times.trip_id = ? " +
+                "and stops.stop_id = ?",
+                new String[]{ ""+trip.getId(), stop.getId() }
+        );
+        if (c.getCount() != 1) {
+            throw new AssertionError("Invalid Time at Stop " + trip.getId() + ", " + stop.getId());
+        }
+        c.moveToFirst();
+        int arrival_time_column = c.getColumnIndex("arrival_time");
+        int arrivalTime = c.getInt(arrival_time_column);
+        c.close();
+        return arrivalTime;
     }
 
     public DateTime getNow() {
@@ -378,7 +452,7 @@ public class OcTranspoDataAccess {
         return result;
     }
 
-    public void getLiveDataForTrips(Context context, Collection<ForthcomingTrip> trips, OcTranspoApi.Listener apiListener) {
+    public void getLiveDataForTrips(Context context, Collection<ForthcomingTrip> trips, boolean synchronously, OcTranspoApi.Listener apiListener) {
         // Uniqify the info we need to pass to the API
         // FIXME: Do we worry about cases where we don't think there should be a bus (because the last one was too long ago)
         // but in fact there is (because the last one is very late)?  Currently such will not be caught.
@@ -390,7 +464,7 @@ public class OcTranspoDataAccess {
 
         // Trigger all those queries
         for (Map.Entry<TimeQuery, Collection<ForthcomingTrip>> entry : queries.asMap().entrySet()) {
-            mApi.queryTimes(context, entry.getKey(), entry.getValue(), apiListener);
+            mApi.queryTimes(context, entry.getKey(), entry.getValue(), synchronously, apiListener);
         }
     }
 
