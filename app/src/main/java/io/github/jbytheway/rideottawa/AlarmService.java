@@ -88,6 +88,7 @@ public class AlarmService extends IntentService {
             default:
                 throw new AssertionError("Unexpected ACTION "+action);
         }
+        mOcTranspo.closeDatabase();
     }
 
     private PendingAlarmData getNextAlarmData() {

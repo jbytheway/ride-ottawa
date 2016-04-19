@@ -67,6 +67,10 @@ public class OcTranspoDataAccess {
         }
     }
 
+    public void closeDatabase() {
+        mHelper.close();
+    }
+
     @SuppressWarnings("unused")
     public void deleteDatabase() {
         mHelper.deleteDatabase();
