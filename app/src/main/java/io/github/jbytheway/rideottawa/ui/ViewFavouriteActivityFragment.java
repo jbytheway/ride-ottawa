@@ -7,15 +7,10 @@ import android.app.DialogFragment;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.app.Fragment;
 import android.os.Handler;
-import android.preference.PreferenceManager;
-import android.support.annotation.ColorRes;
-import android.support.annotation.Nullable;
-import android.support.annotation.StringRes;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
@@ -29,25 +24,17 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.NumberPicker;
-import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import org.joda.time.DateTime;
-import org.joda.time.DateTimeZone;
-import org.joda.time.Interval;
-import org.joda.time.format.DateTimeFormat;
-import org.joda.time.format.DateTimeFormatter;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 
 import io.github.jbytheway.rideottawa.AlarmService;
-import io.github.jbytheway.rideottawa.ArrivalEstimate;
 import io.github.jbytheway.rideottawa.Favourite;
-import io.github.jbytheway.rideottawa.FavouriteRoute;
 import io.github.jbytheway.rideottawa.FavouriteStop;
 import io.github.jbytheway.rideottawa.ForthcomingTrip;
 import io.github.jbytheway.rideottawa.OcTranspoApi;
@@ -56,9 +43,6 @@ import io.github.jbytheway.rideottawa.utils.IndirectArrayAdapter;
 import io.github.jbytheway.rideottawa.RideOttawaApplication;
 import io.github.jbytheway.rideottawa.OcTranspoDataAccess;
 import io.github.jbytheway.rideottawa.R;
-import io.github.jbytheway.rideottawa.Route;
-import io.github.jbytheway.rideottawa.Stop;
-import io.github.jbytheway.rideottawa.utils.TimeUtils;
 
 public class ViewFavouriteActivityFragment extends Fragment implements OcTranspoApi.Listener {
     private static final String TAG = "ViewFavouriteFragment";

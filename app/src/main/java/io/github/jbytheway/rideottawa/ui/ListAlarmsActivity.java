@@ -1,6 +1,5 @@
 package io.github.jbytheway.rideottawa.ui;
 
-import android.app.Activity;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;

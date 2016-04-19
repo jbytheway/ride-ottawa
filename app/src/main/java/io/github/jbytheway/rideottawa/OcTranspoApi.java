@@ -7,7 +7,6 @@ import android.util.Log;
 
 import com.google.common.io.CharStreams;
 import com.koushikdutta.async.future.FutureCallback;
-import com.koushikdutta.async.http.body.UrlEncodedFormBody;
 import com.koushikdutta.ion.Ion;
 import com.koushikdutta.ion.Response;
 
@@ -19,7 +18,6 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;

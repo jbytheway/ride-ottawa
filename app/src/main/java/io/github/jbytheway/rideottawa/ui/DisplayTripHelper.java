@@ -22,7 +22,6 @@ import io.github.jbytheway.rideottawa.FavouriteRoute;
 import io.github.jbytheway.rideottawa.FavouriteStop;
 import io.github.jbytheway.rideottawa.ForthcomingTrip;
 import io.github.jbytheway.rideottawa.OcTranspoDataAccess;
-import io.github.jbytheway.rideottawa.PendingAlarmData;
 import io.github.jbytheway.rideottawa.R;
 import io.github.jbytheway.rideottawa.RideOttawaApplication;
 import io.github.jbytheway.rideottawa.Route;

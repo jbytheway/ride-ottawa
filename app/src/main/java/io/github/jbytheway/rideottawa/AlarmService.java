@@ -20,8 +20,6 @@ import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 
 import java.util.List;
-import java.util.concurrent.ScheduledThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
 
 import io.github.jbytheway.rideottawa.ui.ViewFavouriteActivity;
 import io.github.jbytheway.rideottawa.utils.TimeUtils;

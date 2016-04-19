@@ -3,40 +3,25 @@ package io.github.jbytheway.rideottawa.ui;
 import android.app.Fragment;
 import android.content.Context;
 import android.os.Bundle;
-import android.os.Handler;
-import android.preference.PreferenceManager;
-import android.support.annotation.ColorRes;
-import android.support.annotation.StringRes;
-import android.support.v4.widget.SwipeRefreshLayout;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
 
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Iterators;
-
-import org.joda.time.DateTime;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import io.github.jbytheway.rideottawa.Alarm;
-import io.github.jbytheway.rideottawa.ArrivalEstimate;
-import io.github.jbytheway.rideottawa.Favourite;
 import io.github.jbytheway.rideottawa.ForthcomingTrip;
 import io.github.jbytheway.rideottawa.OcTranspoDataAccess;
 import io.github.jbytheway.rideottawa.PendingAlarmData;
 import io.github.jbytheway.rideottawa.R;
 import io.github.jbytheway.rideottawa.RideOttawaApplication;
-import io.github.jbytheway.rideottawa.Route;
-import io.github.jbytheway.rideottawa.Stop;
 import io.github.jbytheway.rideottawa.utils.IndirectArrayAdapter;
-import io.github.jbytheway.rideottawa.utils.TimeUtils;
 
 public class ListAlarmsActivityFragment extends Fragment {
 
