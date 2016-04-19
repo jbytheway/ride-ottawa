@@ -12,7 +12,7 @@ public class AlarmReceiver extends WakefulBroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
         Intent intentToSend = new Intent(context, AlarmService.class);
-        intentToSend.putExtra(AlarmService.ACTION, AlarmService.ACTION_CHECK_ALARMS);
+        intentToSend.putExtra(AlarmService.ACTION, AlarmService.ACTION_CHECK_ALARMS_WAKEFULLY);
         startWakefulService(context, intentToSend);
     }
 }

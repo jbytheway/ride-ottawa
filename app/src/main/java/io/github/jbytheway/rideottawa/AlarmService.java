@@ -35,6 +35,7 @@ public class AlarmService extends IntentService {
 
     public static final int ACTION_NEW_ALARM = 1;
     public static final int ACTION_CHECK_ALARMS = 2;
+    public static final int ACTION_CHECK_ALARMS_WAKEFULLY = 3;
 
     private static final int ALARM_NOTIFICATION_ID = 1;
     private static final long[] VIBRATION_PATTERN = new long[]{0, 300, 200, 300};
@@ -80,6 +81,9 @@ public class AlarmService extends IntentService {
                 ).refreshTimeEstimate(this, mOcTranspo);
                 break;
             case ACTION_CHECK_ALARMS:
+                checkAlarms();
+                break;
+            case ACTION_CHECK_ALARMS_WAKEFULLY:
                 checkAlarms();
                 // In this case we are called from a WakefulBroadcastReceiver, so we must release
                 // the wake lock
