@@ -22,6 +22,7 @@ import io.github.jbytheway.rideottawa.FavouriteRoute;
 import io.github.jbytheway.rideottawa.FavouriteStop;
 import io.github.jbytheway.rideottawa.ForthcomingTrip;
 import io.github.jbytheway.rideottawa.OcTranspoDataAccess;
+import io.github.jbytheway.rideottawa.PendingAlarmData;
 import io.github.jbytheway.rideottawa.R;
 import io.github.jbytheway.rideottawa.RideOttawaApplication;
 import io.github.jbytheway.rideottawa.Route;
@@ -117,6 +118,13 @@ public class DisplayTripHelper implements IndirectArrayAdapter.ViewGenerator<For
         DateTime now = mOcTranspo.getNow().withZone(mOttawaTimeZone);
         long minutesAway = TimeUtils.minutesDifference(now, estimatedArrival);
         minutes_away.setText(mContext.getString(R.string.minutes_format, minutesAway));
+        if (minutesAway >= -199) {
+            minutes_away.setTextAppearance(mContext, android.R.style.TextAppearance_DeviceDefault_Large);
+        } else if (minutesAway >= -999 ){
+            minutes_away.setTextAppearance(mContext, android.R.style.TextAppearance_DeviceDefault_Medium);
+        } else {
+            minutes_away.setTextAppearance(mContext, android.R.style.TextAppearance_DeviceDefault_Small);
+        }
 
         if (ae.getType() == ArrivalEstimate.Type.Schedule) {
             arrival_time_estimated.setVisibility(View.INVISIBLE);
