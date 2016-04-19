@@ -117,13 +117,16 @@ public class DisplayTripHelper implements IndirectArrayAdapter.ViewGenerator<For
         DateTime now = mOcTranspo.getNow().withZone(mOttawaTimeZone);
         long minutesAway = TimeUtils.minutesDifference(now, estimatedArrival);
         minutes_away.setText(mContext.getString(R.string.minutes_format, minutesAway));
+        int minutesAwayAppearance;
         if (minutesAway >= -199) {
-            minutes_away.setTextAppearance(mContext, android.R.style.TextAppearance_DeviceDefault_Large);
+            minutesAwayAppearance = android.R.style.TextAppearance_DeviceDefault_Large;
         } else if (minutesAway >= -999 ){
-            minutes_away.setTextAppearance(mContext, android.R.style.TextAppearance_DeviceDefault_Medium);
+            minutesAwayAppearance = android.R.style.TextAppearance_DeviceDefault_Medium;
         } else {
-            minutes_away.setTextAppearance(mContext, android.R.style.TextAppearance_DeviceDefault_Small);
+            minutesAwayAppearance = android.R.style.TextAppearance_DeviceDefault_Small;
         }
+        //noinspection deprecation
+        minutes_away.setTextAppearance(mContext, minutesAwayAppearance);
 
         if (ae.getType() == ArrivalEstimate.Type.Schedule) {
             arrival_time_estimated.setVisibility(View.INVISIBLE);
@@ -193,5 +196,5 @@ public class DisplayTripHelper implements IndirectArrayAdapter.ViewGenerator<For
     private final DateTimeFormatter mTimeFormatter;
     private final OcTranspoDataAccess mOcTranspo;
     private final SharedPreferences mSharedPreferences;
-    private HashMap<Stop, HashMap<Route, String>> mChosenDestinations;
+    private final HashMap<Stop, HashMap<Route, String>> mChosenDestinations;
 }

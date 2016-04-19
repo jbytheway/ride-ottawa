@@ -198,6 +198,6 @@ public class AlarmService extends IntentService {
     }
 
     private OcTranspoDataAccess mOcTranspo;
-    private DateTimeFormatter mTimeFormatter;
-    private Alarm.OnRefreshedListener mListener;
+    private final DateTimeFormatter mTimeFormatter;
+    private final Alarm.OnRefreshedListener mListener;
 }

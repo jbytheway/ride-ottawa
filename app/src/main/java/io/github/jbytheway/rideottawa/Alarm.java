@@ -88,12 +88,12 @@ public class Alarm {
         });
     }
 
-    private Stop mStop;
-    private Trip mTrip;
-    private FavouriteStop mFavouriteStop;
-    private Favourite mFavourite;
-    private int mMinutesWarning;
-    private ForthcomingTrip mForthcomingTrip;
-    private OnRefreshedListener mOnRefreshedListener;
+    private final Stop mStop;
+    private final Trip mTrip;
+    private final FavouriteStop mFavouriteStop;
+    private final Favourite mFavourite;
+    private final int mMinutesWarning;
+    private final ForthcomingTrip mForthcomingTrip;
+    private final OnRefreshedListener mOnRefreshedListener;
     private DateTime mTimeEstimate;
 }

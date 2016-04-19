@@ -8,6 +8,7 @@ import android.view.MenuItem;
 import io.github.jbytheway.rideottawa.R;
 
 public class EditFavouriteActivity extends AppCompatActivity {
+    @SuppressWarnings("unused")
     private static final String TAG = "EditFavouriteActivity";
 
     public static final String NEW_FAVOURITE = "new_favourite";

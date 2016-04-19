@@ -35,7 +35,6 @@ public class ListAlarmsActivityFragment extends Fragment {
         // This Fragment adds options to the ActionBar
         setHasOptionsMenu(true);
 
-        Context context = getActivity();
         mOcTranspo = ((RideOttawaApplication) getActivity().getApplication()).getOcTranspo();
     }
 
@@ -45,8 +44,8 @@ public class ListAlarmsActivityFragment extends Fragment {
             Alarm = alarm;
         }
 
-        public long Id;
-        public Alarm Alarm;
+        public final long Id;
+        public final Alarm Alarm;
     }
 
     @Override
@@ -63,7 +62,7 @@ public class ListAlarmsActivityFragment extends Fragment {
             noAlarmsMessage.setVisibility(View.GONE);
         }
 
-        mAlarmList = (ListView) view.findViewById(R.id.alarms);
+        ListView alarmList = (ListView) view.findViewById(R.id.alarms);
 
         final Alarm.OnRefreshedListener listener = new Alarm.OnRefreshedListener() {
             @Override
@@ -107,7 +106,7 @@ public class ListAlarmsActivityFragment extends Fragment {
                 }
         );
 
-        mAlarmList.setAdapter(mAlarmAdapter);
+        alarmList.setAdapter(mAlarmAdapter);
 
         return view;
     }
@@ -122,6 +121,5 @@ public class ListAlarmsActivityFragment extends Fragment {
     }
 
     private OcTranspoDataAccess mOcTranspo;
-    private ListView mAlarmList;
     private IndirectArrayAdapter<AlarmWithId> mAlarmAdapter;
 }

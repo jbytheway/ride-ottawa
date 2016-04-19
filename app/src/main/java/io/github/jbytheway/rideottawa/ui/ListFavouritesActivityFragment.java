@@ -261,12 +261,6 @@ public class ListFavouritesActivityFragment extends Fragment {
         }
 
         @Override
-        public void onAttach(Activity activity) {
-            super.onAttach(activity);
-            //Bundle args = getArguments();
-        }
-
-        @Override
         public Dialog onCreateDialog(Bundle savedInstance) {
             AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
             String version = BuildConfig.VERSION_NAME;

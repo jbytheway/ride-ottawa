@@ -110,6 +110,7 @@ public class SelectStopActivity extends AppCompatActivity implements GoogleApiCl
         });
 
         ListView stopList = (ListView) findViewById(R.id.stop_list);
+        assert stopList != null;
 
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         mOrderBy = sharedPreferences.getString(SettingsActivityFragment.PREF_SORT_STOPS, "stop_name");
@@ -246,8 +247,8 @@ public class SelectStopActivity extends AppCompatActivity implements GoogleApiCl
             LastLocation = lastLocation;
         }
 
-        String Filter;
-        Location LastLocation;
+        final String Filter;
+        final Location LastLocation;
     }
 
     private class UpdateListTask extends AsyncTask<UpdateArgs, Void, List<Stop>> {

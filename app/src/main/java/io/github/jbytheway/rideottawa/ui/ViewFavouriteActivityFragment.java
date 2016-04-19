@@ -1,5 +1,6 @@
 package io.github.jbytheway.rideottawa.ui;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -269,7 +270,7 @@ public class ViewFavouriteActivityFragment extends Fragment implements OcTranspo
         @Override
         public Dialog onCreateDialog(Bundle savedInstance) {
             LayoutInflater inflater = getActivity().getLayoutInflater();
-            View view = inflater.inflate(R.layout.number_picker, null);
+            @SuppressLint("InflateParams") View view = inflater.inflate(R.layout.number_picker, null);
 
             TextView caption = (TextView) view.findViewById(R.id.caption);
             caption.setText(R.string.choose_minutes_warning);
@@ -334,12 +335,6 @@ public class ViewFavouriteActivityFragment extends Fragment implements OcTranspo
         public HelpDialog() {
             // Default constructor required for DialogFragments
             // Real construction happens in onAttach
-        }
-
-        @Override
-        public void onAttach(Activity activity) {
-            super.onAttach(activity);
-            //Bundle args = getArguments();
         }
 
         @Override

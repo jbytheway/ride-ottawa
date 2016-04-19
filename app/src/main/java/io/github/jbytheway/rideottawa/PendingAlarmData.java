@@ -44,5 +44,5 @@ public class PendingAlarmData extends SugarRecord {
     private int MinutesWarning;
     private long TimeToCheck;
 
-    private static DateTimeFormatter mMidnightFormatter = DateTimeFormat.forPattern("yyyyMMdd");
+    private static final DateTimeFormatter mMidnightFormatter = DateTimeFormat.forPattern("yyyyMMdd");
 }
