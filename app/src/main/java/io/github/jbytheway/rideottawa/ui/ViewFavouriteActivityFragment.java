@@ -51,7 +51,6 @@ public class ViewFavouriteActivityFragment extends Fragment implements OcTranspo
     private static final int MINIMUM_REFRESH_SECONDS = 15;
     private static final int MAX_FORTHCOMING_TRIPS = 50;
     private static final int MAX_ALARM_MINUTES_WARNING = 60;
-    private static final int DEFAULT_ALARM_MINUTES_WARNING = 5;
 
     public ViewFavouriteActivityFragment() {
         // Required empty public constructor
@@ -264,6 +263,7 @@ public class ViewFavouriteActivityFragment extends Fragment implements OcTranspo
             mListener = ((ViewFavouriteActivity) activity).getFragment().getAlarmListener();
             Bundle args = getArguments();
             mFavouriteStopId = args.getLong("favourite_stop_id");
+            mDefaultMinutesWarning = args.getInt("default_minutes_warning");
             mTripUid = args.getParcelable("trip_uid");
         }
 
@@ -277,7 +277,7 @@ public class ViewFavouriteActivityFragment extends Fragment implements OcTranspo
 
             NumberPicker numberPicker = (NumberPicker) view.findViewById(R.id.number_picker);
             numberPicker.setMaxValue(MAX_ALARM_MINUTES_WARNING);
-            numberPicker.setValue(DEFAULT_ALARM_MINUTES_WARNING);
+            numberPicker.setValue(mDefaultMinutesWarning);
 
             AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
             builder
@@ -301,6 +301,7 @@ public class ViewFavouriteActivityFragment extends Fragment implements OcTranspo
 
         private AlarmDialogListener mListener;
         private long mFavouriteStopId;
+        private int mDefaultMinutesWarning;
         private TripUid mTripUid;
     }
 
@@ -311,6 +312,7 @@ public class ViewFavouriteActivityFragment extends Fragment implements OcTranspo
         SetAlarmDialog dialog = new SetAlarmDialog();
         Bundle args = new Bundle();
         args.putLong("favourite_stop_id", favouriteStop.getId());
+        args.putInt("default_minutes_warning", favouriteStop.MinutesWarning);
         args.putParcelable("trip_uid", trip.getTripUid());
         dialog.setArguments(args);
         dialog.show(getFragmentManager(), "SetAlarmDialog");
@@ -320,6 +322,12 @@ public class ViewFavouriteActivityFragment extends Fragment implements OcTranspo
         return new SetAlarmDialog.AlarmDialogListener() {
             @Override
             public void setAlarmAt(long favouriteStopId, TripUid tripUid, int minutesWarning) {
+                // first we save the chosen number of minutes warning for next time
+                FavouriteStop favouriteStop = FavouriteStop.findById(FavouriteStop.class, favouriteStopId);
+                favouriteStop.MinutesWarning = minutesWarning;
+                favouriteStop.save();
+
+                // Then we actually set the alarm
                 Intent intent = new Intent(getActivity(), AlarmService.class);
                 Log.d(TAG, "favouriteStopId = "+favouriteStopId);
                 intent.putExtra(AlarmService.ACTION, AlarmService.ACTION_NEW_ALARM);

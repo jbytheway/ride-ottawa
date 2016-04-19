@@ -109,6 +109,7 @@ public class Favourite extends SugarRecord {
     public void addStop(String stopId) {
         FavouriteStop stop = new FavouriteStop();
         stop.StopId = stopId;
+        stop.MinutesWarning = FavouriteStop.DEFAULT_MINUTES_WARNING;
         stop.Favourite = this;
         mPendingStops.add(stop);
     }

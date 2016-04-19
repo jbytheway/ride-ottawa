@@ -15,6 +15,8 @@ public class FavouriteStop extends SugarRecord {
     @SuppressWarnings("unused")
     private static final String TAG = "FavouriteStop";
 
+    public static final int DEFAULT_MINUTES_WARNING = 5;
+
     @SuppressWarnings("unused")
     public FavouriteStop() {
         // Required for Sugar
@@ -139,6 +141,7 @@ public class FavouriteStop extends SugarRecord {
     public String StopId;
     @SuppressWarnings("unused")
     public Favourite Favourite;
+    public int MinutesWarning;
 
     @Ignore
     private final ArrayList<FavouriteRoute> mPendingRoutes;

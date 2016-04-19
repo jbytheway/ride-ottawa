@@ -23,7 +23,7 @@
         <!-- This is the Sugar ORM database version -->
         <meta-data
             android:name="VERSION"
-            android:value="3" />
+            android:value="4" />
 
         <activity
             android:name=".ui.ListFavouritesActivity"
