@@ -29,31 +29,39 @@ public class Alarm {
         mTimeEstimate = mForthcomingTrip.getEstimatedArrival().getTime();
     }
 
-    interface OnRefreshedListener {
+    public interface OnRefreshedListener {
         void onRefreshed(Alarm alarm);
     }
 
-    Stop getStop() {
+    public Stop getStop() {
         return mStop;
     }
 
-    Route getRoute() {
+    public Route getRoute() {
         return mTrip.getRoute();
     }
 
-    Favourite getFavourite() {
+    public Favourite getFavourite() {
         return mFavourite;
     }
 
-    DateTime getTimeOfBus() {
+    public FavouriteStop getFavouriteStop() {
+        return mFavouriteStop;
+    }
+
+    public DateTime getTimeOfBus() {
         return mTimeEstimate;
     }
 
-    DateTime getTimeOfAlarm() {
+    public DateTime getTimeOfAlarm() {
         return mTimeEstimate.minusMinutes(mMinutesWarning);
     }
 
-    PendingAlarmData makePendingAlarmData(long timeToCheck) {
+    public ForthcomingTrip getForthcomingTrip() {
+        return mForthcomingTrip;
+    }
+
+    public PendingAlarmData makePendingAlarmData(long timeToCheck) {
         return new PendingAlarmData(mForthcomingTrip.getTripUid(), mFavouriteStop.getId(), mMinutesWarning, timeToCheck);
     }
 

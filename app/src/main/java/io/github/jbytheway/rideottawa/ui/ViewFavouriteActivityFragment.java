@@ -70,8 +70,6 @@ public class ViewFavouriteActivityFragment extends Fragment implements OcTranspo
 
     public ViewFavouriteActivityFragment() {
         // Required empty public constructor
-        mTimeFormatter = DateTimeFormat.forPattern("HH:mm");
-        mOttawaTimeZone = DateTimeZone.forID("America/Toronto");
     }
 
     @Override
@@ -86,7 +84,6 @@ public class ViewFavouriteActivityFragment extends Fragment implements OcTranspo
 
         mContext = getActivity();
         mOcTranspo = ((RideOttawaApplication) getActivity().getApplication()).getOcTranspo();
-        mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(mContext);
         // Need an empty list of trips to start with because the ListView will
         // be rendered before we get informed of our Favourite.
         mForthcomingTrips = new ArrayList<>();
@@ -111,6 +108,7 @@ public class ViewFavouriteActivityFragment extends Fragment implements OcTranspo
         });
 
         mTripList = (ListView) view.findViewById(R.id.trip_list);
+        mDisplayTripHelper = new DisplayTripHelper(getActivity());
 
         mTripAdapter = new IndirectArrayAdapter<>(
                 getActivity(),
@@ -122,118 +120,7 @@ public class ViewFavouriteActivityFragment extends Fragment implements OcTranspo
                         return mForthcomingTrips;
                     }
                 },
-                new IndirectArrayAdapter.ViewGenerator<ForthcomingTrip>() {
-                    @Override
-                    public void applyView(View v, final ForthcomingTrip trip) {
-                        TextView stop_code = (TextView) v.findViewById(R.id.stop_code);
-                        TextView stop_name = (TextView) v.findViewById(R.id.stop_name);
-                        TextView route_name = (TextView) v.findViewById(R.id.route_name);
-                        TextView head_sign = (TextView) v.findViewById(R.id.head_sign);
-                        TextView arrival_time_scheduled = (TextView) v.findViewById(R.id.arrival_time_scheduled);
-                        TextView arrival_time_estimated = (TextView) v.findViewById(R.id.arrival_time_estimated);
-                        TextView label_time_estimated = (TextView) v.findViewById(R.id.label_time_estimated);
-                        TextView minutes_away = (TextView) v.findViewById(R.id.minutes_away);
-                        TextView time_type = (TextView) v.findViewById(R.id.time_type);
-                        Stop stop = trip.getStop();
-                        stop_code.setText(stop.getCode());
-                        stop_name.setText(stop.getName(mContext));
-                        Route route = trip.getRoute();
-                        route.applyToTextView(route_name);
-                        String defaultWhatDestination = getString(R.string.pref_default_what_destination);
-                        String whatDestination = mSharedPreferences.getString(SettingsActivityFragment.PREF_WHAT_DESTINATION, defaultWhatDestination);
-                        switch (whatDestination) {
-                            case "headsign":
-                                head_sign.setText(trip.getHeadSign());
-                                break;
-                            case "final_stop": {
-                                String lastStopName = trip.getLastStop().getName(mContext);
-                                head_sign.setText(lastStopName);
-                                break;
-                            }
-                            case "chosen": {
-                                String destination = mChosenDestinations.get(stop).get(route);
-                                if (destination == null) {
-                                    // Fall back on trip end
-                                    String lastStopName = trip.getLastStop().getName(mContext);
-                                    head_sign.setText(lastStopName);
-                                } else {
-                                    head_sign.setText(destination);
-                                }
-                                break;
-                            }
-                            default:
-                                throw new AssertionError("Unexpected what_destination " + whatDestination);
-                        }
-                        arrival_time_scheduled.setText(mTimeFormatter.print(trip.getArrivalTime()));
-                        ArrivalEstimate ae = trip.getEstimatedArrival();
-                        DateTime estimatedArrival = ae.getTime();
-                        DateTime now = mOcTranspo.getNow().withZone(mOttawaTimeZone);
-                        long minutesAway = TimeUtils.minutesDifference(now, estimatedArrival);
-                        minutes_away.setText(getString(R.string.minutes_format, minutesAway));
-
-                        if (ae.getType() == ArrivalEstimate.Type.Schedule) {
-                            arrival_time_estimated.setVisibility(View.INVISIBLE);
-                            label_time_estimated.setVisibility(View.INVISIBLE);
-                        } else {
-                            arrival_time_estimated.setVisibility(View.VISIBLE);
-                            label_time_estimated.setVisibility(View.VISIBLE);
-                            arrival_time_estimated.setText(mTimeFormatter.print(estimatedArrival));
-                        }
-
-                        @ColorRes int arrivalTimeColour;
-                        @StringRes int timeTypeString;
-                        int estimationVisibility;
-
-                        switch (ae.getType()) {
-                            case Gps: {
-                                timeTypeString = R.string.gps_abbrev;
-                                arrivalTimeColour = R.color.time_gps;
-                                estimationVisibility = View.VISIBLE;
-                                break;
-                            }
-                            case GpsOld: case NoLongerGps: {
-                                timeTypeString = R.string.gps_old_abbrev;
-                                arrivalTimeColour = R.color.time_gps_old;
-                                estimationVisibility = View.VISIBLE;
-                                break;
-                            }
-                            case Schedule: {
-                                timeTypeString = R.string.scheduled_abbrev;
-                                arrivalTimeColour = R.color.time_scheduled;
-                                estimationVisibility = View.INVISIBLE;
-                                break;
-                            }
-                            case LastStop: {
-                                timeTypeString = R.string.last_stop_abbrev;
-                                arrivalTimeColour = R.color.time_scheduled;
-                                estimationVisibility = View.INVISIBLE;
-                                break;
-                            }
-                            default:
-                                throw new AssertionError("Unexpected estimate type "+ae.getType());
-                        }
-
-                        time_type.setText(getString(timeTypeString));
-
-                        if (minutesAway < 0) {
-                            arrivalTimeColour = R.color.time_past;
-                        }
-
-                        //noinspection deprecation
-                        int colour = getResources().getColor(arrivalTimeColour);
-                        minutes_away.setTextColor(colour);
-                        arrival_time_estimated.setTextColor(colour);
-
-                        // Set visibility
-                        arrival_time_estimated.setVisibility(estimationVisibility);
-                        label_time_estimated.setVisibility(estimationVisibility);
-
-                        // Override the above text if we are waiting for data
-                        if (trip.isWaitingForLiveData()) {
-                            time_type.setText(R.string.waiting_for_data_abbrev);
-                        }
-                    }
-                }
+                mDisplayTripHelper
         );
 
         mTripList.setAdapter(mTripAdapter);
@@ -294,21 +181,7 @@ public class ViewFavouriteActivityFragment extends Fragment implements OcTranspo
         if (actionBar != null) {
             actionBar.setTitle(mFavourite.Name);
         }
-        mChosenDestinations = new HashMap<>();
-        for (FavouriteStop stop : mFavourite.getStops()) {
-            HashMap<Route, String> destinationsByRoute = new HashMap<>();
-            for (FavouriteRoute favouriteRoute : stop.getRoutes()) {
-                String destinationId = favouriteRoute.Destination;
-                Route route = favouriteRoute.asRoute(mOcTranspo);
-                if (destinationId == null) {
-                    destinationsByRoute.put(route, null);
-                } else {
-                    Stop destination = mOcTranspo.getStop(destinationId);
-                    destinationsByRoute.put(route, destination.getName(mContext));
-                }
-            }
-            mChosenDestinations.put(stop.asStop(mOcTranspo), destinationsByRoute);
-        }
+        mDisplayTripHelper.addFavourite(mFavourite);
         refresh();
     }
 
@@ -507,19 +380,16 @@ public class ViewFavouriteActivityFragment extends Fragment implements OcTranspo
         dialog.show(getFragmentManager(), "HelpDialog");
     }
 
-    private final DateTimeZone mOttawaTimeZone;
     private Context mContext;
     private OcTranspoDataAccess mOcTranspo;
-    private SharedPreferences mSharedPreferences;
     private Handler mHandler;
     private Favourite mFavourite;
-    private HashMap<Stop, HashMap<Route, String>> mChosenDestinations;
     private ArrayList<ForthcomingTrip> mForthcomingTrips;
     private DateTime mLastRefresh;
     private boolean mRefreshingNow;
     private SwipeRefreshLayout mSwipeRefresh;
     private ListView mTripList;
     private IndirectArrayAdapter<ForthcomingTrip> mTripAdapter;
-    private final DateTimeFormatter mTimeFormatter;
+    private DisplayTripHelper mDisplayTripHelper;
 
 }

@@ -34,6 +34,7 @@ import java.util.List;
 import io.github.jbytheway.rideottawa.BuildConfig;
 import io.github.jbytheway.rideottawa.Favourite;
 import io.github.jbytheway.rideottawa.OcTranspoDataAccess;
+import io.github.jbytheway.rideottawa.PendingAlarmData;
 import io.github.jbytheway.rideottawa.RideOttawaApplication;
 import io.github.jbytheway.rideottawa.utils.IndirectArrayAdapter;
 import io.github.jbytheway.rideottawa.R;
@@ -148,13 +149,29 @@ public class ListFavouritesActivityFragment extends Fragment {
     }
 
     @Override
+    public void onPrepareOptionsMenu(Menu menu) {
+        super.onPrepareOptionsMenu(menu);
+
+        MenuItem alarms = menu.findItem(R.id.menu_alarms);
+        long numAlarms = PendingAlarmData.count(PendingAlarmData.class);
+
+        alarms.setVisible(numAlarms > 0);
+    }
+
+    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
-            case R.id.menu_settings:
+            case R.id.menu_alarms: {
+                Intent intent = new Intent(getActivity(), ListAlarmsActivity.class);
+                startActivity(intent);
+                return true;
+            }
+            case R.id.menu_settings: {
                 Intent intent = new Intent(getActivity(), SettingsActivity.class);
                 startActivity(intent);
                 return true;
-            case R.id.menu_database:
+            }
+            case R.id.menu_database: {
                 DatabaseCheckDialog databaseCheckDialog = new DatabaseCheckDialog();
                 String databaseEndDate;
                 String lastUpdateCheck;
@@ -172,10 +189,12 @@ public class ListFavouritesActivityFragment extends Fragment {
                 databaseCheckDialog.setArguments(args);
                 databaseCheckDialog.show(getActivity().getFragmentManager(), "DatabaseCheckDialog");
                 return true;
-            case R.id.menu_about:
+            }
+            case R.id.menu_about: {
                 AboutDialog aboutDialog = new AboutDialog();
                 aboutDialog.show(getActivity().getFragmentManager(), "AboutDialog");
                 return true;
+            }
             default:
                 return super.onOptionsItemSelected(item);
         }
