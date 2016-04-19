@@ -166,10 +166,11 @@ public class AlarmService extends IntentService {
         DateTime timeOfBus = alarm.getTimeOfBus();
         DateTime now = mOcTranspo.getNow();
         String routeName = alarm.getRoute().getName();
-        long minutesDifference = TimeUtils.minutesDifference(now, timeOfBus);
+        int minutesDifference = (int)TimeUtils.minutesDifference(now, timeOfBus);
         String busTimeFormatted = mTimeFormatter.print(timeOfBus);
 
-        String title = getString(R.string.alarm_notification_title, routeName, minutesDifference);
+        String minutesString = getResources().getQuantityString(R.plurals.minute_plural, minutesDifference, minutesDifference);
+        String title = getString(R.string.alarm_notification_title, routeName, minutesString);
         String text = getString(R.string.alarm_notification_text, routeName, alarm.getStop().getName(this), busTimeFormatted);
 
         Intent resultIntent = new Intent(this, ViewFavouriteActivity.class);
