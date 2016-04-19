@@ -39,6 +39,8 @@ public class AlarmService extends IntentService {
     private static final int ALARM_NOTIFICATION_ID = 1;
     private static final long[] VIBRATION_PATTERN = new long[]{0, 300, 200, 300};
 
+    private static final int SECONDS_IN_ADVANCE_TO_CHECK = 600;
+
     public AlarmService() {
         super("AlarmService");
 
@@ -108,7 +110,7 @@ public class AlarmService extends IntentService {
             // If under a minute away, wait until alarm should trigger
             // If more than 10 minutes away, wait until 10 minutes away
             // Otherwise, wait a minute
-            long secondsUntilNextCheck = Math.min(secondsUntilAlarm, Math.max(secondsUntilAlarm - 600, 60));
+            long secondsUntilNextCheck = Math.min(secondsUntilAlarm, Math.max(secondsUntilAlarm - SECONDS_IN_ADVANCE_TO_CHECK, 60));
             Log.d(TAG, "processAlarm: secondsUntilNextCheck = " + secondsUntilNextCheck);
             DateTime timeToCheck = now.plusSeconds((int) secondsUntilNextCheck);
             long millisToCheck = timeToCheck.getMillis();
