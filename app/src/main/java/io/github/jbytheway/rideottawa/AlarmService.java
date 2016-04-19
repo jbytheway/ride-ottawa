@@ -137,15 +137,22 @@ public class AlarmService extends IntentService {
 
     private void checkAlarms() {
         // This is called from AlarmReceiver when the Intent set up through the AlarmManager above fires
-        // We need to load the next alarm of interest, update it, and process it.
+        // We need to load all alarms that are within the check interval, update, and process them.
 
-        PendingAlarmData nextAlarmData = getNextAlarmData();
-        if (nextAlarmData == null) {
-            return;
+        DateTime now = mOcTranspo.getNow();
+        DateTime checkThreshold = now.plusSeconds(SECONDS_IN_ADVANCE_TO_CHECK);
+        long checkThresholdMillis = checkThreshold.getMillis();
+
+        List<PendingAlarmData> nextAlarmsList = PendingAlarmData.find(PendingAlarmData.class, null, null, null, "time_to_check", "1");
+        for (PendingAlarmData alarmData : nextAlarmsList) {
+            if (alarmData.getTimeToCheck() > checkThresholdMillis) {
+                // This alarm is far enough in the future we don't need to worry yet
+                break;
+            }
+            Alarm nextAlarm = alarmData.makeAlarm(mListener, mOcTranspo);
+            alarmData.delete();
+            nextAlarm.refreshTimeEstimate(this, mOcTranspo);
         }
-        Alarm nextAlarm = nextAlarmData.makeAlarm(mListener, mOcTranspo);
-        nextAlarmData.delete();
-        nextAlarm.refreshTimeEstimate(this, mOcTranspo);
     }
 
     private void triggerAlarm(Alarm alarm) {
