@@ -26,7 +26,8 @@ public class PendingAlarmData extends SugarRecord {
         FavouriteStop favouriteStop = FavouriteStop.findById(FavouriteStop.class, StopId);
 
         if (favouriteStop == null) {
-            throw new AssertionError("Invalid FavouriteStop id "+StopId);
+            // this can happen if the FavouriteStop was deleted while the alarm was active
+            return null;
         }
 
         DateTime midnight = mMidnightFormatter.parseDateTime(TripMidnight);

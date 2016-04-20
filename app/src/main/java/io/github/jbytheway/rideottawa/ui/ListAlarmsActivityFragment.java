@@ -115,8 +115,12 @@ public class ListAlarmsActivityFragment extends Fragment {
         alarms.clear();
         for (PendingAlarmData alarmData : ImmutableList.copyOf(PendingAlarmData.findAll(PendingAlarmData.class))) {
             Alarm alarm = alarmData.makeAlarm(listener, mOcTranspo);
-            alarms.add(new AlarmWithId(alarmData.getId(), alarm));
-            tripHelper.addFavouriteStop(alarm.getFavouriteStop());
+            if (alarm == null) {
+                alarmData.delete();
+            } else {
+                alarms.add(new AlarmWithId(alarmData.getId(), alarm));
+                tripHelper.addFavouriteStop(alarm.getFavouriteStop());
+            }
         }
     }
 

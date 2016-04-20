@@ -156,7 +156,9 @@ public class AlarmService extends IntentService {
             }
             Alarm nextAlarm = alarmData.makeAlarm(mListener, mOcTranspo);
             alarmData.delete();
-            nextAlarm.refreshTimeEstimate(this, mOcTranspo);
+            if (nextAlarm != null) {
+                nextAlarm.refreshTimeEstimate(this, mOcTranspo);
+            }
         }
     }
 
