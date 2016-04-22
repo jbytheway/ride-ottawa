@@ -78,7 +78,7 @@ public class OcTranspoDataAccess {
 
     private static final String[] STOP_COLUMNS = new String[]{"stops._id", "stops.stop_id", "stops.stop_code", "stops.stop_name"};
 
-    private static final String[] TRIP_COLUMNS = new String[]{"trips.trip_id"};
+    private static final String[] TRIP_COLUMNS = new String[]{"trips.trip_id", "trips.trip_headsign"};
 
     public Route getRoute(String routeName, int directionId) {
         SQLiteDatabase database = mHelper.getReadableDatabase();
@@ -258,6 +258,26 @@ public class OcTranspoDataAccess {
         return new Stop(stopId, stopCode, stopName);
     }
 
+    public Stop getLastStopOf(Trip trip) {
+        SQLiteDatabase database = mHelper.getReadableDatabase();
+
+        long tripId = trip.getId();
+        String cols = Joiner.on(", ").join(STOP_COLUMNS);
+        Cursor c = database.rawQuery(
+                "select "+cols+" " +
+                "from stops " +
+                "join stop_times on stop_times.stop_id = stops._id " +
+                "join trips on trips.trip_id = stop_times.trip_id " +
+                "where trips.trip_id = ? " +
+                "and stop_times.stop_sequence = trips.last_stop_sequence",
+                new String[]{""+tripId}
+        );
+        if (c.getCount() != 1) {
+            throw new AssertionError("Problem retrieving last stop of " + tripId);
+        }
+        return stopCursorToList(c).get(0);
+    }
+
     public List<Stop> stopCursorToList(Cursor c) {
         ArrayList<Stop> result = new ArrayList<>();
         if (c.moveToFirst()) {
@@ -301,14 +321,16 @@ public class OcTranspoDataAccess {
         int route_name_column = c.getColumnIndexOrThrow("route_short_name");
         int direction_column = c.getColumnIndexOrThrow("direction_id");
         int headsign_column = c.getColumnIndexOrThrow("route_modal_headsign");
+        int trip_headsign_column = c.getColumnIndexOrThrow("trip_headsign");
         int start_time_column = c.getColumnIndexOrThrow("arrival_time");
         String routeName = c.getString(route_name_column);
         int direction = c.getInt(direction_column);
         String modalHeadSign = c.getString(headsign_column);
+        String tripHeadSign = c.getString(trip_headsign_column);
         int startTime = c.getInt(start_time_column);
         c.close();
         Route route = new Route(routeName, direction, modalHeadSign);
-        return new Trip(id, route, startTime);
+        return new Trip(id, route, startTime, tripHeadSign);
     }
 
     public int getTimeAtStop(Trip trip, Stop stop) {

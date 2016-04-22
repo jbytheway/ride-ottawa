@@ -19,10 +19,11 @@ public class Alarm {
 
         mStop = favouriteStop.asStop(ocTranspo);
         mTrip = ocTranspo.getTrip(tripUid.getTripId());
+        Stop lastStop = ocTranspo.getLastStopOf(mTrip);
         int timeAtStop = ocTranspo.getTimeAtStop(mTrip, mStop);
 
         mForthcomingTrip =  new ForthcomingTrip(
-                mStop, mTrip.getRoute(), null, null, tripUid.getTripId(),
+                mStop, mTrip.getRoute(), mTrip.getHeadsign(), lastStop, tripUid.getTripId(),
                 tripUid.getMidnight(), timeAtStop, mTrip.getStartTime()
         );
 
