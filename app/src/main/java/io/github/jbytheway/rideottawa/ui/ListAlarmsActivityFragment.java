@@ -97,7 +97,10 @@ public class ListAlarmsActivityFragment extends Fragment {
                             @Override
                             public void onClick(View v) {
                                 PendingAlarmData alarmData = PendingAlarmData.findById(PendingAlarmData.class, alarmWithId.Id);
-                                PendingAlarmData.delete(alarmData);
+                                // If the alarm just went off, it might be deleted, so check for null
+                                if (alarmData != null) {
+                                    PendingAlarmData.delete(alarmData);
+                                }
                                 createAlarms(alarms, listener, tripHelper);
                                 mAlarmAdapter.notifyDataSetChanged();
                             }
