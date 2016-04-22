@@ -12,6 +12,8 @@ import android.widget.TextView;
 
 import com.google.common.collect.ImmutableList;
 
+import org.joda.time.DateTime;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -91,6 +93,14 @@ public class ListAlarmsActivityFragment extends Fragment {
                         Alarm alarm = alarmWithId.Alarm;
                         ForthcomingTrip trip = alarm.getForthcomingTrip();
                         tripHelper.applyView(v, trip);
+
+                        DateTime alarmTime = alarm.getTimeOfAlarm();
+
+                        TextView alarmTimeView = (TextView) v.findViewById(R.id.alarm_time);
+                        alarmTimeView.setText(tripHelper.formatTime(alarmTime));
+
+                        TextView alarmMinutesAway = (TextView) v.findViewById(R.id.alarm_minutes_away);
+                        tripHelper.formatMinutesAway(alarmTime, alarmMinutesAway);
 
                         Button deleteButton = (Button) v.findViewById(R.id.delete_button);
                         deleteButton.setOnClickListener(new View.OnClickListener() {

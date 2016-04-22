@@ -111,22 +111,10 @@ public class DisplayTripHelper implements IndirectArrayAdapter.ViewGenerator<For
             default:
                 throw new AssertionError("Unexpected what_destination " + whatDestination);
         }
-        arrival_time_scheduled.setText(mTimeFormatter.print(trip.getArrivalTime()));
+        arrival_time_scheduled.setText(formatTime(trip.getArrivalTime()));
         ArrivalEstimate ae = trip.getEstimatedArrival();
         DateTime estimatedArrival = ae.getTime();
-        DateTime now = mOcTranspo.getNow().withZone(mOttawaTimeZone);
-        long minutesAway = TimeUtils.minutesDifference(now, estimatedArrival);
-        minutes_away.setText(mContext.getString(R.string.minutes_format, minutesAway));
-        int minutesAwayAppearance;
-        if (minutesAway >= -199) {
-            minutesAwayAppearance = android.R.style.TextAppearance_DeviceDefault_Large;
-        } else if (minutesAway >= -999 ){
-            minutesAwayAppearance = android.R.style.TextAppearance_DeviceDefault_Medium;
-        } else {
-            minutesAwayAppearance = android.R.style.TextAppearance_DeviceDefault_Small;
-        }
-        //noinspection deprecation
-        minutes_away.setTextAppearance(mContext, minutesAwayAppearance);
+        long minutesAway = formatMinutesAway(estimatedArrival, minutes_away);
 
         if (ae.getType() == ArrivalEstimate.Type.Schedule) {
             arrival_time_estimated.setVisibility(View.INVISIBLE);
@@ -189,6 +177,28 @@ public class DisplayTripHelper implements IndirectArrayAdapter.ViewGenerator<For
         if (trip.isWaitingForLiveData()) {
             time_type.setText(R.string.waiting_for_data_abbrev);
         }
+    }
+
+    public String formatTime(DateTime time) {
+        return mTimeFormatter.print(time);
+    }
+
+    public long formatMinutesAway(DateTime time, TextView view) {
+        DateTime now = mOcTranspo.getNow().withZone(mOttawaTimeZone);
+        long minutesAway = TimeUtils.minutesDifference(now, time);
+        view.setText(mContext.getString(R.string.minutes_format, minutesAway));
+        int minutesAwayAppearance;
+        if (minutesAway >= -199) {
+            minutesAwayAppearance = android.R.style.TextAppearance_DeviceDefault_Large;
+        } else if (minutesAway >= -999 ){
+            minutesAwayAppearance = android.R.style.TextAppearance_DeviceDefault_Medium;
+        } else {
+            minutesAwayAppearance = android.R.style.TextAppearance_DeviceDefault_Small;
+        }
+        //noinspection deprecation
+        view.setTextAppearance(mContext, minutesAwayAppearance);
+
+        return minutesAway;
     }
 
     private final Context mContext;

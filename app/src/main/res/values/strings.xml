@@ -67,6 +67,7 @@
         <item quantity="one">%d minute</item>
         <item quantity="other">%d minutes</item>
     </plurals>
+    <string name="alarm_at">Alarm at</string>
 
     <!-- Strings related to Settings -->
     <string name="pref_title_download_wifi_only">Download databases on WiFi only</string>
