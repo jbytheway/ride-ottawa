@@ -132,6 +132,7 @@ public class ListAlarmsActivityFragment extends Fragment {
                 alarmData.delete();
             } else {
                 alarms.add(new AlarmWithId(alarmData.getId(), alarm));
+                alarm.refreshTimeEstimate(false, getActivity(), mOcTranspo);
                 tripHelper.addFavouriteStop(alarm.getFavouriteStop());
             }
         }

@@ -76,7 +76,7 @@ public class AlarmService extends IntentService {
                         favouriteStop, tripUid, minutesWarning,
                         mListener,
                         mOcTranspo
-                ).refreshTimeEstimate(this, mOcTranspo);
+                ).refreshTimeEstimate(true, this, mOcTranspo);
                 break;
             case ACTION_CHECK_ALARMS:
                 checkAlarms();
@@ -157,7 +157,7 @@ public class AlarmService extends IntentService {
             Alarm nextAlarm = alarmData.makeAlarm(mListener, mOcTranspo);
             alarmData.delete();
             if (nextAlarm != null) {
-                nextAlarm.refreshTimeEstimate(this, mOcTranspo);
+                nextAlarm.refreshTimeEstimate(true, this, mOcTranspo);
             }
         }
     }
