@@ -90,12 +90,12 @@ public class Alarm {
         }
     }
 
-    public void refreshTimeEstimate(boolean synchronously, Context context, OcTranspoDataAccess ocTranspo) {
+    public void refreshTimeEstimate(OcTranspoApi.Synchronicity synchronicity, Context context, OcTranspoDataAccess ocTranspo) {
         ArrayList<ForthcomingTrip> forthcomingTrips = new ArrayList<>();
         forthcomingTrips.add(mForthcomingTrip);
 
         Log.d(TAG, "Alarm getting live data");
-        ocTranspo.getLiveDataForTrips(context, forthcomingTrips, synchronously, new OcTranspoApi.Listener() {
+        ocTranspo.getLiveDataForTrips(context, forthcomingTrips, synchronicity, new OcTranspoApi.Listener() {
             @Override
             public void onApiFail(@Nullable Exception e) {
                 Log.d(TAG, "onApiFail: exception=" + e);

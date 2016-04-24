@@ -526,7 +526,7 @@ public class OcTranspoDataAccess {
         return result;
     }
 
-    public void getLiveDataForTrips(Context context, Collection<ForthcomingTrip> trips, boolean synchronously, OcTranspoApi.Listener apiListener) {
+    public void getLiveDataForTrips(Context context, Collection<ForthcomingTrip> trips, OcTranspoApi.Synchronicity synchronicity, OcTranspoApi.Listener apiListener) {
         // Uniqify the info we need to pass to the API
         // FIXME: Do we worry about cases where we don't think there should be a bus (because the last one was too long ago)
         // but in fact there is (because the last one is very late)?  Currently such will not be caught.
@@ -539,7 +539,7 @@ public class OcTranspoDataAccess {
 
         // Trigger all those queries
         for (Map.Entry<TimeQuery, Collection<ForthcomingTrip>> entry : queries.asMap().entrySet()) {
-            mApi.queryTimes(context, entry.getKey(), entry.getValue(), synchronously, apiListener);
+            mApi.queryTimes(context, entry.getKey(), entry.getValue(), synchronicity, apiListener);
         }
     }
 

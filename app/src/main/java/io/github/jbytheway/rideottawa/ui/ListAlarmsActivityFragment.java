@@ -22,6 +22,7 @@ import java.util.List;
 
 import io.github.jbytheway.rideottawa.Alarm;
 import io.github.jbytheway.rideottawa.ForthcomingTrip;
+import io.github.jbytheway.rideottawa.OcTranspoApi;
 import io.github.jbytheway.rideottawa.OcTranspoDataAccess;
 import io.github.jbytheway.rideottawa.PendingAlarmData;
 import io.github.jbytheway.rideottawa.R;
@@ -184,7 +185,7 @@ public class ListAlarmsActivityFragment extends Fragment {
         // First we check if we're already refreshing (very unlikely, because we force a fairly
         // long delay between refreshes)
         for (AlarmWithId alarmWithId : mAlarms) {
-            alarmWithId.Alarm.refreshTimeEstimate(false, getActivity(), mOcTranspo);
+            alarmWithId.Alarm.refreshTimeEstimate(OcTranspoApi.Synchronicity.Asyncronous, getActivity(), mOcTranspo);
         }
 
         mLastRefresh = DateTime.now();

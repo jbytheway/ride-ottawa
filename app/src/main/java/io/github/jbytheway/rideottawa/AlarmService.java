@@ -77,7 +77,7 @@ public class AlarmService extends IntentService {
                         mListener,
                         null,
                         mOcTranspo
-                ).refreshTimeEstimate(true, this, mOcTranspo);
+                ).refreshTimeEstimate(OcTranspoApi.Synchronicity.Syncronous, this, mOcTranspo);
                 break;
             case ACTION_CHECK_ALARMS:
                 checkAlarms();
@@ -158,7 +158,7 @@ public class AlarmService extends IntentService {
             }
             Alarm nextAlarm = alarmData.makeAlarm(mListener, mOcTranspo);
             if (nextAlarm != null) {
-                nextAlarm.refreshTimeEstimate(true, this, mOcTranspo);
+                nextAlarm.refreshTimeEstimate(OcTranspoApi.Synchronicity.Syncronous, this, mOcTranspo);
             }
         }
     }
