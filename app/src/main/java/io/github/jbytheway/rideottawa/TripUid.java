@@ -9,12 +9,12 @@ import java.util.Objects;
 
 public class TripUid implements Parcelable {
     public TripUid(int id, DateTime midnight) {
-        mId = id;
+        mTripId = id;
         mMidnight = midnight;
     }
 
     public int getTripId() {
-        return mId;
+        return mTripId;
     }
 
     public DateTime getMidnight() {
@@ -25,7 +25,7 @@ public class TripUid implements Parcelable {
     public boolean equals(Object o) {
         if (o instanceof TripUid) {
             TripUid other = (TripUid) o;
-            return mId == other.mId && mMidnight.equals(other.mMidnight);
+            return mTripId == other.mTripId && mMidnight.equals(other.mMidnight);
         }
 
         return false;
@@ -33,7 +33,7 @@ public class TripUid implements Parcelable {
 
     @Override
     public int hashCode() {
-        return Objects.hash(mId, mMidnight);
+        return Objects.hash(mTripId, mMidnight);
     }
 
     public int describeContents() {
@@ -41,7 +41,7 @@ public class TripUid implements Parcelable {
     }
 
     public void writeToParcel(Parcel out, int flags) {
-        out.writeInt(mId);
+        out.writeInt(mTripId);
         out.writeSerializable(mMidnight);
     }
 
@@ -57,6 +57,6 @@ public class TripUid implements Parcelable {
         }
     };
 
-    private final int mId;
+    private final int mTripId;
     private final DateTime mMidnight;
 }
