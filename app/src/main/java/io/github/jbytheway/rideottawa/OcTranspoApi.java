@@ -66,10 +66,9 @@ public class OcTranspoApi {
      */
     public void queryTimes(final Context context, final TimeQuery query, final Collection<ForthcomingTrip> trips, boolean synchronously, final Listener listener) {
         // curl -d "appID=${appId}&apiKey=${apiKey}&stopNo=${stopCode}&routeNo=${routeName}&format=json" https://api.octranspo1.com/v1.2/GetNextTripsForStop
-        final String stopCode = query.StopCode;
         final String routeName = query.Route.getName();
 
-        Log.d(TAG, "Submitting API query, stopCode="+stopCode+", routeName="+routeName);
+        Log.d(TAG, "Submitting API query, stopCode="+query.StopCodeToQuery+", routeName="+routeName);
 
         // We generally prefer using the Ion library (asynchronously) but in some circomstances
         // we need a synchronous version instead, so we offer these two complete implementations
@@ -90,7 +89,7 @@ public class OcTranspoApi {
                 Uri.Builder builder = new Uri.Builder()
                         .appendQueryParameter("appID", mAppId)
                         .appendQueryParameter("apiKey", mApiKey)
-                        .appendQueryParameter("stopNo", stopCode)
+                        .appendQueryParameter("stopNo", query.StopCodeToQuery)
                         .appendQueryParameter("routeNo", routeName)
                         .appendQueryParameter("format", "json");
                 String postContent = builder.build().getEncodedQuery();
@@ -104,13 +103,13 @@ public class OcTranspoApi {
 
                 conn.connect();
 
-                int code = conn.getResponseCode();
+                int responseCode = conn.getResponseCode();
 
                 InputStream is = conn.getInputStream();
                 InputStreamReader isr = new InputStreamReader(is, "UTF-8");
                 String result = CharStreams.toString(isr);
 
-                processStringResponse(context, query, trips, code, result, null, listener);
+                processStringResponse(context, query, trips, responseCode, result, null, listener);
             } catch (IOException e) {
                 listener.onApiFail(e);
             } finally {
@@ -124,7 +123,7 @@ public class OcTranspoApi {
                     .load(NEXT_TRIPS_URL)
                     .setBodyParameter("appID", mAppId)
                     .setBodyParameter("apiKey", mApiKey)
-                    .setBodyParameter("stopNo", stopCode)
+                    .setBodyParameter("stopNo", query.StopCodeToQuery)
                     .setBodyParameter("routeNo", routeName)
                     .setBodyParameter("format", "json")
                     .asString()
@@ -176,9 +175,9 @@ public class OcTranspoApi {
     private void ProcessJsonResponse(Context context, String jsonString, TimeQuery query, Collection<ForthcomingTrip> trips) throws JSONException {
         JSONObject json = new JSONObject(jsonString);
         JSONArray routeDirections = GetArrayOrObject(json.getJSONObject("GetNextTripsForStopResult").getJSONObject("Route"), "RouteDirection");
-        final String stopCode = query.StopCode;
+        final String stopCodeToQuery = query.StopCodeToQuery;
         final String routeName = query.Route.getName();
-        Log.d(TAG, "Response for stop "+stopCode+", route "+routeName+" has "+routeDirections.length()+" entries");
+        Log.d(TAG, "Response for stop "+stopCodeToQuery+", route "+routeName+" has "+routeDirections.length()+" entries");
 
         // Before we start messing with the actual JSON, we inform each trip that they have received a response
         for (ForthcomingTrip trip : trips) {
@@ -194,7 +193,7 @@ public class OcTranspoApi {
             // wait for that, so we cache the results, and if the cache lacks
             // the value right now, don't worry about it (but fire off a job
             // to fill the cache)
-            DirectionKey key = new DirectionKey(stopCode, query.Route);
+            DirectionKey key = new DirectionKey(stopCodeToQuery, query.Route);
 
             if (mDirectionCache.containsKey(key)) {
                 apiDirection = mDirectionCache.get(key);

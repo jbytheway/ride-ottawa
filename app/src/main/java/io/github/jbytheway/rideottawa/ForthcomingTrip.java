@@ -5,7 +5,16 @@ import org.joda.time.DateTime;
 import java.util.Comparator;
 
 public class ForthcomingTrip {
-    public ForthcomingTrip(Stop stop, Route route, String headSign, Stop lastStop, int tripId, DateTime midnight, int time, int startTime) {
+    public ForthcomingTrip(
+            Stop stop,
+            Route route,
+            String headSign,
+            Stop lastStop,
+            int tripId,
+            DateTime midnight,
+            int time,
+            int startTime
+    ) {
         mStop = stop;
         mRoute = route;
         mHeadSign = headSign;
@@ -14,6 +23,11 @@ public class ForthcomingTrip {
         mMidnight = midnight;
         mTime = time;
         mStartTime = startTime;
+    }
+
+    public void useSecondStop(Stop secondStop, int secondStopTime) {
+        mSecondStop = secondStop;
+        mGpsTimeOffset = mTime - secondStopTime;
     }
 
     public static class CompareEstimatedArrivals implements Comparator<ForthcomingTrip> {
@@ -50,6 +64,13 @@ public class ForthcomingTrip {
     }
 
     public TripUid getTripUid() { return new TripUid(getTripId(), mMidnight); }
+
+    public Stop getStopToQuery() {
+        if (mSecondStop != null) {
+            return mSecondStop;
+        }
+        return mStop;
+    }
 
     public boolean isWaitingForLiveData() { return mWaitingForLiveData; }
 
@@ -90,6 +111,9 @@ public class ForthcomingTrip {
 
     public void provideLiveData(DateTime processingTime, int minutesAway, double estimateAge) {
         mEstimatedArrival = processingTime.plusMinutes(minutesAway);
+        if (mSecondStop != null) {
+            mEstimatedArrival = mEstimatedArrival.plusMinutes(mGpsTimeOffset);
+        }
         mEstimateAge = estimateAge;
         mNoGpsOnLastData = false;
     }
@@ -102,6 +126,10 @@ public class ForthcomingTrip {
     private final DateTime mMidnight; // the origin from which times are measured
     private final int mTime;
     private final int mStartTime;
+
+    private Stop mSecondStop;
+    private int mGpsTimeOffset;
+
     private boolean mWaitingForLiveData;
     private boolean mNoGpsOnLastData;
     private DateTime mEstimatedArrival;

@@ -390,8 +390,13 @@ public class OcTranspoDataAccess {
         String query =
                 "select stops.stop_id, stops.stop_code, stops.stop_name, " +
                 "route_short_name, trips.direction_id, " +
-                "trips.trip_id, trip_headsign, date, stop_times.arrival_time, " +
+                "trips.trip_id, trip_headsign, date, " +
+                "stop_times.arrival_time, stop_times.stop_sequence, " +
                 "start_stop_time.arrival_time as start_arrival_time, " +
+                "second_stop_time.arrival_time as second_arrival_time, " +
+                "second_stop.stop_id as second_stop_id, " +
+                "second_stop.stop_code as second_stop_code, " +
+                "second_stop.stop_name as second_stop_name, " +
                 "last_stop.stop_id as last_stop_id, " +
                 "last_stop.stop_code as last_stop_code, " +
                 "last_stop.stop_name as last_stop_name, " +
@@ -402,6 +407,8 @@ public class OcTranspoDataAccess {
                 "join directed_routes on trips.route_id = directed_routes.route_id " +
                 "join stops on stop_times.stop_id = stops._id " +
                 "join stop_times as start_stop_time on start_stop_time.trip_id = trips.trip_id " +
+                "join stop_times as second_stop_time on second_stop_time.trip_id = trips.trip_id " +
+                "join stops as second_stop on second_stop._id = second_stop_time.stop_id " +
                 "join stop_times as last_stop_time on last_stop_time.trip_id = trips.trip_id " +
                 "join stops as last_stop on last_stop._id = last_stop_time.stop_id " +
                 extraJoin +
@@ -412,6 +419,7 @@ public class OcTranspoDataAccess {
                 "and days.date = ? " +
                 "and stop_times.arrival_time >= ? " +
                 "and start_stop_time.stop_sequence = 1 " +
+                "and second_stop_time.stop_sequence = 2 " +
                 "and last_stop_time.stop_sequence = trips.last_stop_sequence " +
                 extraWhere +
                 "order by stop_times.arrival_time " +
@@ -429,6 +437,9 @@ public class OcTranspoDataAccess {
             int stop_id_column = c.getColumnIndex("stop_id");
             int stop_code_column = c.getColumnIndex("stop_code");
             int stop_name_column = c.getColumnIndex("stop_name");
+            int second_stop_id_column = c.getColumnIndex("second_stop_id");
+            int second_stop_code_column = c.getColumnIndex("second_stop_code");
+            int second_stop_name_column = c.getColumnIndex("second_stop_name");
             int last_stop_id_column = c.getColumnIndex("last_stop_id");
             int last_stop_code_column = c.getColumnIndex("last_stop_code");
             int last_stop_name_column = c.getColumnIndex("last_stop_name");
@@ -440,6 +451,8 @@ public class OcTranspoDataAccess {
             int date_column = c.getColumnIndex("date");
             int arrival_time_column = c.getColumnIndex("arrival_time");
             int start_time_column = c.getColumnIndex("start_arrival_time");
+            int stop_sequence_column = c.getColumnIndex("stop_sequence");
+            int second_time_column = c.getColumnIndex("second_arrival_time");
 
             while (true) {
                 String stopId = c.getString(stop_id_column);
@@ -456,12 +469,27 @@ public class OcTranspoDataAccess {
                 String date = c.getString(date_column);
                 int arrivalTime = c.getInt(arrival_time_column);
                 int startTime = c.getInt(start_time_column);
+                int stopSequence = c.getInt(stop_sequence_column);
                 DateTime midnight = mIsoDateFormatter.parseDateTime(date).withZoneRetainFields(mOttawaTimeZone);
                 //Log.d(TAG, "arrivalTime="+arrivalTime+", startTime="+startTime);
                 Stop stop = new Stop(stopId, stopCode, stopName);
                 Stop lastStop = new Stop(lastStopId, lastStopCode, lastStopName);
                 Route route = new Route(routeName, direction, modalHeadsign);
-                result.add(new ForthcomingTrip(stop, route, headsign, lastStop, trip_id, midnight, arrivalTime, startTime));
+                ForthcomingTrip forthcomingTrip =
+                        new ForthcomingTrip(stop, route, headsign, lastStop, trip_id, midnight, arrivalTime, startTime);
+
+                if (stopSequence == 1) {
+                    // There is no GPS data for first stops, so we substitute the second stop
+                    String secondStopId = c.getString(second_stop_id_column);
+                    String secondStopCode = c.getString(second_stop_code_column);
+                    String secondStopName = c.getString(second_stop_name_column);
+                    int secondArrivalTime = c.getInt(second_time_column);
+
+                    Stop secondStop = new Stop(secondStopId, secondStopCode, secondStopName);
+                    forthcomingTrip.useSecondStop(secondStop, secondArrivalTime);
+                }
+
+                result.add(forthcomingTrip);
 
                 if (!c.moveToNext()) {
                     break;
@@ -478,7 +506,8 @@ public class OcTranspoDataAccess {
         // but in fact there is (because the last one is very late)?  Currently such will not be caught.
         HashMultimap<TimeQuery, ForthcomingTrip> queries = HashMultimap.create();
         for (ForthcomingTrip trip : trips) {
-            TimeQuery query = new TimeQuery(trip.getStop().getCode(), trip.getRoute());
+            Stop stopToQuery = trip.getStopToQuery();
+            TimeQuery query = new TimeQuery(trip.getStop().getCode(), stopToQuery.getCode(), trip.getRoute());
             queries.put(query, trip);
         }
 
