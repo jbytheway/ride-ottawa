@@ -59,7 +59,7 @@ public class OcTranspoDataAccess {
             SQLiteDatabase database = mHelper.getReadableDatabase();
             Cursor c = database.rawQuery(
                     "select date from days order by date desc limit 1", new String[]{});
-            int col = c.getColumnIndex("date");
+            int col = c.getColumnIndexOrThrow("date");
             c.moveToFirst();
             String date = c.getString(col);
             c.close();
@@ -156,10 +156,10 @@ public class OcTranspoDataAccess {
     public List<Route> routeCursorToList(Cursor c) {
         ArrayList<Route> result = new ArrayList<>();
         if (c.moveToFirst()) {
-            //int id_column = c.getColumnIndex("route_id");
-            int name_column = c.getColumnIndex("route_short_name");
-            int direction_column = c.getColumnIndex("direction_id");
-            int headsign_column = c.getColumnIndex("route_modal_headsign");
+            //int id_column = c.getColumnIndexOrThrow("route_id");
+            int name_column = c.getColumnIndexOrThrow("route_short_name");
+            int direction_column = c.getColumnIndexOrThrow("direction_id");
+            int headsign_column = c.getColumnIndexOrThrow("route_modal_headsign");
 
             while (true) {
                 //String id = c.getString(id_column);
@@ -236,8 +236,8 @@ public class OcTranspoDataAccess {
             throw new AssertionError("Requested invalid StopId " + stopId);
         }
         c.moveToFirst();
-        int stopCodeColumn = c.getColumnIndex("stop_code");
-        int stopNameColumn = c.getColumnIndex("stop_name");
+        int stopCodeColumn = c.getColumnIndexOrThrow("stop_code");
+        int stopNameColumn = c.getColumnIndexOrThrow("stop_name");
         String stopCode = c.getString(stopCodeColumn);
         String stopName = c.getString(stopNameColumn);
         c.close();
@@ -252,9 +252,9 @@ public class OcTranspoDataAccess {
         }
         // FIXME duplicating stopCursorToList
         c.moveToFirst();
-        int stopIdColumn = c.getColumnIndex("stop_id");
-        int stopCodeColumn = c.getColumnIndex("stop_code");
-        int stopNameColumn = c.getColumnIndex("stop_name");
+        int stopIdColumn = c.getColumnIndexOrThrow("stop_id");
+        int stopCodeColumn = c.getColumnIndexOrThrow("stop_code");
+        int stopNameColumn = c.getColumnIndexOrThrow("stop_name");
         String stopId = c.getString(stopIdColumn);
         String stopCode = c.getString(stopCodeColumn);
         String stopName = c.getString(stopNameColumn);
@@ -305,9 +305,9 @@ public class OcTranspoDataAccess {
     public List<Stop> stopCursorToList(Cursor c) {
         ArrayList<Stop> result = new ArrayList<>();
         if (c.moveToFirst()) {
-            int stopIdColumn = c.getColumnIndex("stop_id");
-            int stopCodeColumn = c.getColumnIndex("stop_code");
-            int stopNameColumn = c.getColumnIndex("stop_name");
+            int stopIdColumn = c.getColumnIndexOrThrow("stop_id");
+            int stopCodeColumn = c.getColumnIndexOrThrow("stop_code");
+            int stopNameColumn = c.getColumnIndexOrThrow("stop_name");
 
             while (true) {
                 String stopId = c.getString(stopIdColumn);
@@ -371,8 +371,8 @@ public class OcTranspoDataAccess {
             throw new AssertionError("Invalid Time at Stop " + trip.getId() + ", " + stop.getId());
         }
         c.moveToFirst();
-        int arrival_time_column = c.getColumnIndex("arrival_time");
-        int stop_sequence_column = c.getColumnIndex("stop_sequence");
+        int arrival_time_column = c.getColumnIndexOrThrow("arrival_time");
+        int stop_sequence_column = c.getColumnIndexOrThrow("stop_sequence");
         int arrivalTime = c.getInt(arrival_time_column);
         int stopSequence = c.getInt(stop_sequence_column);
         c.close();
@@ -460,25 +460,25 @@ public class OcTranspoDataAccess {
     public List<ForthcomingTrip> stopTimeCursorToList(Cursor c) {
         ArrayList<ForthcomingTrip> result = new ArrayList<>();
         if (c.moveToFirst()) {
-            int stop_id_column = c.getColumnIndex("stop_id");
-            int stop_code_column = c.getColumnIndex("stop_code");
-            int stop_name_column = c.getColumnIndex("stop_name");
-            int second_stop_id_column = c.getColumnIndex("second_stop_id");
-            int second_stop_code_column = c.getColumnIndex("second_stop_code");
-            int second_stop_name_column = c.getColumnIndex("second_stop_name");
-            int last_stop_id_column = c.getColumnIndex("last_stop_id");
-            int last_stop_code_column = c.getColumnIndex("last_stop_code");
-            int last_stop_name_column = c.getColumnIndex("last_stop_name");
-            int route_name_column = c.getColumnIndex("route_short_name");
-            int route_modal_headsign_column = c.getColumnIndex("route_modal_headsign");
-            int direction_column = c.getColumnIndex("direction_id");
-            int head_sign_column = c.getColumnIndex("trip_headsign");
-            int trip_id_column = c.getColumnIndex("trip_id");
-            int date_column = c.getColumnIndex("date");
-            int arrival_time_column = c.getColumnIndex("arrival_time");
-            int start_time_column = c.getColumnIndex("start_arrival_time");
-            int stop_sequence_column = c.getColumnIndex("stop_sequence");
-            int second_time_column = c.getColumnIndex("second_arrival_time");
+            int stop_id_column = c.getColumnIndexOrThrow("stop_id");
+            int stop_code_column = c.getColumnIndexOrThrow("stop_code");
+            int stop_name_column = c.getColumnIndexOrThrow("stop_name");
+            int second_stop_id_column = c.getColumnIndexOrThrow("second_stop_id");
+            int second_stop_code_column = c.getColumnIndexOrThrow("second_stop_code");
+            int second_stop_name_column = c.getColumnIndexOrThrow("second_stop_name");
+            int last_stop_id_column = c.getColumnIndexOrThrow("last_stop_id");
+            int last_stop_code_column = c.getColumnIndexOrThrow("last_stop_code");
+            int last_stop_name_column = c.getColumnIndexOrThrow("last_stop_name");
+            int route_name_column = c.getColumnIndexOrThrow("route_short_name");
+            int route_modal_headsign_column = c.getColumnIndexOrThrow("route_modal_headsign");
+            int direction_column = c.getColumnIndexOrThrow("direction_id");
+            int head_sign_column = c.getColumnIndexOrThrow("trip_headsign");
+            int trip_id_column = c.getColumnIndexOrThrow("trip_id");
+            int date_column = c.getColumnIndexOrThrow("date");
+            int arrival_time_column = c.getColumnIndexOrThrow("arrival_time");
+            int start_time_column = c.getColumnIndexOrThrow("start_arrival_time");
+            int stop_sequence_column = c.getColumnIndexOrThrow("stop_sequence");
+            int second_time_column = c.getColumnIndexOrThrow("second_arrival_time");
 
             while (true) {
                 String stopId = c.getString(stop_id_column);
