@@ -32,11 +32,15 @@ public class PendingAlarmData extends SugarRecord {
 
         DateTime midnight = mMidnightFormatter.parseDateTime(TripMidnight);
 
-        return new Alarm(favouriteStop, new TripUid(TripId, midnight), MinutesWarning, listener, ocTranspo);
+        return new Alarm(favouriteStop, new TripUid(TripId, midnight), MinutesWarning, listener, this, ocTranspo);
     }
 
     public long getTimeToCheck() {
         return TimeToCheck;
+    }
+
+    public void setTimeToCheck(long timeToCheck) {
+        TimeToCheck = timeToCheck;
     }
 
     private int TripId;

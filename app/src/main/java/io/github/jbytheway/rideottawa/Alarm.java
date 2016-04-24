@@ -11,11 +11,12 @@ import java.util.ArrayList;
 public class Alarm {
     private static final String TAG = "Alarm";
 
-    public Alarm(FavouriteStop favouriteStop, TripUid tripUid, int minutesWarning, OnRefreshedListener listener, OcTranspoDataAccess ocTranspo) {
+    public Alarm(FavouriteStop favouriteStop, TripUid tripUid, int minutesWarning, OnRefreshedListener listener, PendingAlarmData fromPendingData, OcTranspoDataAccess ocTranspo) {
         mFavouriteStop = favouriteStop;
         mFavourite = favouriteStop.Favourite;
         mMinutesWarning = minutesWarning;
         mOnRefreshedListener = listener;
+        mFromPendingData = fromPendingData;
 
         mStop = favouriteStop.asStop(ocTranspo);
         mTrip = ocTranspo.getTrip(tripUid.getTripId());
@@ -63,7 +64,19 @@ public class Alarm {
     }
 
     public PendingAlarmData makePendingAlarmData(long timeToCheck) {
-        return new PendingAlarmData(mForthcomingTrip.getTripUid(), mFavouriteStop.getId(), mMinutesWarning, timeToCheck);
+        // We try to update the existing PendingAlarmData where possible
+        if (mFromPendingData == null) {
+            return new PendingAlarmData(mForthcomingTrip.getTripUid(), mFavouriteStop.getId(), mMinutesWarning, timeToCheck);
+        } else {
+            mFromPendingData.setTimeToCheck(timeToCheck);
+            return mFromPendingData;
+        }
+    }
+
+    public void delete() {
+        if (mFromPendingData != null) {
+            mFromPendingData.delete();
+        }
     }
 
     public void refreshTimeEstimate(boolean synchronously, Context context, OcTranspoDataAccess ocTranspo) {
@@ -96,5 +109,6 @@ public class Alarm {
     private final int mMinutesWarning;
     private final ForthcomingTrip mForthcomingTrip;
     private final OnRefreshedListener mOnRefreshedListener;
+    private final PendingAlarmData mFromPendingData;
     private DateTime mTimeEstimate;
 }

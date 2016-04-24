@@ -75,6 +75,7 @@ public class AlarmService extends IntentService {
                 new Alarm(
                         favouriteStop, tripUid, minutesWarning,
                         mListener,
+                        null,
                         mOcTranspo
                 ).refreshTimeEstimate(true, this, mOcTranspo);
                 break;
@@ -107,6 +108,7 @@ public class AlarmService extends IntentService {
         Log.d(TAG, "processAlarm now=" + now + ", timeForAlarm=" + timeForAlarm);
         if (now.isAfter(timeForAlarm)) {
             triggerAlarm(alarm);
+            alarm.delete();
         } else {
             Duration timeToWait = new Interval(now, timeForAlarm).toDuration();
             long secondsUntilAlarm = timeToWait.getStandardSeconds();
@@ -155,7 +157,6 @@ public class AlarmService extends IntentService {
                 break;
             }
             Alarm nextAlarm = alarmData.makeAlarm(mListener, mOcTranspo);
-            alarmData.delete();
             if (nextAlarm != null) {
                 nextAlarm.refreshTimeEstimate(true, this, mOcTranspo);
             }
