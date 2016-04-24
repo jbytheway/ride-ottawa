@@ -62,7 +62,7 @@ public class ListFavouritesActivityFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_list_favourites, container, false);
+        View view = inflater.inflate(R.layout.list_favourites_fragment, container, false);
 
         mNoFavouritesHint = (TextView) view.findViewById(R.id.no_favourites_hint);
         mEditFavouriteHint = (TextView) view.findViewById(R.id.list_favourites_hint);

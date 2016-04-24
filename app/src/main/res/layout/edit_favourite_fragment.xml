@@ -27,7 +27,7 @@
                 android:text="@string/name_label"
                 android:id="@+id/name_label"
                 android:layout_centerVertical="true"
-                android:labelFor="@id/name" />
+                android:labelFor="@+id/name" />
 
             <EditText
                 android:layout_width="fill_parent"

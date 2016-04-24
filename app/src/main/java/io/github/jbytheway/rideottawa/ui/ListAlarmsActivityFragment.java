@@ -1,8 +1,6 @@
 package io.github.jbytheway.rideottawa.ui;
 
 import android.app.Fragment;
-import android.content.Context;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -20,7 +18,6 @@ import com.google.common.collect.ImmutableList;
 import org.joda.time.DateTime;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import io.github.jbytheway.rideottawa.Alarm;
@@ -64,7 +61,7 @@ public class ListAlarmsActivityFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_list_alarms, container, false);
+        View view = inflater.inflate(R.layout.list_alarms_fragment, container, false);
 
         TextView noAlarmsMessage = (TextView) view.findViewById(R.id.no_alarms_message);
         long numAlarms = PendingAlarmData.count(PendingAlarmData.class);

@@ -89,7 +89,7 @@ public class SelectStopActivity extends AppCompatActivity implements GoogleApiCl
 
         mStopList = new ArrayList<>();
 
-        setContentView(R.layout.activity_select_stop);
+        setContentView(R.layout.select_stop_activity);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 

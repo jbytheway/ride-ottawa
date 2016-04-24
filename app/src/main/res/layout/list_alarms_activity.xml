@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fitsSystemWindows="true"
-    tools:context=".ui.EditFavouriteActivity">
+    tools:context=".ui.ViewFavouriteActivity">
 
     <android.support.design.widget.AppBarLayout
         android:layout_width="match_parent"
@@ -23,10 +23,10 @@
 
     <fragment
         android:id="@+id/fragment"
-        android:name="io.github.jbytheway.rideottawa.ui.EditFavouriteActivityFragment"
+        android:name="io.github.jbytheway.rideottawa.ui.ListAlarmsActivityFragment"
         android:layout_marginTop="?android:attr/actionBarSize"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:layout="@layout/fragment_edit_favourite" />
+        tools:layout="@layout/list_alarms_fragment" />
 
 </android.support.design.widget.CoordinatorLayout>

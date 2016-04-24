@@ -77,7 +77,7 @@ public class ViewFavouriteActivityFragment extends Fragment implements OcTranspo
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_view_favourite, container, false);
+        View view = inflater.inflate(R.layout.view_favourite_fragment, container, false);
 
         mSwipeRefresh = (SwipeRefreshLayout) view.findViewById(R.id.trip_list_swiper);
         mSwipeRefresh.setColorSchemeResources(R.color.colorPrimaryDark);
