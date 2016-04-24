@@ -258,6 +258,26 @@ public class OcTranspoDataAccess {
         return new Stop(stopId, stopCode, stopName);
     }
 
+    public Stop getNthStopOf(int stopSequence, Trip trip) {
+        SQLiteDatabase database = mHelper.getReadableDatabase();
+
+        long tripId = trip.getId();
+        String cols = Joiner.on(", ").join(STOP_COLUMNS);
+        Cursor c = database.rawQuery(
+                "select "+cols+" " +
+                        "from stops " +
+                        "join stop_times on stop_times.stop_id = stops._id " +
+                        "join trips on trips.trip_id = stop_times.trip_id " +
+                        "where trips.trip_id = ? " +
+                        "and stop_times.stop_sequence = ?",
+                new String[]{""+tripId, ""+stopSequence}
+        );
+        if (c.getCount() != 1) {
+            throw new AssertionError("Problem retrieving last stop of " + tripId);
+        }
+        return stopCursorToList(c).get(0);
+    }
+
     public Stop getLastStopOf(Trip trip) {
         SQLiteDatabase database = mHelper.getReadableDatabase();
 
@@ -333,10 +353,10 @@ public class OcTranspoDataAccess {
         return new Trip(id, route, startTime, tripHeadSign);
     }
 
-    public int getTimeAtStop(Trip trip, Stop stop) {
+    public StopTime getTimeAtStop(Trip trip, Stop stop) {
         SQLiteDatabase database = mHelper.getReadableDatabase();
         Cursor c = database.rawQuery(
-                "select arrival_time " +
+                "select arrival_time, stop_sequence " +
                 "from stop_times " +
                 "join stops on stops._id = stop_times.stop_id " +
                 "where stop_times.trip_id = ? " +
@@ -348,9 +368,11 @@ public class OcTranspoDataAccess {
         }
         c.moveToFirst();
         int arrival_time_column = c.getColumnIndex("arrival_time");
+        int stop_sequence_column = c.getColumnIndex("stop_sequence");
         int arrivalTime = c.getInt(arrival_time_column);
+        int stopSequence = c.getInt(stop_sequence_column);
         c.close();
-        return arrivalTime;
+        return new StopTime(arrivalTime, stopSequence);
     }
 
     public DateTime getNow() {

@@ -21,12 +21,18 @@ public class Alarm {
         mStop = favouriteStop.asStop(ocTranspo);
         mTrip = ocTranspo.getTrip(tripUid.getTripId());
         Stop lastStop = ocTranspo.getLastStopOf(mTrip);
-        int timeAtStop = ocTranspo.getTimeAtStop(mTrip, mStop);
+        StopTime tripAtStop = ocTranspo.getTimeAtStop(mTrip, mStop);
 
         mForthcomingTrip =  new ForthcomingTrip(
                 mStop, mTrip.getRoute(), mTrip.getHeadsign(), lastStop, tripUid.getTripId(),
-                tripUid.getMidnight(), timeAtStop, mTrip.getStartTime()
+                tripUid.getMidnight(), tripAtStop.Time, mTrip.getStartTime()
         );
+
+        if (tripAtStop.StopSequence == 1) {
+            Stop secondStop = ocTranspo.getNthStopOf(2, mTrip);
+            StopTime secondStopTime = ocTranspo.getTimeAtStop(mTrip, secondStop);
+            mForthcomingTrip.useSecondStop(secondStop, secondStopTime.Time);
+        }
 
         mTimeEstimate = mForthcomingTrip.getEstimatedArrival().getTime();
     }
