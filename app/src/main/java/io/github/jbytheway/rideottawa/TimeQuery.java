@@ -2,8 +2,10 @@ package io.github.jbytheway.rideottawa;
 
 import java.util.Objects;
 
+import io.github.jbytheway.rideottawa.db.Route;
+
 class TimeQuery {
-    public TimeQuery(String stopCodeWanted, String stopCodeToQuery, io.github.jbytheway.rideottawa.Route route) {
+    public TimeQuery(String stopCodeWanted, String stopCodeToQuery, io.github.jbytheway.rideottawa.db.Route route) {
         StopCodeWanted = stopCodeWanted;
         StopCodeToQuery = stopCodeToQuery;
         Route = route;

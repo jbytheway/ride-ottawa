@@ -1,4 +1,4 @@
-package io.github.jbytheway.rideottawa;
+package io.github.jbytheway.rideottawa.db;
 
 import android.os.Parcel;
 import android.os.Parcelable;
@@ -11,7 +11,7 @@ public class Route implements Parcelable {
     @SuppressWarnings("unused")
     private static final String TAG = "Route";
 
-    Route(String name, int direction, String modalHeadSign) {
+    public Route(String name, int direction, String modalHeadSign) {
         //mId = id;
         mName = name;
         mDirection = direction;

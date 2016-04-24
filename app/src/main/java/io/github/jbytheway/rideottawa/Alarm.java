@@ -8,6 +8,11 @@ import org.joda.time.DateTime;
 
 import java.util.ArrayList;
 
+import io.github.jbytheway.rideottawa.db.Route;
+import io.github.jbytheway.rideottawa.db.Stop;
+import io.github.jbytheway.rideottawa.db.StopTime;
+import io.github.jbytheway.rideottawa.db.Trip;
+
 public class Alarm {
     private static final String TAG = "Alarm";
 

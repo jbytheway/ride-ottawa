@@ -1,7 +1,9 @@
-package io.github.jbytheway.rideottawa;
+package io.github.jbytheway.rideottawa.db;
+
+import io.github.jbytheway.rideottawa.db.Route;
 
 public class Trip {
-    Trip(long id, Route route, int startTime, String headsign) {
+    public Trip(long id, Route route, int startTime, String headsign) {
         mId = id;
         mRoute = route;
         mStartTime = startTime;

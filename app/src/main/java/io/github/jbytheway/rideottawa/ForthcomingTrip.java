@@ -4,6 +4,9 @@ import org.joda.time.DateTime;
 
 import java.util.Comparator;
 
+import io.github.jbytheway.rideottawa.db.Route;
+import io.github.jbytheway.rideottawa.db.Stop;
+
 public class ForthcomingTrip {
     public ForthcomingTrip(
             Stop stop,

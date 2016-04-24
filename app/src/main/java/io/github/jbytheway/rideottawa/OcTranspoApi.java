@@ -31,6 +31,8 @@ import java.util.HashMap;
 import java.util.Objects;
 import java.util.concurrent.CancellationException;
 
+import io.github.jbytheway.rideottawa.db.Route;
+
 public class OcTranspoApi {
     private static final String TAG = "OcTranspoApi";
     private static final String URL_ROOT = "https://api.octranspo1.com/v1.2/";
@@ -309,7 +311,7 @@ public class OcTranspoApi {
     }
 
     private class DirectionKey {
-        DirectionKey(String stopCode, Route route) {
+        DirectionKey(String stopCode, io.github.jbytheway.rideottawa.db.Route route) {
             StopCode = stopCode;
             Route = route;
         }

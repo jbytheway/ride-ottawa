@@ -24,8 +24,8 @@ import io.github.jbytheway.rideottawa.ForthcomingTrip;
 import io.github.jbytheway.rideottawa.OcTranspoDataAccess;
 import io.github.jbytheway.rideottawa.R;
 import io.github.jbytheway.rideottawa.RideOttawaApplication;
-import io.github.jbytheway.rideottawa.Route;
-import io.github.jbytheway.rideottawa.Stop;
+import io.github.jbytheway.rideottawa.db.Route;
+import io.github.jbytheway.rideottawa.db.Stop;
 import io.github.jbytheway.rideottawa.utils.IndirectArrayAdapter;
 import io.github.jbytheway.rideottawa.utils.TimeUtils;
 

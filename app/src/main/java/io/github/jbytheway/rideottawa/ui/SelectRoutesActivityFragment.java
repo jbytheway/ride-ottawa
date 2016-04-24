@@ -22,7 +22,7 @@ import io.github.jbytheway.rideottawa.utils.IndirectArrayAdapter;
 import io.github.jbytheway.rideottawa.RideOttawaApplication;
 import io.github.jbytheway.rideottawa.OcTranspoDataAccess;
 import io.github.jbytheway.rideottawa.R;
-import io.github.jbytheway.rideottawa.Route;
+import io.github.jbytheway.rideottawa.db.Route;
 
 public class SelectRoutesActivityFragment extends Fragment {
 

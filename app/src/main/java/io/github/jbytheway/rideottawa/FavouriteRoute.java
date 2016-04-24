@@ -10,6 +10,8 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 
+import io.github.jbytheway.rideottawa.db.Route;
+
 public class FavouriteRoute extends SugarRecord implements Comparable<FavouriteRoute> {
     @SuppressWarnings("unused")
     private static final String TAG = "FavouriteRoute";

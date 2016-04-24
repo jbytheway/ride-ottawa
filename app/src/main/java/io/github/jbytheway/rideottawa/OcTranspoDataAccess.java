@@ -25,6 +25,10 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
+import io.github.jbytheway.rideottawa.db.Route;
+import io.github.jbytheway.rideottawa.db.Stop;
+import io.github.jbytheway.rideottawa.db.StopTime;
+import io.github.jbytheway.rideottawa.db.Trip;
 import io.github.jbytheway.rideottawa.utils.DownloadableDatabase;
 
 public class OcTranspoDataAccess {

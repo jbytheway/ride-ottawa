@@ -1,4 +1,4 @@
-package io.github.jbytheway.rideottawa;
+package io.github.jbytheway.rideottawa.db;
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -9,7 +9,7 @@ import org.apache.commons.lang3.text.WordUtils;
 import io.github.jbytheway.rideottawa.ui.SettingsActivityFragment;
 
 public class Stop {
-    Stop(String id, String code, String name) {
+    public Stop(String id, String code, String name) {
         mId = id;
         mCode = code;
         mName = name;

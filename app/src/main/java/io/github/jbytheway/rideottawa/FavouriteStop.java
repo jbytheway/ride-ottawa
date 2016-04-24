@@ -11,6 +11,9 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import io.github.jbytheway.rideottawa.db.Route;
+import io.github.jbytheway.rideottawa.db.Stop;
+
 public class FavouriteStop extends SugarRecord {
     @SuppressWarnings("unused")
     private static final String TAG = "FavouriteStop";
