@@ -191,7 +191,7 @@ public class AlarmService extends IntentService {
                 .setContentTitle(title)
                 .setContentText(text)
                 .setCategory(Notification.CATEGORY_ALARM)
-                .setWhen(alarm.getTimeOfBus().getMillis())
+                .setWhen(alarm.getTimeOfAlarm().getMillis())
                 .setAutoCancel(true)
                 .setPriority(Notification.PRIORITY_MAX)
                 .setSound(sound)
