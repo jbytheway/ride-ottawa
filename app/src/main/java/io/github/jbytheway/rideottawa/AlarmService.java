@@ -191,6 +191,7 @@ public class AlarmService extends IntentService {
                 .setContentTitle(title)
                 .setContentText(text)
                 .setCategory(Notification.CATEGORY_ALARM)
+                .setVisibility(Notification.VISIBILITY_PUBLIC)
                 .setWhen(alarm.getTimeOfAlarm().getMillis())
                 .setAutoCancel(true)
                 .setPriority(Notification.PRIORITY_MAX)
