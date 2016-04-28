@@ -52,6 +52,7 @@ public class ViewFavouriteActivityFragment extends Fragment implements OcTranspo
     private static final int MINIMUM_SECONDS_BETWEEN_API_ERRORS = 25;
     private static final int MAX_FORTHCOMING_TRIPS = 50;
     private static final int MAX_ALARM_MINUTES_WARNING = 60;
+    private static final int MAX_AUTOMATIC_REFRESHES = 40;
 
     public ViewFavouriteActivityFragment() {
         // Required empty public constructor
@@ -86,7 +87,7 @@ public class ViewFavouriteActivityFragment extends Fragment implements OcTranspo
         mSwipeRefresh.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                if (!refreshIfLateEnough(true)) {
+                if (!refreshIfLateEnough(true, true)) {
                     mSwipeRefresh.setRefreshing(false);
                 }
             }
@@ -143,7 +144,7 @@ public class ViewFavouriteActivityFragment extends Fragment implements OcTranspo
     @Override
     public void onResume() {
         super.onResume();
-        refreshIfLateEnough(false);
+        refreshIfLateEnough(false, true);
     }
 
     @Override
@@ -153,7 +154,7 @@ public class ViewFavouriteActivityFragment extends Fragment implements OcTranspo
                 helpDialog();
                 return true;
             case R.id.menu_refresh:
-                refreshIfLateEnough(true);
+                refreshIfLateEnough(true, true);
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -167,10 +168,10 @@ public class ViewFavouriteActivityFragment extends Fragment implements OcTranspo
             actionBar.setTitle(mFavourite.Name);
         }
         mDisplayTripHelper.addFavourite(mFavourite);
-        refresh();
+        refresh(true);
     }
 
-    private boolean refreshIfLateEnough(boolean showMessage) {
+    private boolean refreshIfLateEnough(boolean showMessage, boolean manuallyTriggered) {
         DateTime now = new DateTime();
         if (now.minusSeconds(MINIMUM_REFRESH_SECONDS).isBefore(mLastRefresh)) {
             // Too soon; we won't refresh yet
@@ -179,7 +180,7 @@ public class ViewFavouriteActivityFragment extends Fragment implements OcTranspo
             }
             return false;
         } else {
-            refresh();
+            refresh(manuallyTriggered);
             return true;
         }
     }
@@ -214,7 +215,7 @@ public class ViewFavouriteActivityFragment extends Fragment implements OcTranspo
         }
     }
 
-    private void refresh() {
+    private void refresh(boolean manuallyTriggered) {
         // The process of updating the Forthcoming trips can take a while (maybe half
         // a second or more depending on how many routes are involved.
         // Therefore we want to do it on a background thread.
@@ -228,15 +229,27 @@ public class ViewFavouriteActivityFragment extends Fragment implements OcTranspo
             new RefreshTask().execute();
         }
 
+        if (manuallyTriggered) {
+            mNumAutomaticRefreshes = 0;
+        } else {
+            ++mNumAutomaticRefreshes;
+        }
+
         // Whether we actually refreshed or not, trigger another refresh
-        mHandler.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                if (isResumed()) {
-                    refreshIfLateEnough(false);
+        // But only a certain number of times; prevent oo many automatic
+        // refreshes because that can cause the app to exceed the rate limiter
+        if (mNumAutomaticRefreshes > MAX_AUTOMATIC_REFRESHES) {
+            getActivity().finish();
+        } else {
+            mHandler.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    if (isResumed()) {
+                        refreshIfLateEnough(false, false);
+                    }
                 }
-            }
-        }, AUTO_REFRESH_SECONDS * 1000);
+            }, AUTO_REFRESH_SECONDS * 1000);
+        }
     }
 
     public void onApiFail(Exception e) {
@@ -380,6 +393,7 @@ public class ViewFavouriteActivityFragment extends Fragment implements OcTranspo
     private Favourite mFavourite;
     private ArrayList<ForthcomingTrip> mForthcomingTrips;
     private DateTime mLastRefresh;
+    private int mNumAutomaticRefreshes;
     private DateTime mLastApiErrorReport;
     private boolean mRefreshingNow;
     private SwipeRefreshLayout mSwipeRefresh;
