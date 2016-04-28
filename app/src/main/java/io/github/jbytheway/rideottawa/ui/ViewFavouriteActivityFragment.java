@@ -49,6 +49,7 @@ public class ViewFavouriteActivityFragment extends Fragment implements OcTranspo
     private static final String TAG = "ViewFavouriteFragment";
     private static final int AUTO_REFRESH_SECONDS = 30;
     private static final int MINIMUM_REFRESH_SECONDS = 15;
+    private static final int MINIMUM_SECONDS_BETWEEN_API_ERRORS = 25;
     private static final int MAX_FORTHCOMING_TRIPS = 50;
     private static final int MAX_ALARM_MINUTES_WARNING = 60;
 
@@ -240,7 +241,13 @@ public class ViewFavouriteActivityFragment extends Fragment implements OcTranspo
 
     public void onApiFail(Exception e) {
         Log.e(TAG, "API error", e);
-        // TODO: report to user somehow?
+        DateTime now = new DateTime();
+        if (mLastApiErrorReport == null ||
+                now.minusSeconds(MINIMUM_SECONDS_BETWEEN_API_ERRORS).isAfter(mLastApiErrorReport)) {
+            Toast.makeText(mContext, R.string.api_error, Toast.LENGTH_LONG).show();
+            mLastApiErrorReport = now;
+        }
+        // TODO: remove ellipsis on Trips; or are we happy with it?
     }
 
     public void onTripData() {
@@ -373,6 +380,7 @@ public class ViewFavouriteActivityFragment extends Fragment implements OcTranspo
     private Favourite mFavourite;
     private ArrayList<ForthcomingTrip> mForthcomingTrips;
     private DateTime mLastRefresh;
+    private DateTime mLastApiErrorReport;
     private boolean mRefreshingNow;
     private SwipeRefreshLayout mSwipeRefresh;
     private ListView mTripList;

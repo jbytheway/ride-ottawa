@@ -49,6 +49,7 @@
     <string name="gps_old_abbrev">GPS?</string>
     <string name="waiting_for_data_abbrev">&#8230;</string>
     <string name="skipping_refresh_too_soon">Refreshed too recently.</string>
+    <string name="api_error">API error; GPS data unavailable.</string>
     <string name="title_set_alarm_dialog">Set alarm for trip</string>
     <string name="choose_minutes_warning">Minutes of warning:</string>
     <string name="example_stop_code">8888</string>
@@ -129,5 +130,6 @@
     this is the last stop for the route, and thus you cannot board the bus here,\n‘GPS’ if the time
     is an estimate based a GPS reading,\n‘GPS?’ if there was a GPS reading, but it is more than
     a minute old, which is suspicious, and might indicate that the estimate is no longer
-    good, or \n‘&#8230;’ when waiting for GPS data from the OCTranspo API.</string>
+    good, or \n‘&#8230;’ when waiting for GPS data from the OCTranspo API (or in the event of an
+    error accessing the API).</string>
 </resources>
