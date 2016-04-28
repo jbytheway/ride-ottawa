@@ -131,5 +131,6 @@
     is an estimate based a GPS reading,\n‘GPS?’ if there was a GPS reading, but it is more than
     a minute old, which is suspicious, and might indicate that the estimate is no longer
     good, or \n‘&#8230;’ when waiting for GPS data from the OCTranspo API (or in the event of an
-    error accessing the API).</string>
+    error accessing the API).
+    \n\nTap a trip to set an alarm for it.</string>
 </resources>
