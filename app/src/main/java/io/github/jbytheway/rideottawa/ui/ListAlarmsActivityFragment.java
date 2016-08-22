@@ -163,17 +163,15 @@ public class ListAlarmsActivityFragment extends Fragment {
         refresh();
     }
 
-    private boolean refreshIfLateEnough(boolean showMessage) {
+    private void refreshIfLateEnough(boolean showMessage) {
         DateTime now = new DateTime();
         if (now.minusSeconds(MINIMUM_REFRESH_SECONDS).isBefore(mLastRefresh)) {
             // Too soon; we won't refresh yet
             if (showMessage) {
                 Toast.makeText(getActivity(), getString(R.string.skipping_refresh_too_soon), Toast.LENGTH_LONG).show();
             }
-            return false;
         } else {
             refresh();
-            return true;
         }
     }
 
@@ -203,7 +201,7 @@ public class ListAlarmsActivityFragment extends Fragment {
     }
 
     private OcTranspoDataAccess mOcTranspo;
-    private ArrayList<AlarmWithId> mAlarms;
+    private final ArrayList<AlarmWithId> mAlarms;
     private IndirectArrayAdapter<AlarmWithId> mAlarmAdapter;
     private DateTime mLastRefresh;
 }
