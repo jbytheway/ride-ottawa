@@ -6,6 +6,7 @@ import android.os.AsyncTask;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
+import com.commonsware.cwac.netsecurity.TrustManagerBuilder;
 import com.google.common.io.CharStreams;
 import com.koushikdutta.async.future.FutureCallback;
 import com.koushikdutta.ion.Ion;
@@ -27,6 +28,8 @@ import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.security.KeyManagementException;
+import java.security.NoSuchAlgorithmException;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Objects;
@@ -112,6 +115,12 @@ public class OcTranspoApi {
         HttpURLConnection conn = null;
         try {
             conn = (HttpURLConnection) url.openConnection();
+
+            // Apply our custom trust settings
+            // (This code does nothing on API 24+ and can be removed once those are ubiquitous)
+            TrustManagerBuilder tmb = new TrustManagerBuilder().withManifestConfig(args.Context);
+            tmb.applyTo(conn);
+
             conn.setDoInput(true);
             conn.setDoOutput(true);
             conn.setRequestMethod("POST");
@@ -141,6 +150,10 @@ public class OcTranspoApi {
 
             return new QueryResult(responseCode, result);
         } catch (IOException e) {
+            return new QueryResult(e);
+        } catch (NoSuchAlgorithmException e) {
+            return new QueryResult(e);
+        } catch (KeyManagementException e) {
             return new QueryResult(e);
         } finally {
             if (conn != null) {
