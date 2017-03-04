@@ -2,6 +2,7 @@ package io.github.jbytheway.rideottawa;
 
 import android.content.Context;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
@@ -62,6 +63,108 @@ public class OcTranspoApi {
         mProcessingDateTimeFormat = DateTimeFormat.forPattern("yyyyMMddHHmmss");
     }
 
+    private static class QueryArgs {
+        QueryArgs(final Context context, final TimeQuery query, final Collection<ForthcomingTrip> trips, final Listener listener) {
+            Context = context;
+            Query = query;
+            Trips = trips;
+            Listener = listener;
+        }
+
+        final Context Context;
+        final TimeQuery Query;
+        final Collection<ForthcomingTrip> Trips;
+        final Listener Listener;
+    }
+
+    private static class QueryResult {
+        QueryResult(Integer responseCode, String response) {
+            ResponseCode = responseCode;
+            Response = response;
+            Exception = null;
+        }
+
+        QueryResult(Exception exception) {
+            ResponseCode = null;
+            Response = null;
+            Exception = exception;
+        }
+
+        final Integer ResponseCode;
+        final String Response;
+        final Exception Exception;
+    }
+
+    private QueryResult syncronousQuery(final QueryArgs args) {
+        TimeQuery query = args.Query;
+
+        // curl -d "appID=${appId}&apiKey=${apiKey}&stopNo=${stopCode}&routeNo=${routeName}&format=json" https://api.octranspo1.com/v1.2/GetNextTripsForStop
+        final String routeName = query.Route.getName();
+
+        Log.d(TAG, "Submitting API query, stopCode="+query.StopCodeToQuery+", routeName="+routeName);
+
+        URL url;
+        try {
+            url = new URL(NEXT_TRIPS_URL);
+        } catch (MalformedURLException e) {
+            throw new AssertionError("Malformed URL "+NEXT_TRIPS_URL);
+        }
+        HttpURLConnection conn = null;
+        try {
+            conn = (HttpURLConnection) url.openConnection();
+            conn.setDoInput(true);
+            conn.setDoOutput(true);
+            conn.setRequestMethod("POST");
+
+            Uri.Builder builder = new Uri.Builder()
+                    .appendQueryParameter("appID", mAppId)
+                    .appendQueryParameter("apiKey", mApiKey)
+                    .appendQueryParameter("stopNo", query.StopCodeToQuery)
+                    .appendQueryParameter("routeNo", routeName)
+                    .appendQueryParameter("format", "json");
+            String postContent = builder.build().getEncodedQuery();
+
+            conn.setFixedLengthStreamingMode(postContent.length());
+
+            OutputStream os = conn.getOutputStream();
+            OutputStreamWriter writer = new OutputStreamWriter(os, "UTF-8");
+            writer.write(postContent);
+            writer.close();
+
+            conn.connect();
+
+            int responseCode = conn.getResponseCode();
+
+            InputStream is = conn.getInputStream();
+            InputStreamReader isr = new InputStreamReader(is, "UTF-8");
+            String result = CharStreams.toString(isr);
+
+            return new QueryResult(responseCode, result);
+        } catch (IOException e) {
+            return new QueryResult(e);
+        } finally {
+            if (conn != null) {
+                conn.disconnect();
+            }
+        }
+    }
+
+    private class BackgroundQueryTask extends AsyncTask<QueryArgs, Void, QueryResult> {
+        @Override
+        protected QueryResult doInBackground(QueryArgs... params) {
+            QueryArgs args = params[0];
+            mArgs = args;
+            return syncronousQuery(args);
+        }
+
+        @Override
+        protected void onPostExecute(QueryResult result) {
+            processStringResponse(mArgs.Context, mArgs.Query, mArgs.Trips, result.ResponseCode, result.Response, result.Exception, mArgs.Listener);
+        }
+
+        private QueryArgs mArgs;
+    }
+
     /**
      * Query the OCTranspo API for live data for a collection of ForthcomingTrips.
      *
@@ -72,83 +175,17 @@ public class OcTranspoApi {
      * @param listener The object which will receive callbacks about the results we find.
      */
     public void queryTimes(final Context context, final TimeQuery query, final Collection<ForthcomingTrip> trips, Synchronicity synchronicity, final Listener listener) {
-        // curl -d "appID=${appId}&apiKey=${apiKey}&stopNo=${stopCode}&routeNo=${routeName}&format=json" https://api.octranspo1.com/v1.2/GetNextTripsForStop
-        final String routeName = query.Route.getName();
+        QueryArgs args = new QueryArgs(context, query, trips, listener);
 
-        Log.d(TAG, "Submitting API query, stopCode="+query.StopCodeToQuery+", routeName="+routeName);
-
-        // We generally prefer using the Ion library (asynchronously) but in some circumstances
-        // we need a synchronous version instead, so we offer these two complete implementations
+        // We generally prefer querying asynchronously but in some circumstances
+        // we need a synchronous version instead, so we offer these two alternatives
         switch (synchronicity) {
             case Syncronous:
-                URL url;
-                try {
-                    url = new URL(NEXT_TRIPS_URL);
-                } catch (MalformedURLException e) {
-                    throw new AssertionError("Malformed URL "+NEXT_TRIPS_URL);
-                }
-                HttpURLConnection conn = null;
-                try {
-                    conn = (HttpURLConnection) url.openConnection();
-                    conn.setDoInput(true);
-                    conn.setDoOutput(true);
-                    conn.setRequestMethod("POST");
-
-                    Uri.Builder builder = new Uri.Builder()
-                            .appendQueryParameter("appID", mAppId)
-                            .appendQueryParameter("apiKey", mApiKey)
-                            .appendQueryParameter("stopNo", query.StopCodeToQuery)
-                            .appendQueryParameter("routeNo", routeName)
-                            .appendQueryParameter("format", "json");
-                    String postContent = builder.build().getEncodedQuery();
-
-                    conn.setFixedLengthStreamingMode(postContent.length());
-
-                    OutputStream os = conn.getOutputStream();
-                    OutputStreamWriter writer = new OutputStreamWriter(os, "UTF-8");
-                    writer.write(postContent);
-                    writer.close();
-
-                    conn.connect();
-
-                    int responseCode = conn.getResponseCode();
-
-                    InputStream is = conn.getInputStream();
-                    InputStreamReader isr = new InputStreamReader(is, "UTF-8");
-                    String result = CharStreams.toString(isr);
-
-                    processStringResponse(context, query, trips, responseCode, result, null, listener);
-                } catch (IOException e) {
-                    listener.onApiFail(e);
-                } finally {
-                    if (conn != null) {
-                        conn.disconnect();
-                    }
-                }
+                QueryResult result = syncronousQuery(args);
+                processStringResponse(context, query, trips, result.ResponseCode, result.Response, result.Exception, listener);
                 break;
             case Asyncronous:
-                Ion
-                        .with(context)
-                        .load(NEXT_TRIPS_URL)
-                        .setBodyParameter("appID", mAppId)
-                        .setBodyParameter("apiKey", mApiKey)
-                        .setBodyParameter("stopNo", query.StopCodeToQuery)
-                        .setBodyParameter("routeNo", routeName)
-                        .setBodyParameter("format", "json")
-                        .asString()
-                        .withResponse()
-                        .setCallback(new FutureCallback<Response<String>>() {
-                            @Override
-                            public void onCompleted(Exception httpException, Response<String> result) {
-                                Integer code = null;
-                                if (result != null) {
-                                    code = result.getHeaders().code();
-                                }
-                                Log.d(TAG, "Fetched API result; e=" + httpException + "; code=" + code);
-                                String response = result == null ? null : result.getResult();
-                                processStringResponse(context, query, trips, code, response, httpException, listener);
-                            }
-                        });
+                new BackgroundQueryTask().execute(args);
                 break;
             default:
                 throw new AssertionError("Unexpected synchronicity");
