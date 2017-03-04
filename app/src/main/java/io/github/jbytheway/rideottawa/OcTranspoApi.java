@@ -98,7 +98,7 @@ public class OcTranspoApi {
         final Exception Exception;
     }
 
-    private QueryResult syncronousQuery(final QueryArgs args) {
+    private QueryResult synchronousQuery(final QueryArgs args) {
         TimeQuery query = args.Query;
 
         // curl -d "appID=${appId}&apiKey=${apiKey}&stopNo=${stopCode}&routeNo=${routeName}&format=json" https://api.octranspo1.com/v1.2/GetNextTripsForStop
@@ -167,7 +167,7 @@ public class OcTranspoApi {
         protected QueryResult doInBackground(QueryArgs... params) {
             QueryArgs args = params[0];
             mArgs = args;
-            return syncronousQuery(args);
+            return synchronousQuery(args);
         }
 
         @Override
@@ -194,7 +194,7 @@ public class OcTranspoApi {
         // we need a synchronous version instead, so we offer these two alternatives
         switch (synchronicity) {
             case Syncronous:
-                QueryResult result = syncronousQuery(args);
+                QueryResult result = synchronousQuery(args);
                 processStringResponse(context, query, trips, result.ResponseCode, result.Response, result.Exception, listener);
                 break;
             case Asyncronous:
