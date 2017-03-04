@@ -26,6 +26,7 @@ import java.util.List;
 import io.github.jbytheway.rideottawa.Favourite;
 import io.github.jbytheway.rideottawa.FavouriteRoute;
 import io.github.jbytheway.rideottawa.FavouriteStop;
+import io.github.jbytheway.rideottawa.NoSuchRouteError;
 import io.github.jbytheway.rideottawa.utils.IndirectArrayAdapter;
 import io.github.jbytheway.rideottawa.RideOttawaApplication;
 import io.github.jbytheway.rideottawa.OcTranspoDataAccess;
@@ -114,20 +115,33 @@ public class EditFavouriteActivityFragment extends Fragment {
                         LinearLayout routeList = (LinearLayout) v.findViewById(R.id.route_list);
                         routeList.removeAllViews();
                         List<FavouriteRoute> routes = favouriteStop.getRoutes();
-                        for (FavouriteRoute route : routes) {
+                        boolean someRoutesMissing = false;
+                        for (FavouriteRoute favouriteRoute : routes) {
+                            Route route;
+                            try {
+                                route = favouriteRoute.asRoute(mOcTranspo);
+                            } catch (NoSuchRouteError e) {
+                                someRoutesMissing = true;
+                                favouriteRoute.deleteRecursively();
+                                continue;
+                            }
                             View routeView = inflater.inflate(R.layout.edit_stop_route_list_item, routeList, false);
                             TextView routeName = (TextView) routeView.findViewById(R.id.route_name);
-                            route.asRoute(mOcTranspo).applyToTextView(routeName);
+                            route.applyToTextView(routeName);
                             TextView destinationView = (TextView) routeView.findViewById(R.id.destination);
-                            String destinationStopId = route.Destination;
+                            String destinationStopId = favouriteRoute.Destination;
                             if (destinationStopId == null) {
                                 destinationView.setVisibility(View.GONE);
                             } else {
-                                Stop destination = mOcTranspo.getStop(route.Destination);
+                                Stop destination = mOcTranspo.getStop(favouriteRoute.Destination);
                                 destinationView.setText(destination.getName(context));
                                 destinationView.setVisibility(View.VISIBLE);
                             }
                             routeList.addView(routeView);
+                        }
+
+                        if (someRoutesMissing) {
+                            Toast.makeText(getActivity(), R.string.some_routes_missing, Toast.LENGTH_LONG).show();
                         }
                     }
                 }
@@ -216,7 +230,11 @@ public class EditFavouriteActivityFragment extends Fragment {
         List<FavouriteRoute> routes = favouriteStop.getRoutes();
         ArrayList<Route> selectedRoutes = new ArrayList<>();
         for (FavouriteRoute route : routes) {
-            selectedRoutes.add(route.asRoute(mOcTranspo));
+            try {
+                selectedRoutes.add(route.asRoute(mOcTranspo));
+            } catch (NoSuchRouteError e) {
+                // Ignore missing routes
+            }
         }
         intent.putParcelableArrayListExtra(SelectRoutesActivity.SELECTED_ROUTES, selectedRoutes);
         startActivityForResult(intent, REQUEST_ROUTES);

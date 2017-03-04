@@ -8,6 +8,7 @@ import android.support.annotation.ColorRes;
 import android.support.annotation.StringRes;
 import android.view.View;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
@@ -21,6 +22,7 @@ import io.github.jbytheway.rideottawa.Favourite;
 import io.github.jbytheway.rideottawa.FavouriteRoute;
 import io.github.jbytheway.rideottawa.FavouriteStop;
 import io.github.jbytheway.rideottawa.ForthcomingTrip;
+import io.github.jbytheway.rideottawa.NoSuchRouteError;
 import io.github.jbytheway.rideottawa.OcTranspoDataAccess;
 import io.github.jbytheway.rideottawa.R;
 import io.github.jbytheway.rideottawa.RideOttawaApplication;
@@ -40,22 +42,37 @@ public class DisplayTripHelper implements IndirectArrayAdapter.ViewGenerator<For
     }
 
     public void addFavourite(Favourite favourite) {
+        boolean someRoutesMissing = false;
+
         for (FavouriteStop stop : favourite.getStops()) {
-            addFavouriteStop(stop);
+            someRoutesMissing = addFavouriteStop(stop) | someRoutesMissing;
+        }
+
+        if (someRoutesMissing) {
+            Toast.makeText(mContext, R.string.some_routes_missing, Toast.LENGTH_LONG).show();
         }
     }
 
-    public void addFavouriteStop(FavouriteStop favouriteStop) {
+    public boolean addFavouriteStop(FavouriteStop favouriteStop) {
         Stop stop = favouriteStop.asStop(mOcTranspo);
 
         if (mChosenDestinations.containsKey(stop)) {
-            return;
+            return false;
         }
+
+        boolean someRoutesMissing = false;
 
         HashMap<Route, String> destinationsByRoute = new HashMap<>();
         for (FavouriteRoute favouriteRoute : favouriteStop.getRoutes()) {
             String destinationId = favouriteRoute.Destination;
-            Route route = favouriteRoute.asRoute(mOcTranspo);
+            Route route;
+            try {
+                route = favouriteRoute.asRoute(mOcTranspo);
+            } catch (NoSuchRouteError e) {
+                favouriteRoute.deleteRecursively();
+                someRoutesMissing = true;
+                continue;
+            }
             if (destinationId == null) {
                 destinationsByRoute.put(route, null);
             } else {
@@ -64,6 +81,8 @@ public class DisplayTripHelper implements IndirectArrayAdapter.ViewGenerator<For
             }
         }
         mChosenDestinations.put(stop, destinationsByRoute);
+
+        return someRoutesMissing;
     }
 
     @Override

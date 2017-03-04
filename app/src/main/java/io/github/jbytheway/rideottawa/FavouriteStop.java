@@ -77,10 +77,19 @@ public class FavouriteStop extends SugarRecord {
         HashSet<Route> desiredRoutes = new HashSet<>(routes);
 
         for (FavouriteRoute favRoute : getRoutes()) {
-            Route rawRoute = favRoute.asRoute(ocTranspo);
-            if (desiredRoutes.contains(rawRoute)) {
-                desiredRoutes.remove(rawRoute);
-            } else {
+            boolean remove = false;
+            try {
+                Route rawRoute = favRoute.asRoute(ocTranspo);
+                if (desiredRoutes.contains(rawRoute)) {
+                    desiredRoutes.remove(rawRoute);
+                } else {
+                    remove = true;
+                }
+            } catch (NoSuchRouteError e) {
+                remove = true;
+            }
+
+            if (remove) {
                 if (favRoute.getId() == null) {
                     mPendingRoutes.remove(favRoute);
                 } else {
@@ -100,7 +109,13 @@ public class FavouriteStop extends SugarRecord {
 
         // First add destination to routes we already have
         for (FavouriteRoute favRoute : getRoutes()) {
-            Route rawRoute = favRoute.asRoute(ocTranspo);
+            Route rawRoute;
+            try {
+                rawRoute = favRoute.asRoute(ocTranspo);
+            } catch (NoSuchRouteError e) {
+                // Ignore missing routes
+                continue;
+            }
             if (newRoutes.contains(rawRoute)) {
                 if (favRoute.Destination == null) {
                     favRoute.Destination = destStopId;
@@ -133,7 +148,13 @@ public class FavouriteStop extends SugarRecord {
 
         ArrayList<ForthcomingTrip> result = new ArrayList<>();
         for (FavouriteRoute route : getRoutes()) {
-            Route key = route.asRoute(ocTranspo);
+            Route key;
+            try {
+                key = route.asRoute(ocTranspo);
+            } catch (NoSuchRouteError e) {
+                // Routes should certainly exist at this point
+                throw new AssertionError(e);
+            }
             Set<ForthcomingTrip> tripsForThisRoute = tripsSplit.get(key);
             result.addAll(route.updateForthcomingTrips(ocTranspo, tripsForThisRoute));
         }

@@ -21,7 +21,7 @@ public class FavouriteRoute extends SugarRecord implements Comparable<FavouriteR
         // Required for Sugar
     }
 
-    public Route asRoute(OcTranspoDataAccess ocTranspo) {
+    public Route asRoute(OcTranspoDataAccess ocTranspo) throws NoSuchRouteError {
         return ocTranspo.getRoute(RouteName, Direction);
     }
 

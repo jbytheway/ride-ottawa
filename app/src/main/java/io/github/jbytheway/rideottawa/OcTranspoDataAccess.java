@@ -84,7 +84,7 @@ public class OcTranspoDataAccess {
 
     private static final String[] TRIP_COLUMNS = new String[]{"trips.trip_id", "trips.trip_headsign"};
 
-    public Route getRoute(String routeName, int directionId) {
+    public Route getRoute(String routeName, int directionId) throws NoSuchRouteError {
         SQLiteDatabase database = mHelper.getReadableDatabase();
         String cols = Joiner.on(", ").join(ROUTE_COLUMNS);
         Cursor c = database.rawQuery(
@@ -94,7 +94,7 @@ public class OcTranspoDataAccess {
                         "where routes.route_short_name = ? and directed_routes.direction_id = ?",
                 new String[]{routeName, "" + directionId});
         if (c.getCount() != 1) {
-            throw new AssertionError("Requested invalid Route " + routeName + ", " + directionId);
+            throw new NoSuchRouteError("Requested invalid Route " + routeName + ", " + directionId);
         }
         List<Route> routes = routeCursorToList(c);
         return routes.get(0);
