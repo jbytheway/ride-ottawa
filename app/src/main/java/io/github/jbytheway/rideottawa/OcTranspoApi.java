@@ -35,6 +35,9 @@ import java.util.HashMap;
 import java.util.Objects;
 import java.util.concurrent.CancellationException;
 
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.TrustManager;
+
 import io.github.jbytheway.rideottawa.db.Route;
 
 public class OcTranspoApi {
@@ -64,6 +67,25 @@ public class OcTranspoApi {
         mOttawaTimeZone = DateTimeZone.forID("America/Toronto");
         mStartTimeFormat = DateTimeFormat.forPattern("HH:mm");
         mProcessingDateTimeFormat = DateTimeFormat.forPattern("yyyyMMddHHmmss");
+
+        // Set Ion's HTTP client to use our custom trust settings
+        // Should do nothing and be unnecessary for API 24+
+        Ion ion = Ion.getDefault(context);
+        TrustManagerBuilder tmb = new TrustManagerBuilder().withManifestConfig(context);
+        TrustManager[] tmArray = tmb.buildArray();
+        SSLContext sslContext;
+        try {
+            sslContext = SSLContext.getInstance("TLS");
+            sslContext.init(null, tmArray, null);
+        } catch (KeyManagementException e) {
+            Log.e(TAG, "error initializing Ion", e);
+            return;
+        } catch (NoSuchAlgorithmException e) {
+            Log.e(TAG, "error initializing Ion", e);
+            return;
+        }
+        ion.getHttpClient().getSSLSocketMiddleware().setTrustManagers(tmArray);
+        ion.getHttpClient().getSSLSocketMiddleware().setSSLContext(sslContext);
     }
 
     private static class QueryArgs {
