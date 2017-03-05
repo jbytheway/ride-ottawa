@@ -9,6 +9,9 @@ import java.util.Objects;
 
 public class TripUid implements Parcelable {
     public TripUid(int id, DateTime midnight) {
+        if (midnight.getZone().getID() != "America/Toronto") {
+            throw new AssertionError("Time in wrong time zone (" + midnight.getZone().getID() + ")");
+        }
         mTripId = id;
         mMidnight = midnight;
     }

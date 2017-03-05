@@ -203,6 +203,9 @@ public class DisplayTripHelper implements IndirectArrayAdapter.ViewGenerator<For
     }
 
     public long formatMinutesAway(DateTime time, TextView view) {
+        if (time.getZone() != mOttawaTimeZone) {
+            throw new AssertionError("Time in wrong time zone");
+        }
         DateTime now = mOcTranspo.getNow().withZone(mOttawaTimeZone);
         long minutesAway = TimeUtils.minutesDifference(now, time);
         view.setText(mContext.getString(R.string.minutes_format, minutesAway));

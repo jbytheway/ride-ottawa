@@ -3,6 +3,7 @@ package io.github.jbytheway.rideottawa;
 import com.orm.SugarRecord;
 
 import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 
@@ -30,7 +31,7 @@ public class PendingAlarmData extends SugarRecord {
             return null;
         }
 
-        DateTime midnight = mMidnightFormatter.parseDateTime(TripMidnight);
+        DateTime midnight = mMidnightFormatter.parseDateTime(TripMidnight).withZoneRetainFields(mOttawaTimeZone);
 
         return new Alarm(favouriteStop, new TripUid(TripId, midnight), MinutesWarning, listener, this, ocTranspo);
     }
@@ -49,5 +50,6 @@ public class PendingAlarmData extends SugarRecord {
     private int MinutesWarning;
     private long TimeToCheck;
 
+    private static final DateTimeZone mOttawaTimeZone = DateTimeZone.forID("America/Toronto");
     private static final DateTimeFormatter mMidnightFormatter = DateTimeFormat.forPattern("yyyyMMdd");
 }
