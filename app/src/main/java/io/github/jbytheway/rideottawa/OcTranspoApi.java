@@ -6,12 +6,14 @@ import android.os.AsyncTask;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
-import com.commonsware.cwac.netsecurity.TrustManagerBuilder;
 import com.google.common.io.CharStreams;
 import com.koushikdutta.async.future.FutureCallback;
 import com.koushikdutta.ion.Ion;
 import com.koushikdutta.ion.Response;
 
+import org.apache.commons.lang3.tuple.ImmutablePair;
+import org.apache.commons.lang3.tuple.Pair;
+import org.apache.commons.lang3.tuple.Triple;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.joda.time.format.DateTimeFormat;
@@ -32,6 +34,7 @@ import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.CancellationException;
 
@@ -39,6 +42,8 @@ import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManager;
 
 import io.github.jbytheway.rideottawa.db.Route;
+import io.github.jbytheway.rideottawa.utils.HttpUtils;
+import io.github.jbytheway.rideottawa.utils.TrustUtils;
 
 public class OcTranspoApi {
     private static final String TAG = "OcTranspoApi";
@@ -67,22 +72,6 @@ public class OcTranspoApi {
         mOttawaTimeZone = DateTimeZone.forID("America/Toronto");
         mStartTimeFormat = DateTimeFormat.forPattern("HH:mm");
         mProcessingDateTimeFormat = DateTimeFormat.forPattern("yyyyMMddHHmmss");
-
-        // Set Ion's HTTP client to use our custom trust settings
-        // Should do nothing and be unnecessary for API 24+
-        Ion ion = Ion.getDefault(context);
-        TrustManagerBuilder tmb = new TrustManagerBuilder().withManifestConfig(context);
-        TrustManager[] tmArray = tmb.buildArray();
-        SSLContext sslContext;
-        try {
-            sslContext = SSLContext.getInstance("TLS");
-            sslContext.init(null, tmArray, null);
-        } catch (KeyManagementException | NoSuchAlgorithmException e) {
-            Log.e(TAG, "error initializing Ion", e);
-            return;
-        }
-        ion.getHttpClient().getSSLSocketMiddleware().setTrustManagers(tmArray);
-        ion.getHttpClient().getSSLSocketMiddleware().setSSLContext(sslContext);
     }
 
     private static class QueryArgs {
@@ -99,98 +88,34 @@ public class OcTranspoApi {
         final Listener Listener;
     }
 
-    private static class QueryResult {
-        QueryResult(Integer responseCode, String response) {
-            ResponseCode = responseCode;
-            Response = response;
-            Exception = null;
-        }
-
-        QueryResult(Exception exception) {
-            ResponseCode = null;
-            Response = null;
-            Exception = exception;
-        }
-
-        final Integer ResponseCode;
-        final String Response;
-        final Exception Exception;
-    }
-
-    private QueryResult synchronousQuery(final QueryArgs args) {
-        TimeQuery query = args.Query;
+    private HttpUtils.PostResult synchronousQuery(final QueryArgs args) {
+        final TimeQuery query = args.Query;
 
         // curl -d "appID=${appId}&apiKey=${apiKey}&stopNo=${stopCode}&routeNo=${routeName}&format=json" https://api.octranspo1.com/v1.2/GetNextTripsForStop
         final String routeName = query.Route.getName();
 
         Log.d(TAG, "Submitting API query, stopCode="+query.StopCodeToQuery+", routeName="+routeName);
 
-        URL url;
-        try {
-            url = new URL(NEXT_TRIPS_URL);
-        } catch (MalformedURLException e) {
-            throw new AssertionError("Malformed URL "+NEXT_TRIPS_URL);
-        }
-        HttpURLConnection conn = null;
-        try {
-            conn = (HttpURLConnection) url.openConnection();
+        HashMap<String, String> params = new HashMap<>();
+        params.put("appID", mAppId);
+        params.put("apiKey", mApiKey);
+        params.put("stopNo", query.StopCodeToQuery);
+        params.put("routeNo", routeName);
+        params.put("format", "json");
 
-            // Apply our custom trust settings
-            // (This code does nothing on API 24+ and can be removed once those are ubiquitous)
-            TrustManagerBuilder tmb = new TrustManagerBuilder().withManifestConfig(args.Context);
-            tmb.applyTo(conn);
-
-            conn.setDoInput(true);
-            conn.setDoOutput(true);
-            conn.setRequestMethod("POST");
-
-            Uri.Builder builder = new Uri.Builder()
-                    .appendQueryParameter("appID", mAppId)
-                    .appendQueryParameter("apiKey", mApiKey)
-                    .appendQueryParameter("stopNo", query.StopCodeToQuery)
-                    .appendQueryParameter("routeNo", routeName)
-                    .appendQueryParameter("format", "json");
-            String postContent = builder.build().getEncodedQuery();
-
-            conn.setFixedLengthStreamingMode(postContent.length());
-
-            OutputStream os = conn.getOutputStream();
-            OutputStreamWriter writer = new OutputStreamWriter(os, "UTF-8");
-            writer.write(postContent);
-            writer.close();
-
-            conn.connect();
-
-            int responseCode = conn.getResponseCode();
-
-            InputStream is = conn.getInputStream();
-            InputStreamReader isr = new InputStreamReader(is, "UTF-8");
-            String result = CharStreams.toString(isr);
-
-            return new QueryResult(responseCode, result);
-        } catch (IOException e) {
-            return new QueryResult(e);
-        } catch (NoSuchAlgorithmException e) {
-            return new QueryResult(e);
-        } catch (KeyManagementException e) {
-            return new QueryResult(e);
-        } finally {
-            if (conn != null) {
-                conn.disconnect();
-            }
-        }
+        return HttpUtils.httpPost(args.Context, NEXT_TRIPS_URL, params, R.raw.globalsign_dv_ca_g2);
     }
 
-    private class BackgroundQueryTask extends AsyncTask<QueryArgs, Void, QueryResult> {
+    private class BackgroundQueryTask extends AsyncTask<QueryArgs, Void, HttpUtils.PostResult> {
         @Override
-        protected QueryResult doInBackground(QueryArgs... params) {
+        protected HttpUtils.PostResult doInBackground(QueryArgs... params) {
             QueryArgs args = params[0];
             mArgs = args;
             return synchronousQuery(args);
         }
 
         @Override
-        protected void onPostExecute(QueryResult result) {
+        protected void onPostExecute(HttpUtils.PostResult result) {
             processStringResponse(mArgs.Context, mArgs.Query, mArgs.Trips, result.ResponseCode, result.Response, result.Exception, mArgs.Listener);
         }
 
@@ -213,7 +138,7 @@ public class OcTranspoApi {
         // we need a synchronous version instead, so we offer these two alternatives
         switch (synchronicity) {
             case Syncronous:
-                QueryResult result = synchronousQuery(args);
+                HttpUtils.PostResult result = synchronousQuery(args);
                 processStringResponse(context, query, trips, result.ResponseCode, result.Response, result.Exception, listener);
                 break;
             case Asyncronous:
@@ -320,59 +245,81 @@ public class OcTranspoApi {
         }
     }
 
+    private static class DirectionQueryArgs {
+        public DirectionQueryArgs(Context context, String stopCode, DirectionKey key) {
+            Context = context;
+            StopCode = stopCode;
+            Key = key;
+        }
+
+        Context Context;
+        String StopCode;
+        DirectionKey Key;
+    }
+
+    private class DirectionQueryTask extends AsyncTask<DirectionQueryArgs, Void, HttpUtils.PostResult> {
+        @Override
+        protected HttpUtils.PostResult doInBackground(DirectionQueryArgs... params) {
+            mArgs = params[0];
+            String stopCode = mArgs.StopCode;
+
+            HashMap<String, String> urlParams = new HashMap<>();
+            urlParams.put("appID", mAppId);
+            urlParams.put("apiKey", mApiKey);
+            urlParams.put("stopNo", stopCode);
+            urlParams.put("format", "json");
+
+            return HttpUtils.httpPost(mArgs.Context, ROUTE_SUMMARY_URL, urlParams, R.raw.globalsign_dv_ca_g2);
+        }
+
+        @Override
+        protected void onPostExecute(HttpUtils.PostResult result) {
+            if (result == null || result.ResponseCode != 200) {
+                Log.e(TAG, "CacheDirection HTTP error", result.Exception);
+                return;
+            }
+
+            String response = result.Response;
+
+            try {
+                JSONObject json = new JSONObject(response);
+                JSONArray routes = json.getJSONObject("GetRouteSummaryForStopResult").getJSONObject("Routes").getJSONArray("Route");
+
+                DirectionKey key = mArgs.Key;
+                String targetRouteName = key.Route.getName();
+                int targetDirectionId = key.Route.getDirection();
+
+                for (int i = 0; i < routes.length(); ++i) {
+                    JSONObject route = routes.getJSONObject(i);
+
+                    String routeName = ""+route.getInt("RouteNo");
+                    if (!routeName.equals(targetRouteName)) {
+                        continue;
+                    }
+
+                    int directionId = route.getInt("DirectionID");
+                    if (directionId != targetDirectionId) {
+                        continue;
+                    }
+
+                    // We have found the one we want
+                    String directionString = route.getString("Direction");
+                    mDirectionCache.put(key, directionString);
+                    Log.d(TAG, "Successfully cached a direction");
+                }
+            } catch (JSONException jsonError) {
+                Log.e(TAG, "CacheDirection JSON error; json was "+response, jsonError);
+            }
+        }
+
+        private DirectionQueryArgs mArgs;
+    }
+
     private void CacheDirection(Context context, final DirectionKey key) {
         // We want to launch a job to fill the requested cache entry
+        Log.d(TAG, "Performing direction lookup for cache");
         final String stopCode = key.StopCode;
-
-        Ion
-            .with(context)
-            .load(ROUTE_SUMMARY_URL)
-            .setBodyParameter("appID", mAppId)
-            .setBodyParameter("apiKey", mApiKey)
-            .setBodyParameter("stopNo", stopCode)
-            .setBodyParameter("format", "json")
-            .asString()
-            .withResponse()
-            .setCallback(new FutureCallback<Response<String>>() {
-                @Override
-                public void onCompleted(Exception e, Response<String> result) {
-                    if (result == null || result.getHeaders().code() != 200) {
-                        Log.e(TAG, "CacheDirection HTTP error", e);
-                        return;
-                    }
-
-                    String response = result.getResult();
-
-                    try {
-                        JSONObject json = new JSONObject(response);
-                        JSONArray routes = json.getJSONObject("GetRouteSummaryForStopResult").getJSONObject("Routes").getJSONArray("Route");
-
-                        String targetRouteName = key.Route.getName();
-                        int targetDirectionId = key.Route.getDirection();
-
-                        for (int i = 0; i < routes.length(); ++i) {
-                            JSONObject route = routes.getJSONObject(i);
-
-                            String routeName = ""+route.getInt("RouteNo");
-                            if (!routeName.equals(targetRouteName)) {
-                                continue;
-                            }
-
-                            int directionId = route.getInt("DirectionID");
-                            if (directionId != targetDirectionId) {
-                                continue;
-                            }
-
-                            // We have found the one we want
-                            String directionString = route.getString("Direction");
-                            mDirectionCache.put(key, directionString);
-                            Log.d(TAG, "Successfully cached a direction");
-                        }
-                    } catch (JSONException jsonError) {
-                        Log.e(TAG, "CacheDirection JSON error; json was "+response, jsonError);
-                    }
-                }
-            });
+        new DirectionQueryTask().execute(new DirectionQueryArgs(context, stopCode, key));
     }
 
     private JSONArray GetArrayOrObject(JSONObject o, String member) throws JSONException {
