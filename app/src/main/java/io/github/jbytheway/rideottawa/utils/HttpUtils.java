@@ -13,11 +13,7 @@ import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.Dictionary;
 import java.util.Map;
-
-import io.github.jbytheway.rideottawa.OcTranspoApi;
-import io.github.jbytheway.rideottawa.R;
 
 public class HttpUtils {
     public static class PostResult {

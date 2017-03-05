@@ -1,19 +1,10 @@
 package io.github.jbytheway.rideottawa;
 
 import android.content.Context;
-import android.net.Uri;
 import android.os.AsyncTask;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
-import com.google.common.io.CharStreams;
-import com.koushikdutta.async.future.FutureCallback;
-import com.koushikdutta.ion.Ion;
-import com.koushikdutta.ion.Response;
-
-import org.apache.commons.lang3.tuple.ImmutablePair;
-import org.apache.commons.lang3.tuple.Pair;
-import org.apache.commons.lang3.tuple.Triple;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.joda.time.format.DateTimeFormat;
@@ -22,28 +13,13 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.security.KeyManagementException;
-import java.security.NoSuchAlgorithmException;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.CancellationException;
 
-import javax.net.ssl.SSLContext;
-import javax.net.ssl.TrustManager;
-
 import io.github.jbytheway.rideottawa.db.Route;
 import io.github.jbytheway.rideottawa.utils.HttpUtils;
-import io.github.jbytheway.rideottawa.utils.TrustUtils;
 
 public class OcTranspoApi {
     private static final String TAG = "OcTranspoApi";
