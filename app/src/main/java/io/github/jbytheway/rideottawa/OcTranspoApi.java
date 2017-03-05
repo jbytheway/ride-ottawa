@@ -77,10 +77,7 @@ public class OcTranspoApi {
         try {
             sslContext = SSLContext.getInstance("TLS");
             sslContext.init(null, tmArray, null);
-        } catch (KeyManagementException e) {
-            Log.e(TAG, "error initializing Ion", e);
-            return;
-        } catch (NoSuchAlgorithmException e) {
+        } catch (KeyManagementException | NoSuchAlgorithmException e) {
             Log.e(TAG, "error initializing Ion", e);
             return;
         }

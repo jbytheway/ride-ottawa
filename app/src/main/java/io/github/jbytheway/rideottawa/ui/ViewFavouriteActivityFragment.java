@@ -93,7 +93,7 @@ public class ViewFavouriteActivityFragment extends Fragment implements OcTranspo
             }
         });
 
-        mTripList = (ListView) view.findViewById(R.id.trip_list);
+        ListView tripList = (ListView) view.findViewById(R.id.trip_list);
         mDisplayTripHelper = new DisplayTripHelper(getActivity());
 
         mTripAdapter = new IndirectArrayAdapter<>(
@@ -109,9 +109,9 @@ public class ViewFavouriteActivityFragment extends Fragment implements OcTranspo
                 mDisplayTripHelper
         );
 
-        mTripList.setAdapter(mTripAdapter);
+        tripList.setAdapter(mTripAdapter);
 
-        mTripList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        tripList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 ForthcomingTrip trip = mForthcomingTrips.get(position);
@@ -397,7 +397,6 @@ public class ViewFavouriteActivityFragment extends Fragment implements OcTranspo
     private DateTime mLastApiErrorReport;
     private boolean mRefreshingNow;
     private SwipeRefreshLayout mSwipeRefresh;
-    private ListView mTripList;
     private IndirectArrayAdapter<ForthcomingTrip> mTripAdapter;
     private DisplayTripHelper mDisplayTripHelper;
 
