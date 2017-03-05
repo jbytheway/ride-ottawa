@@ -274,7 +274,8 @@ public class OcTranspoApi {
 
         @Override
         protected void onPostExecute(HttpUtils.PostResult result) {
-            if (result == null || result.ResponseCode != 200) {
+            Integer code = result.ResponseCode;
+            if (code == null || code != 200) {
                 Log.e(TAG, "CacheDirection HTTP error", result.Exception);
                 return;
             }

@@ -88,13 +88,10 @@ public class TrustUtils {
     private static Pair<SSLContext, TrustManager[]> getSslContext(Context context, int certResourceId) {
         try {
             CertificateFactory cf = CertificateFactory.getInstance("X.509");
-            InputStream caInput = context.getResources().openRawResource(R.raw.globalsign_dv_ca_g2);
             Certificate ca;
 
-            try {
+            try (InputStream caInput = context.getResources().openRawResource(R.raw.globalsign_dv_ca_g2)) {
                 ca = cf.generateCertificate(caInput);
-            } finally {
-                caInput.close();
             }
             // Create a KeyStore containing the given CA
             String keyStoreType = KeyStore.getDefaultType();
