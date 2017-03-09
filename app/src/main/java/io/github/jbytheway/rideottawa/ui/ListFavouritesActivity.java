@@ -78,12 +78,24 @@ public class ListFavouritesActivity extends AppCompatActivity {
             }
 
             @Override
-            public void onFail(Exception e, String message, boolean wifiRelated, boolean fatal) {
+            public void onFail(Exception e, Integer code, String message, boolean wifiRelated, boolean fatal) {
                 if (fatal) {
-                    fail(e, message, wifiRelated);
+                    fail(e, code, message, wifiRelated);
                     dialog.dismiss();
                 } else {
-                    String toastText = getString(R.string.continuing_with_old_db, message);
+                    String exceptionMessage;
+                    if (e == null) {
+                        exceptionMessage = getString(R.string.no_exception);
+                    } else {
+                        exceptionMessage = e.getLocalizedMessage();
+                    }
+                    String codeMessage;
+                    if (code == null) {
+                        codeMessage = getString(R.string.no_code);
+                    } else {
+                        codeMessage = code.toString();
+                    }
+                    String toastText = getString(R.string.continuing_with_old_db, message, exceptionMessage, codeMessage);
                     Toast.makeText(ListFavouritesActivity.this, toastText, Toast.LENGTH_LONG).show();
                     dialog.dismiss();
                 }
@@ -142,8 +154,20 @@ public class ListFavouritesActivity extends AppCompatActivity {
         private FatalErrorListener mListener;
     }
 
-    private void fail(Exception e, String message, boolean wifiRelated) {
-        String dialogMessage = getString(R.string.no_database_fatal_error, message);
+    private void fail(Exception e, Integer code, String message, boolean wifiRelated) {
+        String exceptionMessage;
+        if (e == null) {
+            exceptionMessage = getString(R.string.no_exception);
+        } else {
+            exceptionMessage = e.getLocalizedMessage();
+        }
+        String codeMessage;
+        if (code == null) {
+            codeMessage = getString(R.string.no_code);
+        } else {
+            codeMessage = code.toString();
+        }
+        String dialogMessage = getString(R.string.no_database_fatal_error, message, exceptionMessage, codeMessage);
         FatalErrorDialog errorDialog = new FatalErrorDialog();
         Bundle args = new Bundle();
         args.putString(FatalErrorDialog.MESSAGE, dialogMessage);
