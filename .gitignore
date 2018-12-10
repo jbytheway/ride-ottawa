@@ -8,6 +8,7 @@ __pycache__
 /.idea/workspace.xml
 /.idea/libraries
 /.idea/dictionaries
+/.idea/caches/build_file_checksums.ser
 .DS_Store
 /build
 /captures
