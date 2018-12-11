@@ -98,9 +98,9 @@ public class Favourite extends SugarRecord {
             }
         }
 
-        String pendingList = "";
+        StringBuilder pendingList = new StringBuilder();
         for (FavouriteStop stop : mPendingStops) {
-            pendingList += " '" + stop.StopId + "'";
+            pendingList.append(" '").append(stop.StopId).append("'");
         }
 
         throw new AssertionError("Couldn't find requested stop '"+stopId+"'; pending stops were"+pendingList);

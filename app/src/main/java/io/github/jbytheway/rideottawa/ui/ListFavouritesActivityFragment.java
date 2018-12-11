@@ -10,6 +10,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
 import android.preference.PreferenceManager;
+import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -60,11 +61,11 @@ public class ListFavouritesActivityFragment extends Fragment {
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.list_favourites_fragment, container, false);
 
-        mNoFavouritesHint = (TextView) view.findViewById(R.id.no_favourites_hint);
+        mNoFavouritesHint = view.findViewById(R.id.no_favourites_hint);
         mEditFavouriteHint = (TextView) view.findViewById(R.id.list_favourites_hint);
 
         mFavouriteList = (ListView) view.findViewById(R.id.favourite_list_view);

@@ -87,7 +87,7 @@ public class DisplayTripHelper implements IndirectArrayAdapter.ViewGenerator<For
 
     @Override
     public void applyView(View v, final ForthcomingTrip trip) {
-        TextView stop_code = (TextView) v.findViewById(R.id.stop_code);
+        TextView stop_code = v.findViewById(R.id.stop_code);
         TextView stop_name = (TextView) v.findViewById(R.id.stop_name);
         TextView route_name = (TextView) v.findViewById(R.id.route_name);
         TextView head_sign = (TextView) v.findViewById(R.id.head_sign);

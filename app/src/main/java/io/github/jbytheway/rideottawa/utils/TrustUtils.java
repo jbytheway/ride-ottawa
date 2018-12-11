@@ -39,13 +39,13 @@ public class TrustUtils {
 
         @Override
         public void checkServerTrusted(X509Certificate[] chain, String authType) throws CertificateException {
-            String errors = "";
+            StringBuilder errors = new StringBuilder();
             for (X509TrustManager trustManager : mTrustManagers) {
                 try {
                     trustManager.checkServerTrusted(chain, authType);
                     return;
                 } catch (CertificateException e) {
-                    errors += "\n" + e.getMessage();
+                    errors.append("\n").append(e.getMessage());
                 }
             }
             throw new CertificateException("No TrustManager trusted; errors:" + errors);
@@ -53,13 +53,13 @@ public class TrustUtils {
 
         @Override
         public void checkClientTrusted(X509Certificate[] chain, String authType) throws CertificateException {
-            String errors = "";
+            StringBuilder errors = new StringBuilder();
             for (X509TrustManager trustManager : mTrustManagers) {
                 try {
                     trustManager.checkClientTrusted(chain, authType);
                     return;
                 } catch (CertificateException e) {
-                    errors += "\n" + e.getMessage();
+                    errors.append("\n").append(e.getMessage());
                 }
             }
             throw new CertificateException("No TrustManager trusted; errors:" + errors);

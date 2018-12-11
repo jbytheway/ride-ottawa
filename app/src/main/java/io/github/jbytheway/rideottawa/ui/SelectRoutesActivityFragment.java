@@ -44,7 +44,7 @@ public class SelectRoutesActivityFragment extends Fragment {
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.select_routes_fragment, container, false);
 
-        final ListView routeList = (ListView) view.findViewById(R.id.route_list);
+        final ListView routeList = view.findViewById(R.id.route_list);
 
         Intent intent = getActivity().getIntent();
         final String stopId = intent.getStringExtra(SelectRoutesActivity.STOP_ID);

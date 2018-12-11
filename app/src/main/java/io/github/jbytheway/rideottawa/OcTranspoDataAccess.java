@@ -11,7 +11,6 @@ import android.util.Log;
 import com.google.common.base.Joiner;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Lists;
-import com.orm.dsl.NotNull;
 
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
@@ -129,7 +128,7 @@ public class OcTranspoDataAccess {
                 new String[]{stopId});
     }
 
-    public Cursor getRoutesBetweenStops(@NotNull String fromStopId, @NotNull String toStopId) {
+    public Cursor getRoutesBetweenStops(String fromStopId, String toStopId) {
         Log.d(TAG, "Fetching routes from " + fromStopId + " to " + toStopId);
         SQLiteDatabase database = mHelper.getReadableDatabase();
         String cols = Joiner.on(", ").join(ROUTE_COLUMNS);
@@ -161,17 +160,14 @@ public class OcTranspoDataAccess {
             int direction_column = c.getColumnIndexOrThrow("direction_id");
             int headsign_column = c.getColumnIndexOrThrow("route_modal_headsign");
 
-            while (true) {
+            do {
                 //String id = c.getString(id_column);
                 String name = c.getString(name_column);
                 int direction = c.getInt(direction_column);
                 String modalHeadSign = c.getString(headsign_column);
                 result.add(new Route(name, direction, modalHeadSign));
 
-                if (!c.moveToNext()) {
-                    break;
-                }
-            }
+            } while (c.moveToNext());
         }
         c.close();
         return result;
@@ -226,7 +222,7 @@ public class OcTranspoDataAccess {
 
         SQLiteDatabase database = mHelper.getReadableDatabase();
         query += " order by " + orderBy;
-        return database.rawQuery(query, args.toArray(new String[args.size()]));
+        return database.rawQuery(query, args.toArray(new String[0]));
     }
 
     public Stop getStop(String stopId) {
@@ -309,16 +305,12 @@ public class OcTranspoDataAccess {
             int stopCodeColumn = c.getColumnIndexOrThrow("stop_code");
             int stopNameColumn = c.getColumnIndexOrThrow("stop_name");
 
-            while (true) {
+            do {
                 String stopId = c.getString(stopIdColumn);
                 String stopCode = c.getString(stopCodeColumn);
                 String stopName = c.getString(stopNameColumn);
                 result.add(new Stop(stopId, stopCode, stopName));
-
-                if (!c.moveToNext()) {
-                    break;
-                }
-            }
+            } while (c.moveToNext());
         }
         c.close();
         return result;
@@ -451,7 +443,7 @@ public class OcTranspoDataAccess {
                 "order by stop_times.arrival_time " +
                 "limit 10";
         //Log.d(TAG, "Query = " + query + ", stops.stop_id = " + stopId);
-        return database.rawQuery(query, args.toArray(new String[args.size()]));
+        return database.rawQuery(query, args.toArray(new String[0]));
 
         // FIXME: also fetch trips with times which derive from the previous day (i.e. which started yesterday)
         // and the next day

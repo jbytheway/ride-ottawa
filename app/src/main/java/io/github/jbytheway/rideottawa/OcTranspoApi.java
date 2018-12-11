@@ -228,8 +228,8 @@ public class OcTranspoApi {
             Key = key;
         }
 
-        Context Context;
-        String StopCode;
+        final Context Context;
+        final String StopCode;
         DirectionKey Key;
     }
 

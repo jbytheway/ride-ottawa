@@ -62,7 +62,7 @@ public class EditFavouriteActivityFragment extends Fragment {
     public View onCreateView(final LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.edit_favourite_fragment, container, false);
-        ListView stopList = (ListView) view.findViewById(R.id.stop_list);
+        ListView stopList = view.findViewById(R.id.stop_list);
         final Context context = getActivity();
 
         mStopAdapter = new IndirectArrayAdapter<>(

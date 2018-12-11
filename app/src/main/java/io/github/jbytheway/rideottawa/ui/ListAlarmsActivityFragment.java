@@ -64,7 +64,7 @@ public class ListAlarmsActivityFragment extends Fragment {
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.list_alarms_fragment, container, false);
 
-        TextView noAlarmsMessage = (TextView) view.findViewById(R.id.no_alarms_message);
+        TextView noAlarmsMessage = view.findViewById(R.id.no_alarms_message);
         long numAlarms = PendingAlarmData.count(PendingAlarmData.class);
 
         if (numAlarms == 0) {

@@ -81,7 +81,7 @@ public class ViewFavouriteActivityFragment extends Fragment implements OcTranspo
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.view_favourite_fragment, container, false);
 
-        mSwipeRefresh = (SwipeRefreshLayout) view.findViewById(R.id.trip_list_swiper);
+        mSwipeRefresh = view.findViewById(R.id.trip_list_swiper);
         mSwipeRefresh.setColorSchemeResources(R.color.colorPrimaryDark);
         mSwipeRefresh.setProgressBackgroundColorSchemeResource(R.color.colorAccent);
         mSwipeRefresh.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
