@@ -222,26 +222,33 @@ public class OcTranspoApi {
     }
 
     private static class DirectionQueryArgs {
-        public DirectionQueryArgs(Context context, String stopCode, DirectionKey key) {
+        public DirectionQueryArgs(Context context, String stopCode, DirectionKey key, String appId,
+                String apiKey, HashMap<DirectionKey, String> directionCache) {
             Context = context;
             StopCode = stopCode;
             Key = key;
+            AppId = appId;
+            ApiKey = apiKey;
+            DirectionCache = directionCache;
         }
 
         final Context Context;
         final String StopCode;
-        DirectionKey Key;
+        final DirectionKey Key;
+        final String AppId;
+        final String ApiKey;
+        final HashMap<DirectionKey, String> DirectionCache;
     }
 
-    private class DirectionQueryTask extends AsyncTask<DirectionQueryArgs, Void, HttpUtils.PostResult> {
+    private static class DirectionQueryTask extends AsyncTask<DirectionQueryArgs, Void, HttpUtils.PostResult> {
         @Override
         protected HttpUtils.PostResult doInBackground(DirectionQueryArgs... params) {
             mArgs = params[0];
             String stopCode = mArgs.StopCode;
 
             HashMap<String, String> urlParams = new HashMap<>();
-            urlParams.put("appID", mAppId);
-            urlParams.put("apiKey", mApiKey);
+            urlParams.put("appID", mArgs.AppId);
+            urlParams.put("apiKey", mArgs.ApiKey);
             urlParams.put("stopNo", stopCode);
             urlParams.put("format", "json");
 
@@ -281,7 +288,7 @@ public class OcTranspoApi {
 
                     // We have found the one we want
                     String directionString = route.getString("Direction");
-                    mDirectionCache.put(key, directionString);
+                    mArgs.DirectionCache.put(key, directionString);
                     Log.d(TAG, "Successfully cached a direction");
                 }
             } catch (JSONException jsonError) {
@@ -296,7 +303,7 @@ public class OcTranspoApi {
         // We want to launch a job to fill the requested cache entry
         Log.d(TAG, "Performing direction lookup for cache");
         final String stopCode = key.StopCode;
-        new DirectionQueryTask().execute(new DirectionQueryArgs(context, stopCode, key));
+        new DirectionQueryTask().execute(new DirectionQueryArgs(context, stopCode, key, mAppId, mApiKey, mDirectionCache));
     }
 
     private JSONArray GetArrayOrObject(JSONObject o, String member) throws JSONException {
