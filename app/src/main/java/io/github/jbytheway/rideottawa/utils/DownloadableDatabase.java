@@ -75,6 +75,7 @@ public abstract class DownloadableDatabase extends SQLiteOpenHelper {
 
     public interface UpdateListener {
         void onSuccess();
+        void onCancel();
         void onFail(Exception e, Integer code, String message, boolean wifiRelated, boolean fatal);
     }
 
@@ -126,6 +127,7 @@ public abstract class DownloadableDatabase extends SQLiteOpenHelper {
                             if (existingEtag.equals(newEtag)) {
                                 mDownload.cancel(true);
                                 touchEtag();
+                                listener.onCancel();
                             } else {
                                 progressDialog.setMessage(mContext.getString(R.string.downloading_new));
                             }

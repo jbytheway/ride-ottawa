@@ -78,6 +78,12 @@ public class ListFavouritesActivity extends AppCompatActivity {
             }
 
             @Override
+            public void onCancel() {
+                String toastText = getString(R.string.db_already_up_to_date);
+                Toast.makeText(ListFavouritesActivity.this, toastText, Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
             public void onFail(Exception e, Integer code, String message, boolean wifiRelated, boolean fatal) {
                 if (fatal) {
                     fail(e, code, message, wifiRelated);
