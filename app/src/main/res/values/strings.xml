@@ -64,6 +64,8 @@
     <string name="action_alarms">Alarms</string>
     <string name="title_activity_list_alarms">Alarms</string>
     <string name="no_alarms">You have no alarms set.</string>
+    <string name="alarm_channel_name">Bus proximity alarms</string>
+    <string name="alarm_channel_description">Notifications used for alarms you choose to set for specific approaching buses.</string>
     <string name="some_routes_missing">Some routes for this favourite no longer exist and have been removed.</string>
 
     <string name="alarm_notification_text">%1$s departs %2$s at %3$s</string>

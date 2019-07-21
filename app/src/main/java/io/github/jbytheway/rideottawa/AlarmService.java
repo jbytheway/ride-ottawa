@@ -3,11 +3,13 @@ package io.github.jbytheway.rideottawa;
 import android.app.AlarmManager;
 import android.app.IntentService;
 import android.app.Notification;
+import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.TaskStackBuilder;
 import android.content.Context;
 import android.content.Intent;
+import android.media.AudioAttributes;
 import android.media.RingtoneManager;
 import android.net.Uri;
 import androidx.core.app.NotificationCompat;
@@ -26,6 +28,8 @@ import io.github.jbytheway.rideottawa.utils.TimeUtils;
 
 public class AlarmService extends IntentService {
     private static final String TAG = "AlarmService";
+    private static final String CHANNEL_ID = "alarm_notification_channel";
+
     public static final String ACTION = "action";
     public static final String TRIP_UID = "trip_uid";
     public static final String FAVOURITE_STOP_ID = "favourite_stop_id";
@@ -39,6 +43,23 @@ public class AlarmService extends IntentService {
     private static final long[] VIBRATION_PATTERN = new long[]{0, 300, 200, 300};
 
     private static final int SECONDS_IN_ADVANCE_TO_CHECK = 600;
+
+    static public NotificationChannel createNotificationChannel(Context context) {
+        CharSequence name = context.getString(R.string.alarm_channel_name);
+        String description = context.getString(R.string.alarm_channel_description);
+        int importance = NotificationManager.IMPORTANCE_HIGH;
+        NotificationChannel channel = new NotificationChannel(CHANNEL_ID, name, importance);
+        channel.setDescription(description);
+        channel.enableVibration(true);
+        Uri sound = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM);
+        AudioAttributes attributes =
+                new AudioAttributes.Builder()
+                .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
+                .setUsage(AudioAttributes.USAGE_ALARM)
+                .build();
+        channel.setSound(sound, attributes);
+        return channel;
+    }
 
     public AlarmService() {
         super("AlarmService");
@@ -185,16 +206,15 @@ public class AlarmService extends IntentService {
 
         Uri sound = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM);
 
-        NotificationCompat.Builder builder = new NotificationCompat.Builder(this);
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(this, CHANNEL_ID);
         builder
                 .setSmallIcon(R.drawable.alarm_notification)
                 .setContentTitle(title)
                 .setContentText(text)
                 .setCategory(Notification.CATEGORY_ALARM)
-                .setVisibility(Notification.VISIBILITY_PUBLIC)
+                .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
                 .setWhen(alarm.getTimeOfAlarm().getMillis())
                 .setAutoCancel(true)
-                .setPriority(Notification.PRIORITY_MAX)
                 .setSound(sound)
                 .setVibrate(VIBRATION_PATTERN)
                 .setContentIntent(resultPendingIntent);

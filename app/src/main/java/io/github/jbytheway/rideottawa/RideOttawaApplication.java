@@ -1,5 +1,7 @@
 package io.github.jbytheway.rideottawa;
 
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
 import android.content.Intent;
 
 import com.orm.SugarApp;
@@ -14,9 +16,16 @@ public class RideOttawaApplication extends SugarApp {
     public void onCreate() {
         super.onCreate();
         JodaTimeAndroid.init(this);
+        createNotificationChannels();
         Intent intentToSend = new Intent(this, AlarmService.class);
         intentToSend.putExtra(AlarmService.ACTION, AlarmService.ACTION_CHECK_ALARMS);
         startService(intentToSend);
+    }
+
+    private void createNotificationChannels() {
+        NotificationChannel channel = AlarmService.createNotificationChannel(this);
+        NotificationManager notificationManager = getSystemService(NotificationManager.class);
+        notificationManager.createNotificationChannel(channel);
     }
 
     public OcTranspoDataAccess getOcTranspo() {
