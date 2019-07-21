@@ -5,6 +5,7 @@ import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.net.ConnectivityManager;
+import android.os.AsyncTask;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
@@ -88,6 +89,74 @@ public abstract class DownloadableDatabase extends SQLiteOpenHelper {
         }
     }
 
+    private static class DecompressArgs {
+        DecompressArgs(Context context, DownloadableDatabase database, File from, File to, String etag, ProgressDialog progressDialog, UpdateListener listener) {
+            Context = context;
+            mDatabase = database;
+            From = from;
+            To = to;
+            Etag = etag;
+            ProgressDialog = progressDialog;
+            Listener = listener;
+        }
+        private DownloadableDatabase mDatabase;
+
+        final Context Context;
+        final File From;
+        final File To;
+        final String Etag;
+        final ProgressDialog ProgressDialog;
+        final UpdateListener Listener;
+
+        void setEtag(String etag) {
+            mDatabase.setEtag(etag);
+        }
+
+        void close() {
+            mDatabase.close();
+        }
+    }
+
+    private static class DecompressDatabaseTask extends AsyncTask<DecompressArgs, Void, Void> {
+        @Override
+        protected Void doInBackground(DecompressArgs... params) {
+            mArgs = params[0];
+            try {
+                mArgs.ProgressDialog.setMessage(mArgs.Context.getString(R.string.decompressing));
+                final String tmpFileName = mArgs.To.getName() + ".tmp";
+                final File tmpFile = mArgs.Context.getFileStreamPath(tmpFileName);
+                Log.d(TAG, "Decompressing " + mArgs.From.getPath() + " to " + tmpFile.getPath());
+                FileInputStream fin = new FileInputStream(mArgs.From);
+                GZIPInputStream zin = new GZIPInputStream(fin);
+
+                FileOutputStream fout = new FileOutputStream(tmpFile);
+
+                ByteStreams.copy(zin, fout);
+                Log.d(TAG, "Decompression done");
+                if (!tmpFile.renameTo(mArgs.To)) {
+                    throw new IOException("Failed to rename "+tmpFile+" to "+mArgs.To.getPath());
+                }
+                // We want to force any future access to be from the new database, not the old one
+                // so we force a close on this.  (TODO: test if this is really effective)
+                mArgs.close();
+                mArgs.setEtag(mArgs.Etag);
+                mArgs.Listener.onSuccess();
+            } catch (IOException e) {
+                Log.e(TAG, "Decompressing failed", e);
+                // Unset the ETag because we might have partially written the database
+                mArgs.setEtag("");
+                mArgs.Listener.onFail(e, null, mArgs.Context.getString(R.string.database_decompression_error), false, true);
+            } finally {
+                if (!mArgs.From.delete()) {
+                    Log.e(TAG, "Deleting temporary file failed");
+                }
+            }
+            return null;
+        }
+
+        DecompressArgs mArgs;
+    }
+
     public void checkForUpdates(boolean wifiOnly, DateTime ifOlderThan, final ProgressDialog progressDialog, final UpdateListener listener) {
         try {
             final String existingEtag = getEtag();
@@ -153,15 +222,7 @@ public abstract class DownloadableDatabase extends SQLiteOpenHelper {
                                 return;
                             }
 
-                            try {
-                                uncompressNewDatabase(result.getResult(), progressDialog, listener);
-                                setEtag(result.getHeaders().getHeaders().get("ETag"));
-                            } finally {
-                                //noinspection ResultOfMethodCallIgnored
-                                temporaryFile.delete();
-                            }
-
-                            listener.onSuccess();
+                            new DecompressDatabaseTask().execute(new DecompressArgs(mContext, DownloadableDatabase.this, result.getResult(), new File(getPath()), result.getHeaders().getHeaders().get("ETag"), progressDialog, listener));
                         }
                     });
         } catch (IOException e) {
@@ -184,33 +245,6 @@ public abstract class DownloadableDatabase extends SQLiteOpenHelper {
         listener.onFail(e, code, message, wifiRelated, fatal);
     }
 
-    private void uncompressNewDatabase(File from, ProgressDialog progressDialog, UpdateListener listener) {
-        try {
-            progressDialog.setMessage(mContext.getString(R.string.decompressing));
-            final String tmpFileName = getDatabaseName() + ".tmp";
-            final File tmpFile = mContext.getFileStreamPath(tmpFileName);
-            Log.d(TAG, "Decompressing " + from.getPath() + " to " + tmpFile.getPath());
-            FileInputStream fin = new FileInputStream(from);
-            GZIPInputStream zin = new GZIPInputStream(fin);
-
-            FileOutputStream fout = new FileOutputStream(tmpFile);
-
-            ByteStreams.copy(zin, fout);
-            Log.d(TAG, "Decompression done");
-            if (!tmpFile.renameTo(new File(getPath()))) {
-                throw new IOException("Failed to rename "+tmpFile+" to "+getPath());
-            }
-            // We want to force any future access to be from the new database, not the old one
-            // so we force a close on this.  (TODO: test if this is really effective)
-            close();
-        } catch (IOException e) {
-            Log.e(TAG, "Decompressing failed", e);
-            // Unset the ETag because we might have partially written the database
-            setEtag("");
-            listener.onFail(e, null, mContext.getString(R.string.database_decompression_error), false, true);
-        }
-    }
-
     public boolean isDatabaseAvailable() {
         try {
             return !getEtag().isEmpty();
@@ -221,7 +255,7 @@ public abstract class DownloadableDatabase extends SQLiteOpenHelper {
 
     @Override
     public SQLiteDatabase getReadableDatabase() {
-        File file = new File (getPath());
+        File file = new File(getPath());
         if (!file.exists()) {
             throw new RuntimeException("Database file " + getPath() + " does not exist; did you call checkForUpdates() before trying to get the database?");
         }
