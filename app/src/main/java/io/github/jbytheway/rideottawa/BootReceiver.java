@@ -2,7 +2,7 @@ package io.github.jbytheway.rideottawa;
 
 import android.content.Context;
 import android.content.Intent;
-import android.support.v4.content.WakefulBroadcastReceiver;
+import androidx.legacy.content.WakefulBroadcastReceiver;
 
 public class BootReceiver extends WakefulBroadcastReceiver {
     @Override

@@ -2,7 +2,7 @@ package io.github.jbytheway.rideottawa.db;
 
 import android.os.Parcel;
 import android.os.Parcelable;
-import android.support.v4.graphics.ColorUtils;
+import androidx.core.graphics.ColorUtils;
 import android.widget.TextView;
 
 import java.util.Objects;

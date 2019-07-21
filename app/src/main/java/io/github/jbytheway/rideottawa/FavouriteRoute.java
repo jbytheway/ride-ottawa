@@ -1,7 +1,7 @@
 package io.github.jbytheway.rideottawa;
 
 import android.database.Cursor;
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 
 import com.orm.SugarRecord;
 
