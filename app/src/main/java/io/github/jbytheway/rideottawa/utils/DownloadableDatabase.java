@@ -239,8 +239,9 @@ public abstract class DownloadableDatabase extends SQLiteOpenHelper {
     }
 
     private String getEtag() throws IOException {
+        File file = new File(getPath());
         File etagFile = new File(getEtagPath());
-        if (!etagFile.exists()) {
+        if (!etagFile.exists() || !file.exists()) {
             return "";
         }
         InputStream is = new FileInputStream(etagFile);
