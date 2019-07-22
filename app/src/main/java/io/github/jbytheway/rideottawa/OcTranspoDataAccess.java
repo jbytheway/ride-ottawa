@@ -62,7 +62,14 @@ public class OcTranspoDataAccess {
             c.moveToFirst();
             String date = c.getString(col);
             c.close();
-            return mIsoDateFormatter.parseDateTime(date);
+            Log.d(TAG, "Date is "+date);
+            try {
+                return mIsoDateFormatter.parseDateTime(date);
+            } catch (IllegalArgumentException e) {
+                // This indicates a corrupted database.  Delete it to trigger a new download.
+                mHelper.deleteDatabase();
+                return null;
+            }
         } else {
             return null;
         }
