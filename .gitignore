@@ -4,6 +4,8 @@ __pycache__
 *.iml
 .gradle
 /local.properties
+/.idea/caches
+/.idea/encodings.xml
 /.idea/misc.xml
 /.idea/workspace.xml
 /.idea/libraries
@@ -12,4 +14,5 @@ __pycache__
 .DS_Store
 /build
 /captures
+app/app-release.apk
 app/src/main/res/values/api.xml
