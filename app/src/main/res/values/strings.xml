@@ -28,6 +28,7 @@
     <string name="action_set_alarm">Set alarm</string>
     <string name="action_cancel">Cancel</string>
     <string name="title_activity_edit_favourite">Edit Favourite</string>
+    <string name="delete_favourite">Delete favourite</string>
     <string name="name_label">Name:</string>
     <string name="save">Save</string>
     <string name="add_stop">Add stop</string>
@@ -122,6 +123,7 @@
 
     <string name="no_favourites_hint">You currently have no favourites.\nTap the \'+\' button
     below to create one.</string>
+    <string name="add_favourite">Add favourite</string>
 
     <string name="list_favourites_hint">Tap a favourite to use it.\nLong tap to edit.</string>
 
