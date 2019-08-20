@@ -122,7 +122,7 @@ public abstract class DownloadableDatabase extends SQLiteOpenHelper {
         protected Void doInBackground(DecompressArgs... params) {
             mArgs = params[0];
             try {
-                mArgs.ProgressDialog.setMessage(mArgs.Context.getString(R.string.decompressing));
+                publishProgress();
                 final String tmpFileName = mArgs.To.getName() + ".tmp";
                 final File tmpFile = mArgs.Context.getFileStreamPath(tmpFileName);
                 Log.d(TAG, "Decompressing " + mArgs.From.getPath() + " to " + tmpFile.getPath());
@@ -152,6 +152,12 @@ public abstract class DownloadableDatabase extends SQLiteOpenHelper {
                 }
             }
             return null;
+        }
+
+        @Override
+        protected void onProgressUpdate(Void... progress) {
+            Log.d(TAG, "Setting progress dialog message");
+            mArgs.ProgressDialog.setMessage(mArgs.Context.getString(R.string.decompressing));
         }
 
         DecompressArgs mArgs;
