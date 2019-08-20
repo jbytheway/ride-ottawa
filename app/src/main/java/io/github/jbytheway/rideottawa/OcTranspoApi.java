@@ -280,7 +280,7 @@ public class OcTranspoApi {
                 for (int i = 0; i < routes.length(); ++i) {
                     JSONObject route = routes.getJSONObject(i);
 
-                    String routeName = ""+route.getInt("RouteNo");
+                    String routeName = route.getString("RouteNo");
                     if (!routeName.equals(targetRouteName)) {
                         continue;
                     }
