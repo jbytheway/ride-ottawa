@@ -241,7 +241,7 @@ public abstract class DownloadableDatabase extends SQLiteOpenHelper {
             Log.e(TAG, "Error determining ETag", etagError);
             // Apart from the log, we pretty much have to ignore that error
         }
-        Log.d(TAG, "Download failed; e=" + e + "; fatal=" + fatal);
+        Log.d(TAG, "Download failed; e=" + e + "; code=" + code + "; fatal=" + fatal);
         listener.onFail(e, code, message, wifiRelated, fatal);
     }
 
