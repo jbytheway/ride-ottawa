@@ -23,7 +23,7 @@ import io.github.jbytheway.rideottawa.utils.HttpUtils;
 
 public class OcTranspoApi {
     private static final String TAG = "OcTranspoApi";
-    private static final String URL_ROOT = "https://api.octranspo1.com/v1.2/";
+    private static final String URL_ROOT = "https://api.octranspo1.com/v1.3/";
     private static final String NEXT_TRIPS_URL = URL_ROOT + "GetNextTripsForStop";
     private static final String ROUTE_SUMMARY_URL = URL_ROOT + "GetRouteSummaryForStop";
 
@@ -70,7 +70,7 @@ public class OcTranspoApi {
         // curl -d "appID=${appId}&apiKey=${apiKey}&stopNo=${stopCode}&routeNo=${routeName}&format=json" https://api.octranspo1.com/v1.2/GetNextTripsForStop
         final String routeName = query.Route.getName();
 
-        Log.d(TAG, "Submitting API query, stopCode="+query.StopCodeToQuery+", routeName="+routeName);
+        Log.d(TAG, "Submitting NextTrips API query, stopCode="+query.StopCodeToQuery+", routeName="+routeName);
 
         HashMap<String, String> params = new HashMap<>();
         params.put("appID", mAppId);
@@ -245,11 +245,15 @@ public class OcTranspoApi {
         protected HttpUtils.PostResult doInBackground(DirectionQueryArgs... params) {
             mArgs = params[0];
             String stopCode = mArgs.StopCode;
+            String routeName = mArgs.Key.Route.getName();
+
+            Log.d(TAG, "Submitting RouteSummary API query, stopCode="+stopCode+", routeName="+routeName);
 
             HashMap<String, String> urlParams = new HashMap<>();
             urlParams.put("appID", mArgs.AppId);
             urlParams.put("apiKey", mArgs.ApiKey);
             urlParams.put("stopNo", stopCode);
+            urlParams.put("routeNo", routeName);
             urlParams.put("format", "json");
 
             return HttpUtils.httpPost(mArgs.Context, ROUTE_SUMMARY_URL, urlParams, R.raw.globalsign_dv_ca_g2);
