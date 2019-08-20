@@ -166,6 +166,9 @@ public class ListFavouritesActivity extends AppCompatActivity {
             exceptionMessage = getString(R.string.no_exception);
         } else {
             exceptionMessage = e.getLocalizedMessage();
+            if (exceptionMessage == null) {
+                exceptionMessage = e.toString();
+            }
         }
         String codeMessage;
         if (code == null) {
