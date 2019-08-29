@@ -67,7 +67,7 @@
     <string name="no_alarms">You have no alarms set.</string>
     <string name="alarm_channel_name">Bus proximity alarms</string>
     <string name="alarm_channel_description">Notifications used for alarms you choose to set for specific approaching buses.</string>
-    <string name="some_routes_missing">Some routes for this favourite no longer exist and have been removed.</string>
+    <string name="some_routes_missing">Some stops or routes for this favourite no longer exist and have been removed.</string>
 
     <string name="alarm_notification_text">%1$s departs %2$s at %3$s</string>
     <string name="alarm_notification_title">The %1$s is %2$s away</string>

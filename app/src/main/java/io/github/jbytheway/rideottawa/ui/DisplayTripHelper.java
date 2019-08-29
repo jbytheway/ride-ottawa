@@ -23,6 +23,7 @@ import io.github.jbytheway.rideottawa.FavouriteRoute;
 import io.github.jbytheway.rideottawa.FavouriteStop;
 import io.github.jbytheway.rideottawa.ForthcomingTrip;
 import io.github.jbytheway.rideottawa.NoSuchRouteError;
+import io.github.jbytheway.rideottawa.NoSuchStopError;
 import io.github.jbytheway.rideottawa.OcTranspoDataAccess;
 import io.github.jbytheway.rideottawa.R;
 import io.github.jbytheway.rideottawa.RideOttawaApplication;
@@ -42,19 +43,26 @@ public class DisplayTripHelper implements IndirectArrayAdapter.ViewGenerator<For
     }
 
     public void addFavourite(Favourite favourite) {
-        boolean someRoutesMissing = false;
+        boolean someThingsMissing = false;
 
         for (FavouriteStop stop : favourite.getStops()) {
-            someRoutesMissing = addFavouriteStop(stop) | someRoutesMissing;
+            someThingsMissing = addFavouriteStop(stop) | someThingsMissing;
         }
 
-        if (someRoutesMissing) {
+        if (someThingsMissing) {
             Toast.makeText(mContext, R.string.some_routes_missing, Toast.LENGTH_LONG).show();
         }
     }
 
     public boolean addFavouriteStop(FavouriteStop favouriteStop) {
-        Stop stop = favouriteStop.asStop(mOcTranspo);
+        Stop stop;
+
+        try {
+            stop = favouriteStop.asStop(mOcTranspo);
+        } catch (NoSuchStopError e) {
+            favouriteStop.deleteRecursively();
+            return true;
+        }
 
         if (mChosenDestinations.containsKey(stop)) {
             return false;
@@ -76,8 +84,14 @@ public class DisplayTripHelper implements IndirectArrayAdapter.ViewGenerator<For
             if (destinationId == null) {
                 destinationsByRoute.put(route, null);
             } else {
-                Stop destination = mOcTranspo.getStop(destinationId);
-                destinationsByRoute.put(route, destination.getName(mContext));
+                try {
+                    Stop destination = mOcTranspo.getStop(destinationId);
+                    destinationsByRoute.put(route, destination.getName(mContext));
+                } catch(NoSuchStopError e) {
+                    favouriteRoute.Destination = null;
+                    favouriteRoute.save();
+                    someRoutesMissing = true;
+                }
             }
         }
         mChosenDestinations.put(stop, destinationsByRoute);

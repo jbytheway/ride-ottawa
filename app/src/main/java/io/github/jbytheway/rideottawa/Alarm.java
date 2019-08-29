@@ -23,7 +23,11 @@ public class Alarm {
         mOnRefreshedListener = listener;
         mFromPendingData = fromPendingData;
 
-        mStop = favouriteStop.asStop(ocTranspo);
+        try {
+            mStop = favouriteStop.asStop(ocTranspo);
+        } catch (NoSuchStopError e) {
+            throw new AssertionError("No such stop constructing alarm");
+        }
         mTrip = ocTranspo.getTrip(tripUid.getTripId());
         Stop lastStop = ocTranspo.getLastStopOf(mTrip);
         StopTime tripAtStop = ocTranspo.getTimeAtStop(mTrip, mStop);

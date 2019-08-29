@@ -232,11 +232,11 @@ public class OcTranspoDataAccess {
         return database.rawQuery(query, args.toArray(new String[0]));
     }
 
-    public Stop getStop(String stopId) {
+    public Stop getStop(String stopId) throws NoSuchStopError {
         SQLiteDatabase database = mHelper.getReadableDatabase();
         Cursor c = database.query("stops", STOP_COLUMNS, "stop_id = ?", new String[]{stopId}, null, null, null);
         if (c.getCount() != 1) {
-            throw new AssertionError("Requested invalid StopId " + stopId);
+            throw new NoSuchStopError("Requested invalid StopId " + stopId);
         }
         c.moveToFirst();
         int stopCodeColumn = c.getColumnIndexOrThrow("stop_code");

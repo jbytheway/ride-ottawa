@@ -27,6 +27,7 @@ import io.github.jbytheway.rideottawa.Favourite;
 import io.github.jbytheway.rideottawa.FavouriteRoute;
 import io.github.jbytheway.rideottawa.FavouriteStop;
 import io.github.jbytheway.rideottawa.NoSuchRouteError;
+import io.github.jbytheway.rideottawa.NoSuchStopError;
 import io.github.jbytheway.rideottawa.utils.IndirectArrayAdapter;
 import io.github.jbytheway.rideottawa.RideOttawaApplication;
 import io.github.jbytheway.rideottawa.OcTranspoDataAccess;
@@ -81,66 +82,82 @@ public class EditFavouriteActivityFragment extends Fragment {
                 new IndirectArrayAdapter.ViewGenerator<FavouriteStop>() {
                     @Override
                     public void applyView(View v, final FavouriteStop favouriteStop) {
+                        boolean someThingsMissing = false;
                         TextView stop_code = (TextView) v.findViewById(R.id.stop_code);
                         TextView stop_name = (TextView) v.findViewById(R.id.stop_name);
-                        final Stop stop = mOcTranspo.getStop(favouriteStop.StopId);
-                        stop_code.setText(stop.getCode());
-                        stop_name.setText(stop.getName(context));
 
-                        Button chooseRoutesButton = (Button) v.findViewById(R.id.choose_routes_button);
-                        chooseRoutesButton.setOnClickListener(new View.OnClickListener() {
-                            @Override
-                            public void onClick(View v) {
-                                selectRoutesForStop(favouriteStop);
-                            }
-                        });
-
-                        Button addDestinationButton = (Button) v.findViewById(R.id.add_destination_button);
-                        addDestinationButton.setOnClickListener(new View.OnClickListener() {
-                            @Override
-                            public void onClick(View v) {
-                                addDestinationForStop(favouriteStop);
-                            }
-                        });
-
-                        Button deleteStopButton = (Button) v.findViewById(R.id.delete_button);
-                        deleteStopButton.setOnClickListener(new View.OnClickListener() {
-                            @Override
-                            public void onClick(View v) {
-                                mFavourite.removeStop(favouriteStop);
-                                mStopAdapter.notifyDataSetChanged();
-                            }
-                        });
-
-                        LinearLayout routeList = (LinearLayout) v.findViewById(R.id.route_list);
-                        routeList.removeAllViews();
-                        List<FavouriteRoute> routes = favouriteStop.getRoutes();
-                        boolean someRoutesMissing = false;
-                        for (FavouriteRoute favouriteRoute : routes) {
-                            Route route;
-                            try {
-                                route = favouriteRoute.asRoute(mOcTranspo);
-                            } catch (NoSuchRouteError e) {
-                                someRoutesMissing = true;
-                                favouriteRoute.deleteRecursively();
-                                continue;
-                            }
-                            View routeView = inflater.inflate(R.layout.edit_stop_route_list_item, routeList, false);
-                            TextView routeName = (TextView) routeView.findViewById(R.id.route_name);
-                            route.applyToTextView(routeName);
-                            TextView destinationView = (TextView) routeView.findViewById(R.id.destination);
-                            String destinationStopId = favouriteRoute.Destination;
-                            if (destinationStopId == null) {
-                                destinationView.setVisibility(View.GONE);
-                            } else {
-                                Stop destination = mOcTranspo.getStop(favouriteRoute.Destination);
-                                destinationView.setText(destination.getName(context));
-                                destinationView.setVisibility(View.VISIBLE);
-                            }
-                            routeList.addView(routeView);
+                        Stop stop = null;
+                        try {
+                            stop = mOcTranspo.getStop(favouriteStop.StopId);
+                        } catch (NoSuchStopError e) {
+                            favouriteStop.deleteRecursively();
+                            someThingsMissing = true;
                         }
 
-                        if (someRoutesMissing) {
+                        if (stop != null) {
+                            stop_code.setText(stop.getCode());
+                            stop_name.setText(stop.getName(context));
+
+                            Button chooseRoutesButton = (Button) v.findViewById(R.id.choose_routes_button);
+                            chooseRoutesButton.setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View v) {
+                                    selectRoutesForStop(favouriteStop);
+                                }
+                            });
+
+                            Button addDestinationButton = (Button) v.findViewById(R.id.add_destination_button);
+                            addDestinationButton.setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View v) {
+                                    addDestinationForStop(favouriteStop);
+                                }
+                            });
+
+                            Button deleteStopButton = (Button) v.findViewById(R.id.delete_button);
+                            deleteStopButton.setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View v) {
+                                    mFavourite.removeStop(favouriteStop);
+                                    mStopAdapter.notifyDataSetChanged();
+                                }
+                            });
+
+                            LinearLayout routeList = (LinearLayout) v.findViewById(R.id.route_list);
+                            routeList.removeAllViews();
+                            List<FavouriteRoute> routes = favouriteStop.getRoutes();
+                            for (FavouriteRoute favouriteRoute : routes) {
+                                Route route;
+                                try {
+                                    route = favouriteRoute.asRoute(mOcTranspo);
+                                } catch (NoSuchRouteError e) {
+                                    someThingsMissing = true;
+                                    favouriteRoute.deleteRecursively();
+                                    continue;
+                                }
+                                View routeView = inflater.inflate(R.layout.edit_stop_route_list_item, routeList, false);
+                                TextView routeName = (TextView) routeView.findViewById(R.id.route_name);
+                                route.applyToTextView(routeName);
+                                TextView destinationView = (TextView) routeView.findViewById(R.id.destination);
+                                String destinationStopId = favouriteRoute.Destination;
+                                if (destinationStopId == null) {
+                                    destinationView.setVisibility(View.GONE);
+                                } else {
+                                    try {
+                                        Stop destination = mOcTranspo.getStop(destinationStopId);
+                                        destinationView.setText(destination.getName(context));
+                                        destinationView.setVisibility(View.VISIBLE);
+                                    } catch (NoSuchStopError e) {
+                                        favouriteRoute.Destination = null;
+                                        favouriteRoute.save();
+                                        someThingsMissing = true;
+                                    }
+                                }
+                                routeList.addView(routeView);
+                            }
+                        }
+
+                        if (someThingsMissing) {
                             Toast.makeText(getActivity(), R.string.some_routes_missing, Toast.LENGTH_LONG).show();
                         }
                     }
@@ -329,7 +346,11 @@ public class EditFavouriteActivityFragment extends Fragment {
             if (!hasName) {
                 // If it has no name, concoct one
                 FavouriteStop firstStop = stops.get(0);
-                mFavourite.Name = firstStop.asStop(mOcTranspo).getName(context);
+                try {
+                    mFavourite.Name = firstStop.asStop(mOcTranspo).getName(context);
+                } catch (NoSuchStopError e) {
+                    throw new AssertionError("Stop ceased to exist while editing favourite");
+                }
             }
             mFavourite.saveRecursively();
         } else {

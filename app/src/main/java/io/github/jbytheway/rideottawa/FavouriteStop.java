@@ -44,7 +44,7 @@ public class FavouriteStop extends SugarRecord {
         delete();
     }
 
-    public Stop asStop(OcTranspoDataAccess ocTranspo) {
+    public Stop asStop(OcTranspoDataAccess ocTranspo) throws NoSuchStopError {
         return ocTranspo.getStop(StopId);
     }
 
