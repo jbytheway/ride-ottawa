@@ -29,7 +29,8 @@ import io.github.jbytheway.rideottawa.utils.TimeUtils;
 
 public class AlarmService extends IntentService {
     private static final String TAG = "AlarmService";
-    private static final String CHANNEL_ID = "alarm_notification_channel";
+    private static final String CHANNEL_ID_ALARM = "alarm_notification_channel";
+    private static final String CHANNEL_ID_PENDING_ALARM = "pending_alarm_notification_channel";
 
     public static final String ACTION = "action";
     public static final String TRIP_UID = "trip_uid";
@@ -51,7 +52,7 @@ public class AlarmService extends IntentService {
             CharSequence name = context.getString(R.string.alarm_channel_name);
             String description = context.getString(R.string.alarm_channel_description);
             int importance = NotificationManager.IMPORTANCE_HIGH;
-            NotificationChannel channel = new NotificationChannel(CHANNEL_ID, name, importance);
+            NotificationChannel channel = new NotificationChannel(CHANNEL_ID_ALARM, name, importance);
             channel.setDescription(description);
             channel.enableVibration(true);
             Uri sound = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM);
@@ -61,6 +62,14 @@ public class AlarmService extends IntentService {
                             .setUsage(AudioAttributes.USAGE_ALARM)
                             .build();
             channel.setSound(sound, attributes);
+            result.add(channel);
+        }
+        {
+            CharSequence name = context.getString(R.string.pending_alarm_channel_name);
+            String description = context.getString(R.string.pending_alarm_channel_description);
+            int importance = NotificationManager.IMPORTANCE_DEFAULT;
+            NotificationChannel channel = new NotificationChannel(CHANNEL_ID_PENDING_ALARM, name, importance);
+            channel.setDescription(description);
             result.add(channel);
         }
         return result;
@@ -211,7 +220,7 @@ public class AlarmService extends IntentService {
 
         Uri sound = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM);
 
-        NotificationCompat.Builder builder = new NotificationCompat.Builder(this, CHANNEL_ID);
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(this, CHANNEL_ID_ALARM);
         builder
                 .setSmallIcon(R.drawable.alarm_notification)
                 .setContentTitle(title)
