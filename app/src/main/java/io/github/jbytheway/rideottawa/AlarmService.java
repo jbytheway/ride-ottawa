@@ -137,6 +137,33 @@ public class AlarmService extends IntentService {
         return nextAlarmList.get(0);
     }
 
+    private Notification getNotificationForAlarm(Alarm alarm, String channel, DateTime when, Uri sound, PendingIntent pendingIntent) {
+        DateTime timeOfBus = alarm.getTimeOfBus();
+        DateTime now = mOcTranspo.getNow();
+        String routeName = alarm.getRoute().getName();
+        int minutesDifference = (int)TimeUtils.minutesDifference(now, timeOfBus);
+        String busTimeFormatted = mTimeFormatter.print(timeOfBus);
+
+        String minutesString = getResources().getQuantityString(R.plurals.minute_plural, minutesDifference, minutesDifference);
+        String title = getString(R.string.alarm_notification_title, routeName, minutesString);
+        String text = getString(R.string.alarm_notification_text, routeName, alarm.getStop().getName(this), busTimeFormatted);
+
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(this, channel);
+        builder
+                .setSmallIcon(R.drawable.alarm_notification)
+                .setContentTitle(title)
+                .setContentText(text)
+                .setCategory(Notification.CATEGORY_ALARM)
+                .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
+                .setWhen(when.getMillis())
+                .setAutoCancel(true)
+                .setSound(sound)
+                .setVibrate(VIBRATION_PATTERN)
+                .setContentIntent(pendingIntent);
+
+        return builder.build();
+    }
+
     private void processAlarm(final Alarm alarm) {
         DateTime timeForAlarm = alarm.getTimeOfAlarm();
         DateTime now = mOcTranspo.getNow();
@@ -201,16 +228,6 @@ public class AlarmService extends IntentService {
     private void triggerAlarm(Alarm alarm) {
         Log.i(TAG, "ALARM ALARM");
 
-        DateTime timeOfBus = alarm.getTimeOfBus();
-        DateTime now = mOcTranspo.getNow();
-        String routeName = alarm.getRoute().getName();
-        int minutesDifference = (int)TimeUtils.minutesDifference(now, timeOfBus);
-        String busTimeFormatted = mTimeFormatter.print(timeOfBus);
-
-        String minutesString = getResources().getQuantityString(R.plurals.minute_plural, minutesDifference, minutesDifference);
-        String title = getString(R.string.alarm_notification_title, routeName, minutesString);
-        String text = getString(R.string.alarm_notification_text, routeName, alarm.getStop().getName(this), busTimeFormatted);
-
         Intent resultIntent = new Intent(this, ViewFavouriteActivity.class);
         resultIntent.putExtra(ViewFavouriteActivity.FAVOURITE_ID, alarm.getFavourite().getId());
         TaskStackBuilder stackBuilder = TaskStackBuilder.create(this);
@@ -220,21 +237,9 @@ public class AlarmService extends IntentService {
 
         Uri sound = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM);
 
-        NotificationCompat.Builder builder = new NotificationCompat.Builder(this, CHANNEL_ID_ALARM);
-        builder
-                .setSmallIcon(R.drawable.alarm_notification)
-                .setContentTitle(title)
-                .setContentText(text)
-                .setCategory(Notification.CATEGORY_ALARM)
-                .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
-                .setWhen(alarm.getTimeOfAlarm().getMillis())
-                .setAutoCancel(true)
-                .setSound(sound)
-                .setVibrate(VIBRATION_PATTERN)
-                .setContentIntent(resultPendingIntent);
-
         NotificationManager notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
-        notificationManager.notify(ALARM_NOTIFICATION_ID, builder.build());
+        Notification notification = getNotificationForAlarm(alarm, CHANNEL_ID_ALARM, alarm.getTimeOfAlarm(), sound, resultPendingIntent);
+        notificationManager.notify(ALARM_NOTIFICATION_ID, notification);
     }
 
     private OcTranspoDataAccess mOcTranspo;
