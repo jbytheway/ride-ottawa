@@ -21,6 +21,7 @@ import org.joda.time.Interval;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import io.github.jbytheway.rideottawa.ui.ViewFavouriteActivity;
@@ -44,21 +45,25 @@ public class AlarmService extends IntentService {
 
     private static final int SECONDS_IN_ADVANCE_TO_CHECK = 600;
 
-    static public NotificationChannel createNotificationChannel(Context context) {
-        CharSequence name = context.getString(R.string.alarm_channel_name);
-        String description = context.getString(R.string.alarm_channel_description);
-        int importance = NotificationManager.IMPORTANCE_HIGH;
-        NotificationChannel channel = new NotificationChannel(CHANNEL_ID, name, importance);
-        channel.setDescription(description);
-        channel.enableVibration(true);
-        Uri sound = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM);
-        AudioAttributes attributes =
-                new AudioAttributes.Builder()
-                .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
-                .setUsage(AudioAttributes.USAGE_ALARM)
-                .build();
-        channel.setSound(sound, attributes);
-        return channel;
+    static public List<NotificationChannel> createNotificationChannels(Context context) {
+        List<NotificationChannel> result = new ArrayList<NotificationChannel>();
+        {
+            CharSequence name = context.getString(R.string.alarm_channel_name);
+            String description = context.getString(R.string.alarm_channel_description);
+            int importance = NotificationManager.IMPORTANCE_HIGH;
+            NotificationChannel channel = new NotificationChannel(CHANNEL_ID, name, importance);
+            channel.setDescription(description);
+            channel.enableVibration(true);
+            Uri sound = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM);
+            AudioAttributes attributes =
+                    new AudioAttributes.Builder()
+                            .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
+                            .setUsage(AudioAttributes.USAGE_ALARM)
+                            .build();
+            channel.setSound(sound, attributes);
+            result.add(channel);
+        }
+        return result;
     }
 
     public AlarmService() {

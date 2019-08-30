@@ -23,9 +23,10 @@ public class RideOttawaApplication extends SugarApp {
     }
 
     private void createNotificationChannels() {
-        NotificationChannel channel = AlarmService.createNotificationChannel(this);
         NotificationManager notificationManager = getSystemService(NotificationManager.class);
-        notificationManager.createNotificationChannel(channel);
+        for (NotificationChannel channel : AlarmService.createNotificationChannels(this)) {
+            notificationManager.createNotificationChannel(channel);
+        }
     }
 
     public OcTranspoDataAccess getOcTranspo() {
