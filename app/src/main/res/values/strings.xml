@@ -78,6 +78,7 @@
         <item quantity="other">%d minutes</item>
     </plurals>
     <string name="alarm_at">Alarm at</string>
+    <string name="no_alarm_notification_title">Checking for alarms&#8230;</string>
 
     <!-- Strings related to Settings -->
     <string name="pref_title_download_wifi_only">Download databases on WiFi only</string>

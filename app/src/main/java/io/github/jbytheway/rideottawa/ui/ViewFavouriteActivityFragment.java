@@ -354,7 +354,7 @@ public class ViewFavouriteActivityFragment extends Fragment implements OcTranspo
                 intent.putExtra(AlarmService.FAVOURITE_STOP_ID, favouriteStopId);
                 intent.putExtra(AlarmService.TRIP_UID, tripUid);
                 intent.putExtra(AlarmService.MINUTES_WARNING, minutesWarning);
-                getActivity().startService(intent);
+                getActivity().startForegroundService(intent);
             }
         };
     }

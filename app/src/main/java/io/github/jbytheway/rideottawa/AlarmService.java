@@ -24,10 +24,12 @@ import org.joda.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
+import io.github.jbytheway.rideottawa.ui.ListAlarmsActivity;
 import io.github.jbytheway.rideottawa.ui.ViewFavouriteActivity;
+import io.github.jbytheway.rideottawa.utils.NonStopIntentService;
 import io.github.jbytheway.rideottawa.utils.TimeUtils;
 
-public class AlarmService extends IntentService {
+public class AlarmService extends NonStopIntentService {
     private static final String TAG = "AlarmService";
     private static final String CHANNEL_ID_ALARM = "alarm_notification_channel";
     private static final String CHANNEL_ID_PENDING_ALARM = "pending_alarm_notification_channel";
@@ -42,6 +44,7 @@ public class AlarmService extends IntentService {
     public static final int ACTION_CHECK_ALARMS_WAKEFULLY = 3;
 
     private static final int ALARM_NOTIFICATION_ID = 1;
+    private static final int PENDING_ALARM_NOTIFICATION_ID = 2;
     private static final long[] VIBRATION_PATTERN = new long[]{0, 300, 200, 300};
 
     private static final int SECONDS_IN_ADVANCE_TO_CHECK = 600;
@@ -54,6 +57,7 @@ public class AlarmService extends IntentService {
             int importance = NotificationManager.IMPORTANCE_HIGH;
             NotificationChannel channel = new NotificationChannel(CHANNEL_ID_ALARM, name, importance);
             channel.setDescription(description);
+            channel.setLockscreenVisibility(Notification.VISIBILITY_PUBLIC);
             channel.enableVibration(true);
             Uri sound = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM);
             AudioAttributes attributes =
@@ -70,6 +74,7 @@ public class AlarmService extends IntentService {
             int importance = NotificationManager.IMPORTANCE_DEFAULT;
             NotificationChannel channel = new NotificationChannel(CHANNEL_ID_PENDING_ALARM, name, importance);
             channel.setDescription(description);
+            channel.setLockscreenVisibility(Notification.VISIBILITY_PUBLIC);
             result.add(channel);
         }
         return result;
@@ -88,7 +93,7 @@ public class AlarmService extends IntentService {
     }
 
     @Override
-    protected void onHandleIntent(Intent intent) {
+    protected boolean onHandleIntent(Intent intent) {
         Log.d(TAG, "onHandleIntent");
         if (mOcTranspo == null) {
             // Application object not accessible from here, so we must make our own OcTranspo
@@ -107,12 +112,13 @@ public class AlarmService extends IntentService {
                     throw new AssertionError("Invalid FavouriteStop id "+stopId);
                 }
 
-                new Alarm(
+                Alarm alarm = new Alarm(
                         favouriteStop, tripUid, minutesWarning,
                         mListener,
                         null,
                         mOcTranspo
-                ).refreshTimeEstimate(OcTranspoApi.Synchronicity.Syncronous, this, mOcTranspo);
+                );
+                alarm.refreshTimeEstimate(OcTranspoApi.Synchronicity.Syncronous, this, mOcTranspo);
                 break;
             case ACTION_CHECK_ALARMS:
                 checkAlarms();
@@ -126,7 +132,29 @@ public class AlarmService extends IntentService {
             default:
                 throw new AssertionError("Unexpected ACTION "+action);
         }
-        mOcTranspo.closeDatabase();
+
+        PendingAlarmData alarmData = getNextAlarmData();
+        if (alarmData == null) {
+            Log.d(TAG, "All alarms done.  Shutting down AlarmService.");
+            startForeground(PENDING_ALARM_NOTIFICATION_ID, getEmptyNotification(CHANNEL_ID_PENDING_ALARM, makeAlarmsPendingIntent()));
+            return true;
+        } else {
+            setIntentAndStartForeground(alarmData.makeAlarm(mListener, mOcTranspo));
+            mOcTranspo.closeDatabase();
+            return false;
+        }
+    }
+
+    private void setIntentAndStartForeground(Alarm alarm) {
+        PendingIntent alarmsPendingIntent = makeAlarmsPendingIntent();
+        Notification notification = getNotificationForAlarm(alarm, CHANNEL_ID_PENDING_ALARM, alarm.getTimeOfBus(), alarmsPendingIntent);
+        Log.d(TAG, "Calling startForeground");
+        startForeground(PENDING_ALARM_NOTIFICATION_ID, notification);
+    }
+
+    private PendingIntent makeAlarmsPendingIntent() {
+        Intent alarmsIntent = new Intent(this, ListAlarmsActivity.class);
+        return PendingIntent.getActivity(this, 0, alarmsIntent, 0);
     }
 
     private PendingAlarmData getNextAlarmData() {
@@ -137,7 +165,23 @@ public class AlarmService extends IntentService {
         return nextAlarmList.get(0);
     }
 
-    private Notification getNotificationForAlarm(Alarm alarm, String channel, DateTime when, Uri sound, PendingIntent pendingIntent) {
+    private Notification getEmptyNotification(String channel, PendingIntent pendingIntent) {
+        String title = getString(R.string.no_alarm_notification_title);
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(this, channel);
+        builder
+                .setSmallIcon(R.drawable.alarm_notification)
+                .setContentTitle(title)
+                .setCategory(Notification.CATEGORY_ALARM)
+                .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
+                .setWhen(mOcTranspo.getNow().getMillis())
+                .setAutoCancel(true)
+                .setVibrate(VIBRATION_PATTERN)
+                .setContentIntent(pendingIntent);
+
+        return builder.build();
+    }
+
+    private Notification getNotificationForAlarm(Alarm alarm, String channel, DateTime when, PendingIntent pendingIntent) {
         DateTime timeOfBus = alarm.getTimeOfBus();
         DateTime now = mOcTranspo.getNow();
         String routeName = alarm.getRoute().getName();
@@ -156,10 +200,19 @@ public class AlarmService extends IntentService {
                 .setCategory(Notification.CATEGORY_ALARM)
                 .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
                 .setWhen(when.getMillis())
-                .setAutoCancel(true)
-                .setSound(sound)
-                .setVibrate(VIBRATION_PATTERN)
                 .setContentIntent(pendingIntent);
+
+        if (channel == CHANNEL_ID_ALARM) {
+            Uri sound = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM);
+            builder
+                    .setPriority(NotificationCompat.PRIORITY_HIGH)
+                    .setAutoCancel(true)
+                    .setSound(sound)
+                    .setVibrate(VIBRATION_PATTERN);
+        } else {
+            builder
+                    .setPriority(NotificationCompat.PRIORITY_LOW);
+        }
 
         return builder.build();
     }
@@ -190,14 +243,14 @@ public class AlarmService extends IntentService {
 
         // Now we need to find the next PendingAlarmData (which may or may not be the same one) and
         // set up the Alarm (in the android sense) to wake up the phone and check it.
-        PendingAlarmData nextAlarm = getNextAlarmData();
-        if (nextAlarm == null) {
+        PendingAlarmData nextAlarmData = getNextAlarmData();
+        if (nextAlarmData == null) {
             // This happens when we just triggered the last alarm
             return;
         }
-        long nextTimeToCheck = nextAlarm.getTimeToCheck();
 
         // We need to trigger this event even in the case where the phone is asleep, so we must use an alarm for this
+        long nextTimeToCheck = nextAlarmData.getTimeToCheck();
         AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
         Intent intent = new Intent(this, AlarmReceiver.class);
         PendingIntent pendingIntent = PendingIntent.getBroadcast(this, AlarmReceiver.REQUEST_CHECK_ALARMS, intent, PendingIntent.FLAG_UPDATE_CURRENT);
@@ -235,10 +288,14 @@ public class AlarmService extends IntentService {
         stackBuilder.addNextIntent(resultIntent);
         PendingIntent resultPendingIntent = stackBuilder.getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT);
 
-        Uri sound = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM);
-
         NotificationManager notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
-        Notification notification = getNotificationForAlarm(alarm, CHANNEL_ID_ALARM, alarm.getTimeOfAlarm(), sound, resultPendingIntent);
+
+        for (NotificationChannel channel : notificationManager.getNotificationChannels()) {
+            Log.d(TAG, "Channel id: " + channel.getId());
+        }
+        Log.d(TAG, "I am using channel: " + CHANNEL_ID_ALARM);
+
+        Notification notification = getNotificationForAlarm(alarm, CHANNEL_ID_ALARM, alarm.getTimeOfAlarm(), resultPendingIntent);
         notificationManager.notify(ALARM_NOTIFICATION_ID, notification);
     }
 

@@ -19,7 +19,7 @@ public class RideOttawaApplication extends SugarApp {
         createNotificationChannels();
         Intent intentToSend = new Intent(this, AlarmService.class);
         intentToSend.putExtra(AlarmService.ACTION, AlarmService.ACTION_CHECK_ALARMS);
-        startService(intentToSend);
+        startForegroundService(intentToSend);
     }
 
     private void createNotificationChannels() {
