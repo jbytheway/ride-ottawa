@@ -176,12 +176,6 @@ public class ListAlarmsActivityFragment extends Fragment {
     }
 
     private void refresh() {
-        // The process of updating the Forthcoming trips can take a while (maybe half
-        // a second or more depending on how many routes are involved.
-        // Therefore we want to do it on a background thread.
-
-        // First we check if we're already refreshing (very unlikely, because we force a fairly
-        // long delay between refreshes)
         for (AlarmWithId alarmWithId : mAlarms) {
             alarmWithId.Alarm.refreshTimeEstimate(OcTranspoApi.Synchronicity.Asyncronous, getActivity(), mOcTranspo);
         }
