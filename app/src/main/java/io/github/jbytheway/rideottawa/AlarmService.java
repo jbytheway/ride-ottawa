@@ -71,7 +71,7 @@ public class AlarmService extends NonStopIntentService {
         {
             CharSequence name = context.getString(R.string.pending_alarm_channel_name);
             String description = context.getString(R.string.pending_alarm_channel_description);
-            int importance = NotificationManager.IMPORTANCE_DEFAULT;
+            int importance = NotificationManager.IMPORTANCE_LOW;
             NotificationChannel channel = new NotificationChannel(CHANNEL_ID_PENDING_ALARM, name, importance);
             channel.setDescription(description);
             channel.setLockscreenVisibility(Notification.VISIBILITY_PUBLIC);
@@ -190,29 +190,34 @@ public class AlarmService extends NonStopIntentService {
 
         String minutesString = getResources().getQuantityString(R.plurals.minute_plural, minutesDifference, minutesDifference);
         String title = getString(R.string.alarm_notification_title, routeName, minutesString);
-        String text = getString(R.string.alarm_notification_text, routeName, alarm.getStop().getName(this), busTimeFormatted);
 
         NotificationCompat.Builder builder = new NotificationCompat.Builder(this, channel);
         builder
                 .setSmallIcon(R.drawable.alarm_notification)
                 .setContentTitle(title)
-                .setContentText(text)
                 .setCategory(Notification.CATEGORY_ALARM)
                 .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
                 .setWhen(when.getMillis())
                 .setContentIntent(pendingIntent);
 
+        String text;
+
         if (channel == CHANNEL_ID_ALARM) {
+            text = getString(R.string.alarm_notification_text, routeName, alarm.getStop().getName(this), busTimeFormatted);
             Uri sound = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM);
             builder
+                    .setContentText(text)
                     .setPriority(NotificationCompat.PRIORITY_HIGH)
                     .setAutoCancel(true)
                     .setSound(sound)
                     .setVibrate(VIBRATION_PATTERN);
         } else {
+            text = getString(R.string.pending_alarm_notification_text, routeName, alarm.getStop().getName(this), busTimeFormatted);
             builder
+                    .setContentText(text)
                     .setPriority(NotificationCompat.PRIORITY_LOW);
         }
+
 
         return builder.build();
     }

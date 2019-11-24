@@ -68,10 +68,11 @@
     <string name="alarm_channel_name">Bus proximity alarms</string>
     <string name="alarm_channel_description">Notifications used for alarms you choose to set for specific approaching buses.</string>
     <string name="pending_alarm_channel_name">Pending bus proximity alarms</string>
-    <string name="pending_alarm_channel_description">Notifications indicating that you have set an alarms for a specific approaching bus.</string>
+    <string name="pending_alarm_channel_description">Notifications indicating that you have set an alarm for a specific approaching bus.</string>
     <string name="some_routes_missing">Some stops or routes for this favourite no longer exist and have been removed.</string>
 
-    <string name="alarm_notification_text">%1$s departs %2$s at %3$s</string>
+    <string name="alarm_notification_text">Time to go!  %1$s departs %2$s at %3$s</string>
+    <string name="pending_alarm_notification_text">%1$s departs %2$s at %3$s</string>
     <string name="alarm_notification_title">The %1$s is %2$s away</string>
     <plurals name="minute_plural">
         <item quantity="one">%d minute</item>
